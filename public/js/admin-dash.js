@@ -23,6 +23,10 @@ import {
     deleteDoc    
 } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
 
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js";
+
+
+
 // Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBF7gSoZD2mebyD_Kwl-sq5y1ZfErYZfrs",
@@ -34,10 +38,12 @@ const firebaseConfig = {
   measurementId: "G-DDB4BPZ5Z6"
 };
 
+
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functions = getFunctions(app); 
 
 //Variables
 
@@ -498,12 +504,12 @@ window.desactivarUsuario = async function(email) {
         const usuarioDoc = usuarioQuery.docs[0];
         const usuarioData = usuarioDoc.data();
 
-        // Registrar usuario eliminado
+        // Registrar usuario eliminado en otra colección
         await addDoc(collection(db, 'usuarios_eliminados'), {
             email: usuarioData.email,
             nombre: usuarioData.nombre,
             apellidos: usuarioData.apellidos || '',
-            empresaId: usuarioData.empresaId || null,  // Validación de empresaId
+            empresaId: usuarioData.empresaId || null,
             eliminadoPor: {
                 uid: userActual.uid,
                 email: userActual.email,
@@ -514,9 +520,15 @@ window.desactivarUsuario = async function(email) {
         });
 
         // Eliminar usuario de Firestore
-        await deleteDoc(usuarioDoc.ref);
+        try {
+            await deleteDoc(usuarioDoc.ref); // Intentar eliminar el documento de Firestore
+            console.log(`Usuario ${email} eliminado de Firestore`);
+        } catch (error) {
+            console.error("Error al eliminar usuario de Firestore:", error);
+            throw new Error('Error al eliminar usuario de Firestore');
+        }
 
-        // Eliminar usuario de Firebase Authentication
+        // Llamar a la función de Cloud Functions para eliminar de Authentication
         const deleteUserFunction = httpsCallable(functions, 'deleteUser');
         await deleteUserFunction({ email });
 
@@ -544,6 +556,8 @@ window.desactivarUsuario = async function(email) {
         });
     }
 };
+
+
 
 
 
