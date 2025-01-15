@@ -1,51 +1,54 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
-// Inicializar admin SDK
 admin.initializeApp();
 
-// Función de ejemplo
-exports.eliminarUsuario = functions.https.onCall(async (data, context) => {
-    // Verificar que el usuario esté autenticado
+exports.deleteUser = functions.https.onCall(async (data, context) => {
+    // Verificar si el usuario que llama tiene permisos
     if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'Debe estar autenticado');
+        throw new functions.https.HttpsError(
+            'unauthenticated',
+            'No estás autenticado.'
+        );
     }
 
-    // Verificar rol de administrador
-    const userDoc = await admin.firestore().collection('usuarios').doc(context.auth.uid).get();
-    const userData = userDoc.data();
+    const callerUid = context.auth.uid;
 
-    if (userData.rol !== 'admin') {
-        throw new functions.https.HttpsError('permission-denied', 'Solo los administradores pueden eliminar usuarios');
+    // Obtener datos del usuario que ejecuta la función
+    const callerDoc = await admin.firestore().collection('usuarios').doc(callerUid).get();
+    const callerData = callerDoc.data();
+
+    // Solo 'admin' o 'root' pueden eliminar usuarios
+    if (callerData.rol !== 'admin' && callerData.rol !== 'root') {
+        throw new functions.https.HttpsError(
+            'permission-denied',
+            'No tienes permisos para eliminar usuarios.'
+        );
     }
 
-    const { email } = data;
+    const email = data.email;
+
+    if (!email) {
+        throw new functions.https.HttpsError(
+            'invalid-argument',
+            'El email es obligatorio.'
+        );
+    }
 
     try {
         // Buscar usuario por email
         const userRecord = await admin.auth().getUserByEmail(email);
-        
-        // Eliminar documento en Firestore (si existe)
-        await admin.firestore().collection('usuarios')
-            .where('email', '==', email)
-            .get()
-            .then(snapshot => {
-                snapshot.forEach(doc => {
-                    doc.ref.delete();
-                });
-            });
 
         // Eliminar usuario de Authentication
         await admin.auth().deleteUser(userRecord.uid);
 
-        return { 
-            success: true, 
-            message: 'Usuario eliminado completamente',
-            uid: userRecord.uid
-        };
+        return { message: `Usuario con email ${email} eliminado correctamente.` };
 
     } catch (error) {
         console.error('Error al eliminar usuario:', error);
-        throw new functions.https.HttpsError('internal', error.message);
+        throw new functions.https.HttpsError(
+            'internal',
+            `Error al eliminar usuario: ${error.message}`
+        );
     }
 });
