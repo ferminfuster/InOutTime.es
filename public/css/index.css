@@ -1,0 +1,160 @@
+:root {
+    --primary-color: #0ea5e9;
+    --secondary-color: #14b8a6;
+    --background-color: #1e293b;
+    --text-color: #f1f5f9;
+    --card-background: #334155;
+    --error-color: #ef4444;
+    --success-color: #22c55e;
+    --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: var(--background-color);
+    color: var(--text-color);
+}
+
+header.hero {
+    background: var(--gradient-primary);
+    padding: 50px 20px;
+    text-align: center;
+    color: #fff;
+}
+
+.hero .logo img {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+.cta-button {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 30px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+    background: linear-gradient(135deg, #0d9cd9 0%, #12a899 100%);
+}
+
+section {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+}
+
+.features .feature-cards,
+.pricing .pricing-cards {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card, .pricing-card {
+    background: var(--card-background);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    width: 280px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover, .pricing-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card h3, .pricing-card h3 {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.card p, .pricing-card p {
+    color: #94a3b8;
+    margin-bottom: 20px;
+}
+
+.price {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+form input, form textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background: #1e293b;
+    border: 1px solid #475569;
+    color: var(--text-color);
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
+form button {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+}
+
+footer {
+    background: var(--background-color);
+    color: #94a3b8;
+    padding: 20px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2em;
+    }
+    
+    .feature-cards, .pricing-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card, .pricing-card {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+}
+

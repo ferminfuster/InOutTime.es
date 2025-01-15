@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+
+# Archivos de configuración locales
+.env
+firebase-debug.log
+
+# Carpetas de build
+build/
+dist/
+
+# Archivos de configuración de Firebase
+.firebaserc
+firebase-debug.*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

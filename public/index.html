@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="InOutTime: Optimiza la gestión de tu equipo con un control sencillo de entradas, salidas e incidencias.">
+    <meta name="keywords" content="control horario, gestión de personal, fichaje online, informes de trabajo">
+    <meta name="author" content="InOutTime">
+    <title>InOutTime | Control de Horarios y Gestión de Personal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #334155;
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        header .logo img {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin: 10px 0;
+        }
+        header p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .cta-button {
+            background-color: #ff9800;
+            color: #fff;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .cta-button:hover {
+            background-color: #e68900;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="images/logo.png" alt="InOutTime Logo">
+        </div>
+        <div class="header-content">
+            <h1>Optimiza la gestión de tu equipo</h1>
+            <p>Controla entradas, salidas e incidencias de manera rápida y sencilla.</p>
+            <button class="cta-button" onclick="window.location.href='login.html'">Accede al portal</button>
+        </div>
+    </header>
+
+    <section class="features">
+        <h2>¿Qué ofrecemos?</h2>
+        <div class="feature-cards">
+            <div class="card">
+                <h3>Fichajes Simplificados</h3>
+                <p>Registra entradas y salidas al instante con solo un clic.</p>
+            </div>
+            <div class="card">
+                <h3>Gestión de Incidencias</h3>
+                <p>Mantén el control de incidencias y eventos importantes.</p>
+            </div>
+            <div class="card">
+                <h3>Informes Detallados</h3>
+                <p>Accede a informes claros sobre las horas trabajadas.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <h2>Planes Flexibles</h2>
+        <div class="pricing-cards">
+            <div class="pricing-card">
+                <h3>Plan Básico</h3>
+                <p>Alta del administrador y toda la funcionalidad básica.</p>
+                <div class="price">€8.95/mes</div>
+                <div class="annual-price">€79.99/año <span class="discount">(25% ahorro)</span></div>
+            </div>
+            <div class="pricing-card">
+                <h3>Plan Estándar</h3>
+                <p>Incluye soporte por email y alta de usuarios.</p>
+                <div class="price">€13.95/mes</div>
+                <div class="annual-price">€125.99/año <span class="discount">(25% ahorro)</span></div>
+            </div>
+            <div class="pricing-card">
+                <h3>Plan Prime</h3>
+                <p>Informes personalizados y soporte telefónico.</p>
+                <div class="price">€15.95/mes</div>
+                <div class="annual-price">€139.99/año <span class="discount">(27% ahorro)</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact">
+        <h2>Contáctanos</h2>
+        <form>
+            <input type="text" placeholder="Tu nombre" required>
+            <input type="email" placeholder="Tu email" required>
+            <textarea placeholder="Tu mensaje" rows="4" required></textarea>
+            <button type="submit" class="cta-button">Enviar mensaje</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 InOutTime. Todos los derechos reservados.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

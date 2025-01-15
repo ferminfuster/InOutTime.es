@@ -1,0 +1,149 @@
+:root {
+    --primary-color: #0ea5e9;
+    --secondary-color: #14b8a6;
+    --background-color: #1e293b;
+    --text-color: #f1f5f9;
+    --card-background: #334155;
+    --error-color: #ef4444;
+    --success-color: #22c55e;
+    --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: var(--background-color);
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+header.hero {
+    background: var(--gradient-primary);
+    padding: 20px 20px;
+    text-align: center;
+    color: #fff;
+}
+
+.hero .logo img {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+.registro-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+.registro-card {
+    background: var(--card-background);
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    background: #2d3748;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1em;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+button.registro-button {
+    background: var(--gradient-primary);
+    color: #fff;
+    padding: 12px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button.registro-button:hover {
+    background: var(--secondary-color);
+}
+
+.mensaje-registro {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--error-color);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+footer {
+    background: var(--background-color);
+    color: var(--text-color);
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2em;
+    }
+
+    .registro-card {
+        width: 100%;
+        padding: 20px;
+    }
+}
+

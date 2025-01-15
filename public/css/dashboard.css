@@ -1,0 +1,224 @@
+:root {
+    --primary-color: #0ea5e9;
+    --secondary-color: #14b8a6;
+    --background-color: #1e293b;
+    --text-color: #f1f5f9;
+    --card-background: #334155;
+    --error-color: #ef4444;
+    --success-color: #22c55e;
+    --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+}
+
+.user-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    margin-right: 20px;
+}
+
+.user-info h2 {
+    margin-bottom: 5px;
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+
+.user-info p {
+    color: #94a3b8;
+}
+
+.panel-title h3 {
+    font-size: 1.8em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.fichaje-buttons button {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.secondary-actions button {
+    margin-bottom: 15px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.button i {
+    margin-right: 10px;
+}
+
+.entry-button {
+    background-color: #c8e6c9;
+    color: #1B5E20;
+    border: 1px solid #4CAF50;
+}
+
+.entry-button:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.entry-button:active {
+    background-color: #2E7D32;
+}
+
+.exit-button {
+    background-color: #ffcdd2;
+    color: #b71c1c;
+    border: 1px solid #ef5350;
+}
+
+.exit-button:hover {
+    background-color: #ef5350;
+    color: white;
+}
+
+.exit-button:active {
+    background-color: #d32f2f;
+}
+
+.incidence-button {
+    background-color: #fff3e0;
+    color: #ff8f00;
+    border: 1px solid #ffb300;
+}
+
+.incidence-button:hover {
+    background-color: #ffb300;
+    color: white;
+}
+
+.incidence-button:active {
+    background-color: #e65100;
+}
+
+.main-button {
+    background-color: #334155;
+    color: white;
+    border: 1px solid #475569;
+}
+
+.main-button:hover {
+    background-color: #475569;
+}
+
+.main-button:active {
+    background-color: #2c3e50;
+}
+.logo img {
+    width: 80px;
+    margin-bottom: 20px;
+}
+/* Modal básico */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Fijado al fondo */
+    z-index: 1; /* Asegurarse de que el modal se muestre encima de otros contenidos */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ocupa toda la pantalla */
+    height: 100%; /* Ocupa toda la pantalla */
+    overflow: auto; /* Permite desplazarse si el contenido es muy grande */
+    background-color: rgb(0, 0, 0); /* Fondo negro con opacidad */
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo con opacidad */
+}
+
+/* Estilo del contenido del modal */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Centrado vertical y horizontal */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ancho del 80% de la pantalla */
+}
+
+/* Estilo del botón de cerrar */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+/* Estilos para el formulario */
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
