@@ -462,16 +462,14 @@ window.desactivarUsuario = async function(email) {
 
 window.desactivarUsuario = async function(email) {
     try {
-        // Verificar permisos (ROOT o ADMIN)
         const userActual = auth.currentUser;
         const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
         const datosUsuarioActual = userDoc.data();
-        
+
         if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
             throw new Error('No tienes permisos para eliminar usuarios');
         }
 
-        // Confirmar eliminación
         const confirmacion = await Swal.fire({
             title: '¿Estás seguro?',
             html: `Vas a eliminar al usuario con email: <strong>${email}</strong>`,
@@ -485,7 +483,6 @@ window.desactivarUsuario = async function(email) {
 
         if (!confirmacion.isConfirmed) return;
 
-        // Buscar usuario a eliminar
         const usuarioQuery = await getDocs(
             query(collection(db, 'usuarios'), where('email', '==', email))
         );
@@ -497,7 +494,7 @@ window.desactivarUsuario = async function(email) {
         const usuarioDoc = usuarioQuery.docs[0];
         const usuarioData = usuarioDoc.data();
 
-        // Crear registro de usuario eliminado
+        // Registro de eliminación
         await addDoc(collection(db, 'usuarios_eliminados'), {
             email: usuarioData.email,
             nombre: usuarioData.nombre,
@@ -515,23 +512,21 @@ window.desactivarUsuario = async function(email) {
         // Eliminar usuario de Firestore
         await deleteDoc(usuarioDoc.ref);
 
-        // Notificación
+        // Eliminar de Firebase Authentication
+        const eliminarDeAuth = firebase.app().functions('REGION').httpsCallable('eliminarUsuarioAuth');
+        await eliminarDeAuth({ uid: usuarioDoc.id });
+
         await Swal.fire({
             icon: 'success',
             title: 'Usuario Eliminado',
-            html: `
-                <p>El usuario <strong>${usuarioData.nombre} ${usuarioData.apellidos || ''}</strong> ha sido eliminado de Firestore.</p>
-                <p><strong>Importante:</strong> Debes eliminar manualmente el usuario en Firebase Authentication desde la consola.</p>
-            `,
+            html: `<p>El usuario <strong>${usuarioData.nombre} ${usuarioData.apellidos || ''}</strong> ha sido eliminado completamente.</p>`,
             confirmButtonText: 'Entendido'
         });
 
-        // Recargar lista de usuarios
         await cargarUsuarios();
 
     } catch (error) {
         console.error("Error al eliminar usuario:", error);
-
         Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -540,6 +535,7 @@ window.desactivarUsuario = async function(email) {
         });
     }
 };
+
 
 // Función para mostrar usuarios eliminados
 window.mostrarUsuariosEliminados = async function() {
