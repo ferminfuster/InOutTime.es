@@ -277,7 +277,7 @@ window.cargarUsuarios = async function() {
                     <td>${usuario.rol || 'Sin rol'}</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <button class="btn btn-warning btn-sm" onclick="restablecerUsuario('${documento.id}')">
+                            <button class="btn btn-warning btn-sm" onclick="restablecerUsuario('${usuario.email}')">
                                 <i class="fas fa-key"></i>
                             </button>
                             <button class="btn btn-info btn-sm" onclick="modificarUsuario('${documento.id}')">
@@ -493,11 +493,51 @@ window.generarPasswordTemporal = function() {
 
 
 // Funciones de acciones de usuario
-window.restablecerUsuario = function(id) {
-    console.log("Restablecer usuario: ", id);
-    // Implementar lógica de restablecimiento de contraseña
-    alert('Funcionalidad de restablecer contraseña pendiente');
-}
+// Funciones de acciones de usuario
+window.restablecerUsuario = function(email) {
+     
+        if (email) {
+          Swal.fire({
+            title: `¿Deseas cambiar tu contraseña de ${email}?`,
+            text: `Se enviará un correo de restablecimiento a ${email}.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, enviar correo',
+            cancelButtonText: 'Cancelar'
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              try {
+                await sendPasswordResetEmail(auth, email);
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Correo enviado',
+                  text: `Se ha enviado un correo al usuario ${email}.`,
+                  toast: true,
+                  position: 'top-end',
+                  showConfirmButton: false,
+                  timer: 3000
+                });
+              } catch (error) {
+                console.error("Error al enviar el correo:", error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'No se pudo enviar el correo. Inténtalo más tarde.',
+                  confirmButtonText: 'Entendido'
+                });
+              }
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Usuario no autenticado',
+            text: 'Inicia sesión para cambiar tu contraseña.',
+            confirmButtonText: 'Iniciar sesión'
+          });
+        }
+      };
+
 
 window.modificarUsuario = function(id) {
     console.log("Modificar usuario: ", id);
