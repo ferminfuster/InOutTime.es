@@ -489,7 +489,7 @@ window.generarPasswordTemporal = function() {
 }
 
 // En la función de crear usuario, cambia a:
-const passwordTemporal = window.generarPasswordTemporal();
+//const passwordTemporal = window.generarPasswordTemporal();
 
 
 // Funciones de acciones de usuario
