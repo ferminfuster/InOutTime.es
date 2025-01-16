@@ -240,12 +240,14 @@ window.crearNuevoUsuario = async function (event) {
         if (!userDoc.exists()) {
             throw new Error("No se encontraron datos del usuario actual en Firestore.");
         }
+        console.log("Datos del usuario autenticado:", userDoc.data());
 
         // Obtener el ID de la empresa del usuario actual
         const empresaId = userDoc.data().empresa;
         if (!empresaId) {
             throw new Error("El usuario autenticado no tiene asignada una empresa.");
         }
+        console.log("ID de la empresa del usuario actual:", empresaId);
 
         // Obtener el nombre de la empresa
         let nombreEmpresa = 'Sin empresa';
@@ -298,7 +300,7 @@ window.crearNuevoUsuario = async function (event) {
             event.target.reset();
 
             // Recargar lista de usuarios
-            window.cargarUsuarios();
+            await cargarUsuarios();
         } else {
             throw new Error(result.data.message || "Error desconocido al crear el usuario.");
         }
