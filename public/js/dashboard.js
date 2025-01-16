@@ -654,7 +654,6 @@ window.cambiarPassword = function() {
 //
 window.mostrarMisInformes = async function() {
   try {
-      // Obtener el usuario autenticado
       const user = auth.currentUser;
       if (!user) {
           Swal.fire({
@@ -667,19 +666,22 @@ window.mostrarMisInformes = async function() {
 
       const userId = user.uid;
 
-      // Consulta con el índice correcto
-      const registrosSnapshot = await getDocs(
-          query(
-              collection(db, "registros"), 
-              where("userId", "==", userId),
-              orderBy("fecha", "desc")
-          )
+      // Consulta con índice compuesto
+      const q = query(
+          collection(db, "registros"), 
+          where("userId", "==", userId),
+          orderBy("fecha", "desc")
       );
 
-      const registros = registrosSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-      }));
+      const registrosSnapshot = await getDocs(q);
+
+      const registros = registrosSnapshot.docs
+          .map(doc => ({
+              id: doc.id,
+              ...doc.data()
+          }))
+          // Filtro adicional por si acaso
+          .filter(registro => registro.userId === userId);
 
       if (registros.length === 0) {
           Swal.fire({
@@ -690,70 +692,112 @@ window.mostrarMisInformes = async function() {
           return;
       }
 
-      // Procesar registros para crear resumen diario
+      // Procesar registros
       const registrosProcesados = procesarRegistrosDiarios(registros);
 
-      // Mostrar modal con los registros
+      // Mostrar modal
       Swal.fire({
           title: 'Mis Informes',
-          html: `
-              <style>
-                  .informes-modal {
-                      width: 100%;
-                      max-width: 800px;
-                  }
-                  .tabla-informes {
-                      width: 100%;
-                      border-collapse: collapse;
-                  }
-                  .tabla-informes th, .tabla-informes td {
-                      border: 1px solid #ddd;
-                      padding: 8px;
-                      text-align: center;
-                  }
-                  .tabla-informes thead {
-                      background-color: #f2f2f2;
-                  }
-                  .acciones-informes {
-                      display: flex;
-                      justify-content: space-around;
-                      margin-top: 20px;
-                  }
-              </style>
-              <div class="informes-modal">
-                  <table class="tabla-informes">
-                      <thead>
-                          <tr>
-                              <th>Fecha</th>
-                              <th>Hora Entrada</th>
-                              <th>Hora Salida</th>
-                              <th>Horas Trabajadas</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          ${registrosProcesados.map(registro => `
-                              <tr>
-                                  <td>${registro.fecha}</td>
-                                  <td>${registro.entrada}</td>
-                                  <td>${registro.salida}</td>
-                                  <td>${registro.horasTrabajadas}</td>
-                              </tr>
-                          `).join('')}
-                      </tbody>
-                  </table>
-                  <div class="acciones-informes">
-                      <button id="btnDescargarInforme" class="btn btn-primary">
-                          <i class="fas fa-download"></i> Descargar
-                      </button>
-                      <button id="btnEnviarInforme" class="btn btn-success">
-                          <i class="fas fa-envelope"></i> Enviar por Email
-                      </button>
-                      <button id="btnImprimirInforme" class="btn btn-info">
-                          <i class="fas fa-print"></i> Imprimir
-                      </button>
-                  </div>
-              </div>
-          `,
+          html: generarTablaRegistros(registrosProcesados),
+          showConfirmButton: false,
+          width: '90%',
+          didRender: () => {
+              document.getElementById('btnDescargarInforme').addEventListener('click', () => descargarInformeCSV(registrosProcesados));
+              document.getElementById('btnEnviarInforme').addEventListener('click', () => enviarInformePorEmail(registrosProcesados, user));
+              document.getElementById('btnImprimirInforme').addEventListener('click', imprimirInforme);
+          }
+      });
+
+  } catch (error) {
+      console.error("Error al mostrar informes:", error);
+      
+      // Manejo específico de errores de índice
+      if (error.message.includes("requires an index")) {
+          Swal.fire({
+              icon: 'warning',
+              title: 'Índice Necesario',
+              html: `
+                  <p>Se requiere crear un índice en Firestore.</p>
+                  <a href="https://console.firebase.google.com/v1/r/project/inouttime-25fe6/firestore/indexes?create_composite" 
+                     target="_blank" class="btn btn-primary">
+                      Crear Índice
+                  </a>
+              `,
+              showConfirmButton: false
+          });
+      } else {
+          Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Ocurrió un error al cargar los registros: ' + error.message
+          });
+      }
+  }
+};
+
+// Función para generar HTML de tabla
+function generarTablaRegistros(registrosProcesados) {
+  return `
+      <style>
+          .informes-modal {
+              width: 100%;
+              max-width: 800px;
+          }
+          .tabla-informes {
+              width: 100%;
+              border-collapse: collapse;
+          }
+          .tabla-informes th, .tabla-informes td {
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: center;
+          }
+          .tabla-informes thead {
+              background-color: #f2f2f2;
+          }
+          .acciones-informes {
+              display: flex;
+              justify-content: space-around;
+              margin-top: 20px;
+          }
+      </style>
+      <div class="informes-modal">
+          <table class="tabla-informes">
+              <thead>
+                  <tr>
+                      <th>Fecha</th>
+                      <th>Hora Entrada</th>
+                      <th>Hora Salida</th>
+                      <th>Horas Trabajadas</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  ${registrosProcesados.map(registro => `
+                      <tr>
+                          <td>${registro.fecha}</td>
+                          <td>${registro.entrada}</td>
+                          <td>${registro.salida}</td>
+                          <td>${registro.horasTrabajadas}</td>
+                      </tr>
+                  `).join('')}
+              </tbody>
+          </table>
+          <div class="acciones-informes">
+              <button id="btnDescargarInforme" class="btn btn-primary">
+                  <i class="fas fa-download"></i> Descargar
+              </button>
+              <button id="btnEnviarInforme" class="btn btn-success">
+                  <i class="fas fa-envelope"></i> Enviar por Email
+              </button>
+              <button id="btnImprimirInforme" class="btn btn-info">
+                  <i class="fas fa-print"></i> Imprimir
+              </button>
+          </div>
+      </div>
+  `;
+}
+
+// Resto de funciones igual que en el ejemplo anterior
           showConfirmButton: false,
           width: '90%',
           didRender: () => {
