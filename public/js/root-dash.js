@@ -419,11 +419,11 @@ window.modificarUsuario = function(id) {
     alert('Funcionalidad de modificar usuario pendiente');
 }
 
-window.desactivarUsuario = function(id) {
+/*window.desactivarUsuario = function(id) {
     console.log("Desactivar usuario: ", id);
     // Implementar lógica de desactivación de usuario
     alert('Funcionalidad de desactivar usuario pendiente');
-}
+}*/
 
 // Event listener para cargar usuarios cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
@@ -455,7 +455,7 @@ window.restablecerPassword = async function(email) {
 
 
 
-window.desactivarUsuario = async function(uid) {
+/*window.desactivarUsuario = async function(uid) {
     try {
         // Obtener referencia del usuario en Firestore
         const userDoc = await getDoc(doc(db, 'usuarios', uid));
@@ -480,7 +480,7 @@ window.desactivarUsuario = async function(uid) {
         console.error("Error al desactivar usuario:", error);
         alert('No se pudo desactivar el usuario');
     }
-}
+}*/
 
 // Función para cargar datos de usuario en modal de modificación
 window.cargarDatosModificacion = async function(uid) {
