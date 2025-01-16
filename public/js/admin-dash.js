@@ -907,7 +907,7 @@ window.modificarUsuario = async function(email) {
     }
 };
 
-
+*/
 // Función para desactivar y eliminar usuario de Firestore y Firebase Authentication
 window.desactivarUsuario = async function(email) {
     try {
@@ -998,7 +998,7 @@ window.desactivarUsuario = async function(email) {
         });
     }
 };
-*/
+
 window.modificarUsuario = async function(email) {
     try {
         console.log("Iniciando modificación de usuario con email:", email);
