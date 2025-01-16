@@ -651,7 +651,7 @@ window.cambiarPassword = function() {
 };
 ///
 // Mis Informes
-//window.mostrarMisInformes = async function() {
+window.mostrarMisInformes = async function() {
   try {
     // Obtener el usuario autenticado
     const user = auth.currentUser;
