@@ -419,8 +419,20 @@ window.crearNuevoUsuario = async function(event) {
         console.log("Respuesta de createUser:", result);
 
         if (result.data && result.data.success) {
-            alert(`✅ Usuario creado exitosamente. 
-Contraseña temporal: ${result.data.passwordTemporal}`);
+            // Notificación amigable con SweetAlert2
+            await Swal.fire({
+                icon: 'success',
+                title: '✅ Usuario Creado',
+                html: `
+                    <p>El usuario <strong>${nombre} ${apellidos}</strong> ha sido creado exitosamente.</p>
+                    <p>📧 <strong>Email:</strong> ${email}</p>
+                    <p>🏢 <strong>Empresa:</strong> ${nombreEmpresa}</p>
+                    <p>🔑 <strong>Contraseña Temporal:</strong> <code>${result.data.passwordTemporal}</code></p>
+                    <p>✅ Pídele que cambie su contraseña al iniciar sesión.</p>
+                `,
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#3085d6'
+            });
 
             // Cerrar modal
             const modalElement = document.getElementById('modalNuevoUsuario');
@@ -438,9 +450,15 @@ Contraseña temporal: ${result.data.passwordTemporal}`);
 
     } catch (error) {
         console.error("❌ Error al crear usuario:", error);
-        alert("❌ No se pudo crear el usuario: " + error.message);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error al Crear Usuario',
+            text: error.message,
+            confirmButtonText: 'Cerrar'
+        });
     }
 };
+
 
 
 
