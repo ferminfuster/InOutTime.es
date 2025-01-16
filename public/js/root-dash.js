@@ -391,6 +391,19 @@ window.crearNuevoUsuario = async function(event) {
     try {
         const passwordTemporal = window.generarPasswordTemporal();
 
+        // Obtener el nombre de la empresa
+        let nombreEmpresa = 'Sin empresa';
+        if (empresaId) {
+            try {
+                const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
+                if (empresaDoc.exists()) {
+                    nombreEmpresa = empresaDoc.data().nombre_empresa;
+                }
+            } catch (empresaError) {
+                console.error("Error al obtener nombre de empresa:", empresaError);
+            }
+        }
+
         // Llamar a la Cloud Function
         const createUserFunction = httpsCallable(functions, 'createUser');
         const result = await createUserFunction({
@@ -398,7 +411,7 @@ window.crearNuevoUsuario = async function(event) {
             apellidos,
             dni,
             email,
-            empresa: empresaId,
+            empresa: nombreEmpresa,
             rol,
             password: passwordTemporal
         });
