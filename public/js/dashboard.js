@@ -691,7 +691,75 @@ window.mostrarMisInformes = async function() {
       const registrosProcesados = procesarRegistrosDiarios(registros);
 
       // Mostrar modal con los registros
-      mostrarModalRegistros(registrosProcesados, user);
+      Swal.fire({
+          title: 'Mis Informes',
+          html: `
+              <style>
+                  .informes-modal {
+                      width: 100%;
+                      max-width: 800px;
+                  }
+                  .tabla-informes {
+                      width: 100%;
+                      border-collapse: collapse;
+                  }
+                  .tabla-informes th, .tabla-informes td {
+                      border: 1px solid #ddd;
+                      padding: 8px;
+                      text-align: center;
+                  }
+                  .tabla-informes thead {
+                      background-color: #f2f2f2;
+                  }
+                  .acciones-informes {
+                      display: flex;
+                      justify-content: space-around;
+                      margin-top: 20px;
+                  }
+              </style>
+              <div class="informes-modal">
+                  <table class="tabla-informes">
+                      <thead>
+                          <tr>
+                              <th>Fecha</th>
+                              <th>Hora Entrada</th>
+                              <th>Hora Salida</th>
+                              <th>Horas Trabajadas</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          ${registrosProcesados.map(registro => `
+                              <tr>
+                                  <td>${registro.fecha}</td>
+                                  <td>${registro.entrada}</td>
+                                  <td>${registro.salida}</td>
+                                  <td>${registro.horasTrabajadas}</td>
+                              </tr>
+                          `).join('')}
+                      </tbody>
+                  </table>
+                  <div class="acciones-informes">
+                      <button id="btnDescargarInforme" class="btn btn-primary">
+                          <i class="fas fa-download"></i> Descargar
+                      </button>
+                      <button id="btnEnviarInforme" class="btn btn-success">
+                          <i class="fas fa-envelope"></i> Enviar por Email
+                      </button>
+                      <button id="btnImprimirInforme" class="btn btn-info">
+                          <i class="fas fa-print"></i> Imprimir
+                      </button>
+                  </div>
+              </div>
+          `,
+          showConfirmButton: false,
+          width: '90%',
+          didRender: () => {
+              // Eventos para los botones
+              document.getElementById('btnDescargarInforme').addEventListener('click', () => descargarInformeCSV(registrosProcesados));
+              document.getElementById('btnEnviarInforme').addEventListener('click', () => enviarInformePorEmail(registrosProcesados, user));
+              document.getElementById('btnImprimirInforme').addEventListener('click', imprimirInforme);
+          }
+      });
 
   } catch (error) {
       console.error("Error al mostrar informes:", error);
@@ -703,8 +771,8 @@ window.mostrarMisInformes = async function() {
   }
 };
 
+// Función para procesar registros
 function procesarRegistrosDiarios(registros) {
-  // Agrupar registros por fecha
   const registrosPorFecha = {};
 
   registros.forEach(registro => {
@@ -725,7 +793,6 @@ function procesarRegistrosDiarios(registros) {
       }
   });
 
-  // Calcular horas trabajadas
   return Object.entries(registrosPorFecha).map(([fecha, registroDia]) => {
       const { entrada, salida } = registroDia;
       let horasTrabajadas = 'N/A';
@@ -746,83 +813,8 @@ function procesarRegistrosDiarios(registros) {
   });
 }
 
-function mostrarModalRegistros(registrosProcesados, user) {
-  // Crear HTML para la tabla de registros
-  const tablaRegistros = registrosProcesados.map(registro => `
-      <tr>
-          <td>${registro.fecha}</td>
-          <td>${registro.entrada}</td>
-          <td>${registro.salida}</td>
-          <td>${registro.horasTrabajadas}</td>
-      </tr>
-  `).join('');
-
-  Swal.fire({
-      title: 'Mis Informes',
-      html: `
-          <style>
-              .informes-modal {
-                  width: 100%;
-                  max-width: 800px;
-              }
-              .tabla-informes {
-                  width: 100%;
-                  border-collapse: collapse;
-              }
-              .tabla-informes th, .tabla-informes td {
-                  border: 1px solid #ddd;
-                  padding: 8px;
-                  text-align: center;
-              }
-              .tabla-informes thead {
-                  background-color: #f2f2f2;
-              }
-              .acciones-informes {
-                  display: flex;
-                  justify-content: space-around;
-                  margin-top: 20px;
-              }
-          </style>
-          <div class="informes-modal">
-              <table class="tabla-informes">
-                  <thead>
-                      <tr>
-                          <th>Fecha</th>
-                          <th>Hora Entrada</th>
-                          <th>Hora Salida</th>
-                          <th>Horas Trabajadas</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      ${tablaRegistros}
-                  </tbody>
-              </table>
-              <div class="acciones-informes">
-                  <button id="btnDescargarInforme" class="btn btn-primary">
-                      <i class="fas fa-download"></i> Descargar
-                  </button>
-                  <button id="btnEnviarInforme" class="btn btn-success">
-                      <i class="fas fa-envelope"></i> Enviar por Email
-                  </button>
-                  <button id="btnImprimirInforme" class="btn btn-info">
-                      <i class="fas fa-print"></i> Imprimir
-                  </button>
-              </div>
-          </div>
-      `,
-      showConfirmButton: false,
-      width: '90%',
-      didRender: () => {
-          // Añadir eventos a los botones
-          document.getElementById('btnDescargarInforme').addEventListener('click', () => descargarInformeCSV(registrosProcesados));
-          document.getElementById('btnEnviarInforme').addEventListener('click', () => enviarInformePorEmail(registrosProcesados, user));
-          document.getElementById('btnImprimirInforme').addEventListener('click', imprimirInforme);
-      }
-  });
-}
-
+// Función para descargar CSV
 function descargarInformeCSV(registros) {
-  // Similar a tu función original, pero usando los nuevos registros procesados
   const encabezados = ["Fecha", "Hora Entrada", "Hora Salida", "Horas Trabajadas"];
   
   const filas = registros.map(registro => 
@@ -840,8 +832,8 @@ function descargarInformeCSV(registros) {
   enlace.click();
 }
 
+// Funciones de envío de email e impresión (placeholders)
 function enviarInformePorEmail(registros, user) {
-  // Implementar lógica de envío de informe por email
   Swal.fire({
       icon: 'info',
       title: 'Enviar Informe',
@@ -852,182 +844,3 @@ function enviarInformePorEmail(registros, user) {
 function imprimirInforme() {
   window.print();
 }
-
-// Añadir al objeto window para poder llamarla globalmente
-window.mostrarMisInformes = mostrarMisInformes;
-// Función para enviar informe por email (usando Firebase Cloud Functions o servicio externo)
-async function enviarInformePorEmail(registros, user) {
-  try {
-      // Generar contenido HTML del informe
-      const contenidoInforme = generarContenidoInformeHTML(registros);
-
-      // Llamar a Cloud Function para enviar email
-      const enviarEmailFuncion = httpsCallable(functions, 'enviarInformePorEmail');
-      
-      const resultado = await enviarEmailFuncion({
-          email: user.email,
-          nombreUsuario: user.displayName || user.email,
-          contenidoInforme: contenidoInforme,
-          fechaInforme: new Date().toLocaleDateString('es-ES')
-      });
-
-      if (resultado.data.success) {
-          Swal.fire({
-              icon: 'success',
-              title: 'Informe Enviado',
-              text: 'El informe ha sido enviado a su correo electrónico.',
-              toast: true,
-              position: 'top-end',
-              showConfirmButton: false,
-              timer: 3000
-          });
-      } else {
-          throw new Error(resultado.data.message || 'Error al enviar el informe');
-      }
-  } catch (error) {
-      console.error("Error al enviar informe por email:", error);
-      Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo enviar el informe. Inténtelo más tarde.'
-      });
-  }
-}
-
-// Función para generar contenido HTML del informe
-function generarContenidoInformeHTML(registros) {
-  const filas = registros.map(registro => `
-      <tr>
-          <td style="border: 1px solid #ddd; padding: 8px;">${registro.fecha}</td>
-          <td style="border: 1px solid #ddd; padding: 8px;">${registro.entrada}</td>
-          <td style="border: 1px solid #ddd; padding: 8px;">${registro.salida}</td>
-          <td style="border: 1px solid #ddd; padding: 8px;">${registro.horasTrabajadas}</td>
-      </tr>
-  `).join('');
-
-  return `
-      <html>
-          <head>
-              <style>
-                  body { font-family: Arial, sans-serif; }
-                  table { width: 100%; border-collapse: collapse; }
-                  th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-                  th { background-color: #f2f2f2; }
-                  h1 { color: #333; }
-              </style>
-          </head>
-          <body>
-              <h1>Informe de Horas Trabajadas</h1>
-              <p>Fecha del informe: ${new Date().toLocaleDateString('es-ES')}</p>
-              <table>
-                  <thead>
-                      <tr>
-                          <th>Fecha</th>
-                          <th>Hora Entrada</th>
-                          <th>Hora Salida</th>
-                          <th>Horas Trabajadas</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      ${filas}
-                  </tbody>
-              </table>
-              <p>Informe generado por InOutTime</p>
-          </body>
-      </html>
-  `;
-}
-
-// Función de filtrado avanzado
-function mostrarModalFiltroInformes() {
-  Swal.fire({
-      title: 'Filtrar Informes',
-      html: `
-          <div class="filtro-informes">
-              <div class="form-group">
-                  <label>Rango de Fechas</label>
-                  <div class="input-group">
-                      <input type="date" id="fechaDesde" class="swal2-input">
-                      <input type="date" id="fechaHasta" class="swal2-input">
-                  </div>
-              </div>
-              <div class="form-group">
-                  <label>Tipo de Registro</label>
-                  <select id="tipoRegistro" class="swal2-select">
-                      <option value="todos">Todos los Registros</option>
-                      <option value="completos">Solo Registros Completos</option>
-                      <option value="incompletos">Registros Incompletos</option>
-                  </select>
-              </div>
-              <div class="form-group">
-                  <label>Ordenar Por</label>
-                  <select id="ordenRegistros" class="swal2-select">
-                      <option value="fecha-desc">Fecha (Más Reciente)</option>
-                      <option value="fecha-asc">Fecha (Más Antigua)</option>
-                      <option value="horas-desc">Horas Trabajadas (Mayor a Menor)</option>
-                      <option value="horas-asc">Horas Trabajadas (Menor a Mayor)</option>
-                  </select>
-              </div>
-          </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: 'Aplicar Filtros',
-      cancelButtonText: 'Cancelar',
-      preConfirm: () => {
-          return {
-              fechaDesde: document.getElementById('fechaDesde').value,
-              fechaHasta: document.getElementById('fechaHasta').value,
-              tipoRegistro: document.getElementById('tipoRegistro').value,
-              ordenRegistros: document.getElementById('ordenRegistros').value
-          };
-      }
-  }).then((result) => {
-      if (result.isConfirmed) {
-          // Aplicar filtros y recargar registros
-          aplicarFiltrosRegistros(result.value);
-      }
-  });
-}
-
-// Función para aplicar filtros a los registros
-function aplicarFiltrosRegistros(filtros) {
-  // Lógica para filtrar y ordenar registros según los criterios seleccionados
-  console.log("Filtros aplicados:", filtros);
-  
-  // Implementar la lógica de filtrado y ordenación
-  // 1. Filtrar por rango de fechas
-  // 2. Filtrar por tipo de registro (completos/incompletos)
-  // 3. Ordenar según el criterio seleccionado
-}
-
-// Estadísticas rápidas
-function mostrarEstadisticasRegistros(registros) {
-  const totalRegistros = registros.length;
-  const totalHorasTrabajadas = registros.reduce((total, registro) => {
-      // Convertir horas trabajadas a minutos
-      if (registro.horasTrabajadas !== 'N/A') {
-          const [horas, minutos] = registro.horasTrabajadas.split(' ');
-          return total + (parseInt(horas) * 60 + parseInt(minutos));
-      }
-      return total;
-  }, 0);
-
-  const promedioHorasDiarias = totalHorasTrabajadas / totalRegistros;
-
-  Swal.fire({
-      title: 'Estadísticas de Registros',
-      html: `
-          <div class="estadisticas-registros">
-              <p>Total de Registros: <strong>${totalRegistros}</strong></p>
-              <p>Total Horas Trabajadas: <strong>${Math.floor(totalHorasTrabajadas / 60)} horas ${totalHorasTrabajadas % 60} minutos</strong></p>
-              <p>Promedio Horas Diarias: <strong>${promedioHorasDiarias.toFixed(2)} horas</strong></p>
-          </div>
-      `,
-      icon: 'info'
-  });
-}
-
-// Exportar funciones
-window.mostrarMisInformes = mostrarMisInformes;
-window.mostrarModalFiltroInformes = mostrarModalFiltroInformes;
-window.mostrarEstadisticasRegistros = mostrarEstadisticasRegistros;
