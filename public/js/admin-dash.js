@@ -283,7 +283,7 @@ window.crearNuevoUsuario = async function (event) {
                 html: `
                     <p>El usuario <strong>${nombre} ${apellidos}</strong> ha sido creado exitosamente.</p>
                     <p>📧 <strong>Email:</strong> ${email}</p>
-                    <p>🏢 <strong>Empresa:</strong> ${nombreEmpresa}</p>
+                    <p>🏢 <strong>Empresa:</strong> ${empresaId}</p>
                     <p>🔑 <strong>Contraseña Temporal:</strong> <code>${result.data.passwordTemporal}</code></p>
                     <p>✅ Pídele que cambie su contraseña al iniciar sesión.</p>
                 `,
