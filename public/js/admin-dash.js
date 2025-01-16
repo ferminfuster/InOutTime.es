@@ -879,7 +879,6 @@ window.desactivarUsuario = async function(email) {
 */
 window.modificarUsuario = async function(email) {
     try {
-        // 1. Verificar permisos (solo admin o root)
         const userActual = auth.currentUser;
         const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
         const datosUsuarioActual = userDoc.data();
@@ -888,10 +887,7 @@ window.modificarUsuario = async function(email) {
             throw new Error('No tienes permisos para modificar usuarios');
         }
 
-        // 2. Buscar datos del usuario a modificar
-        const usuarioQuery = await getDocs(
-            query(collection(db, 'usuarios'), where('email', '==', email))
-        );
+        const usuarioQuery = await getDocs(query(collection(db, 'usuarios'), where('email', '==', email)));
 
         if (usuarioQuery.empty) {
             throw new Error('Usuario no encontrado');
@@ -900,7 +896,6 @@ window.modificarUsuario = async function(email) {
         const usuarioDoc = usuarioQuery.docs[0];
         const usuarioData = usuarioDoc.data();
 
-        // 3. Mostrar modal con información del usuario
         const { value: formValues } = await Swal.fire({
             title: `Modificar Usuario: ${usuarioData.nombre} ${usuarioData.apellidos}`,
             html: `
@@ -910,6 +905,7 @@ window.modificarUsuario = async function(email) {
                         grid-template-columns: 1fr 1fr;
                         gap: 15px;
                         text-align: left;
+                        width: 100%;
                     }
                     .swal-section-title {
                         grid-column: 1 / 3;
@@ -920,32 +916,25 @@ window.modificarUsuario = async function(email) {
                         color: #3085d6;
                     }
                     .swal2-input, .swal2-select {
-                        margin-bottom: 10px;
                         width: 100%;
+                        box-sizing: border-box;
+                        text-align: left;
                     }
                     .input-group {
                         display: flex;
+                        gap: 5px;
                     }
                 </style>
                 <div class="swal-form">
                     <div class="swal-section-title">Información Personal</div>
-                    
                     <div>
                         <label>Nombre</label>
-                        <input id="swal-nombre" class="swal2-input" 
-                               placeholder="Nombre" 
-                               value="${usuarioData.nombre || ''}"
-                               style="background-color: #f0f0f0;">
+                        <input id="swal-nombre" class="swal2-input" placeholder="Nombre" value="${usuarioData.nombre || ''}">
                     </div>
-                    
                     <div>
                         <label>Apellidos</label>
-                        <input id="swal-apellidos" class="swal2-input" 
-                               placeholder="Apellidos" 
-                               value="${usuarioData.apellidos || ''}"
-                               style="background-color: #f0f0f0;">
+                        <input id="swal-apellidos" class="swal2-input" placeholder="Apellidos" value="${usuarioData.apellidos || ''}">
                     </div>
-                    
                     <div>
                         <label>Rol</label>
                         <select id="swal-rol" class="swal2-select">
@@ -953,17 +942,11 @@ window.modificarUsuario = async function(email) {
                             <option value="admin" ${usuarioData.rol === 'admin' ? 'selected' : ''}>Admin</option>
                         </select>
                     </div>
-                    
                     <div>
                         <label>Email</label>
-                        <input id="swal-email" class="swal2-input" 
-                               value="${usuarioData.email}" 
-                               readonly 
-                               style="background-color: #e0e0e0; cursor: not-allowed;">
+                        <input id="swal-email" class="swal2-input" value="${usuarioData.email}" readonly style="background-color: #e0e0e0; cursor: not-allowed;">
                     </div>
-
                     <div class="swal-section-title">Información de Contacto</div>
-                    
                     <div>
                         <label>Teléfono</label>
                         <div class="input-group">
@@ -971,37 +954,21 @@ window.modificarUsuario = async function(email) {
                                 <option value="+34" ${usuarioData.contactoPersonal?.telefono?.prefijo === '+34' ? 'selected' : ''}>+34</option>
                                 <option value="+351" ${usuarioData.contactoPersonal?.telefono?.prefijo === '+351' ? 'selected' : ''}>+351</option>
                             </select>
-                            <input type="tel" id="swal-telefono-numero" class="swal2-input" 
-                                   placeholder="Número de teléfono" 
-                                   value="${usuarioData.contactoPersonal?.telefono?.numero || ''}"
-                                   pattern="[0-9]{9}">
+                            <input type="tel" id="swal-telefono-numero" class="swal2-input" placeholder="Número de teléfono" value="${usuarioData.contactoPersonal?.telefono?.numero || ''}" pattern="[0-9]{9}">
                         </div>
                     </div>
-                    
                     <div>
                         <label>Dirección</label>
-                        <input id="swal-direccion-calle" class="swal2-input" 
-                               placeholder="Calle y número" 
-                               value="${usuarioData.contactoPersonal?.direccion?.calle || ''}">
+                        <input id="swal-direccion-calle" class="swal2-input" placeholder="Calle y número" value="${usuarioData.contactoPersonal?.direccion?.calle || ''}">
                     </div>
-                    
                     <div class="input-group">
-                        <input id="swal-direccion-codigo-postal" class="swal2-input" 
-                               placeholder="Código Postal" 
-                               style="max-width: 150px;"
-                               value="${usuarioData.contactoPersonal?.direccion?.codigoPostal || ''}"
-                               pattern="[0-9]{5}">
-                        <input id="swal-direccion-ciudad" class="swal2-input" 
-                               placeholder="Ciudad" 
-                               value="${usuarioData.contactoPersonal?.direccion?.ciudad || ''}">
+                        <input id="swal-direccion-codigo-postal" class="swal2-input" placeholder="Código Postal" style="max-width: 150px;" value="${usuarioData.contactoPersonal?.direccion?.codigoPostal || ''}" pattern="[0-9]{5}">
+                        <input id="swal-direccion-ciudad" class="swal2-input" placeholder="Ciudad" value="${usuarioData.contactoPersonal?.direccion?.ciudad || ''}">
                     </div>
-                    
                     <div>
                         <label>Provincia y País</label>
                         <div class="input-group">
-                            <input id="swal-direccion-provincia" class="swal2-input" 
-                                   placeholder="Provincia" 
-                                   value="${usuarioData.contactoPersonal?.direccion?.provincia || ''}">
+                            <input id="swal-direccion-provincia" class="swal2-input" placeholder="Provincia" value="${usuarioData.contactoPersonal?.direccion?.provincia || ''}">
                             <select id="swal-direccion-pais" class="swal2-select">
                                 <option value="España" ${usuarioData.contactoPersonal?.direccion?.pais === 'España' ? 'selected' : ''}>España</option>
                             </select>
@@ -1009,116 +976,20 @@ window.modificarUsuario = async function(email) {
                     </div>
                 </div>
             `,
-            width: '900px',
+            width: '800px',
             background: '#f4f4f4',
-            focusConfirm: false,
-            preConfirm: () => {
-                const nombre = document.getElementById('swal-nombre').value;
-                const apellidos = document.getElementById('swal-apellidos').value;
-                const rol = document.getElementById('swal-rol').value;
-                
-                // Datos de contacto
-                const telefonoPrefijo = document.getElementById('swal-telefono-prefijo').value;
-                const telefonoNumero = document.getElementById('swal-telefono-numero').value;
-                const direccionCalle = document.getElementById('swal-direccion-calle').value;
-                const direccionCodigoPostal = document.getElementById('swal-direccion-codigo-postal').value;
-                const direccionCiudad = document.getElementById('swal-direccion-ciudad').value;
-                const direccionProvincia = document.getElementById('swal-direccion-provincia').value;
-                const direccionPais = document.getElementById('swal-direccion-pais').value;
-
-                // Validaciones básicas
-                if (!nombre) {
-                    Swal.showValidationMessage('El nombre es obligatorio');
-                    return false;
-                }
-
-                // Validación de teléfono (opcional)
-                if (telefonoNumero && !/^\d{9}$/.test(telefonoNumero)) {
-				                    Swal.showValidationMessage('Número de teléfono inválido');
-                    return false;
-                }
-
-                // Validación de código postal (opcional)
-                if (direccionCodigoPostal && !/^\d{5}$/.test(direccionCodigoPostal)) {
-                    Swal.showValidationMessage('Código Postal inválido');
-                    return false;
-                }
-
-                return {
-                    nombre,
-                    apellidos,
-                    rol,
-                    contactoPersonal: {
-                        telefono: {
-                            prefijo: telefonoPrefijo,
-                            numero: telefonoNumero,
-                            tipo: 'móvil'
-                        },
-                        direccion: {
-                            calle: direccionCalle,
-                            codigoPostal: direccionCodigoPostal,
-                            ciudad: direccionCiudad,
-                            provincia: direccionProvincia,
-                            pais: direccionPais
-                        }
-                    }
-                };
-            },
             showCancelButton: true,
             confirmButtonText: 'Guardar Cambios',
             cancelButtonText: 'Cancelar',
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33'
         });
-
-        // 4. Si se confirman los cambios
-        if (formValues) {
-            // 5. Actualizar en Firestore
-            await updateDoc(usuarioDoc.ref, {
-                nombre: formValues.nombre,
-                apellidos: formValues.apellidos,
-                rol: formValues.rol,
-                contactoPersonal: formValues.contactoPersonal,
-                fechaUltimaModificacion: new Date()
-            });
-
-            // 6. Log de modificación
-            await addDoc(collection(db, 'logs_modificaciones'), {
-                usuarioModificado: email,
-                modificadoPor: {
-                    uid: userActual.uid,
-                    email: userActual.email
-                },
-                fechaModificacion: new Date(),
-                cambiosRealizados: formValues
-            });
-
-            // 7. Notificación de éxito
-            await Swal.fire({
-                icon: 'success',
-                title: 'Usuario Modificado',
-                text: `Los datos de ${email} han sido actualizados correctamente`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-
-            // 8. Recargar lista de usuarios
-            await cargarUsuarios();
-        }
-
     } catch (error) {
         console.error("Error al modificar usuario:", error);
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message,
-            confirmButtonText: 'Entendido'
-        });
+        Swal.fire({ icon: 'error', title: 'Error', text: error.message });
     }
 };
+
 
 
 
