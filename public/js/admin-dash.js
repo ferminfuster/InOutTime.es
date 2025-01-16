@@ -393,8 +393,7 @@ window.restablecerUsuario = function(email) {
       };
 
 
-
-      window.modificarUsuario = async function(email) {
+window.modificarUsuario = async function(email) {
         try {
             // 1. Verificar permisos (solo admin o root)
             const userActual = auth.currentUser;
@@ -427,7 +426,6 @@ window.restablecerUsuario = function(email) {
                         <select id="swal-rol" class="swal2-select">
                             <option value="usuario" ${usuarioData.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
                             <option value="admin" ${usuarioData.rol === 'admin' ? 'selected' : ''}>Admin</option>
-                            <option value="root" ${usuarioData.rol === 'root' ? 'selected' : ''}>Root</option>
                         </select>
                         <input id="swal-empresa" class="swal2-input" placeholder="ID Empresa" value="${usuarioData.empresaId || ''}">
                     </div>
@@ -508,106 +506,7 @@ window.restablecerUsuario = function(email) {
             });
         }
     };
-/*
-window.desactivarUsuario = function(id) {
-    console.log("Desactivar usuario: ", id);
-    // Implementar lógica de desactivación de usuario
-    alert('Funcionalidad de desactivar usuario pendiente');
-}*/
-/*
-window.desactivarUsuario = async function(email) {
-    try {
-        console.log(`Iniciando la eliminación del usuario con email: ${email}`);
 
-        // Confirmar la eliminación
-        const resultado = await Swal.fire({
-            title: '¿Estás seguro de eliminar este usuario?',
-            text: "Esta acción eliminará permanentemente la cuenta del usuario del sistema",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar usuario',
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (resultado.isConfirmed) {
-            console.log('Usuario confirmado para eliminación');
-
-            // Obtener referencia del usuario actual
-            const userActual = auth.currentUser;
-            console.log(`Usuario actual: ${userActual.email}`);
-
-            // Verificar que el usuario actual sea administrador
-            const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
-            const datosUsuarioActual = userDoc.data();
-            console.log(`Datos del usuario actual: ${JSON.stringify(datosUsuarioActual)}`);
-
-            if (datosUsuarioActual.rol !== 'admin') {
-                throw new Error('Solo los administradores pueden eliminar usuarios');
-            }
-
-            // Prevenir que un admin se elimine a sí mismo
-            if (email === userActual.email) {
-                throw new Error('No puedes eliminarte a ti mismo');
-            }
-
-            // Obtener los datos del usuario a eliminar usando su correo
-            const usuarioEliminarQuery = await getDocs(query(collection(db, 'usuarios'), where('email', '==', email)));
-            const usuarioEliminar = usuarioEliminarQuery.docs[0]?.data();
-            const usuarioEliminarId = usuarioEliminarQuery.docs[0]?.id;
-
-            if (!usuarioEliminar) {
-                console.error('El usuario no se encuentra en Firestore');
-                throw new Error('El usuario no se encuentra en Firestore');
-            }
-
-            // Buscar el UID del usuario en Authentication
-            let usuarioAuthUID = null;
-            try {
-                const userRecord = await fetchSignInMethodsForEmail(auth, email);
-                if (userRecord.length > 0) {
-                    // El usuario existe en Authentication
-                    console.log(`Usuario encontrado en Authentication: ${userRecord.length}`);
-                    usuarioAuthUID = userRecord[0];
-                }
-            } catch (authError) {
-                console.warn('No se pudo encontrar el usuario en Authentication', authError);
-            }
-
-            // Eliminar el documento del usuario de Firestore
-            await deleteDoc(doc(db, 'usuarios', usuarioEliminarId));
-            console.log(`Documento de usuario eliminado de Firestore: ${usuarioEliminarId}`);
-
-            // Notificación de éxito
-            await Swal.fire({
-                icon: 'success',
-                title: 'Usuario Eliminado',
-                html: `
-                    <p>El usuario <strong>${usuarioEliminar.nombre} ${usuarioEliminar.apellidos}</strong> ha sido eliminado.</p>
-                    <p>Email: ${usuarioEliminar.email}</p>
-                `,
-                confirmButtonText: 'Entendido'
-            });
-
-            // Recargar lista de usuarios
-            await cargarUsuarios();
-            console.log('Lista de usuarios recargada');
-
-        }
-    } catch (error) {
-        console.error("Error al eliminar usuario:", error);
-
-        let mensajeError = "No se pudo eliminar el usuario";
-        
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message || mensajeError,
-            confirmButtonText: 'Entendido'
-        });
-    }
-};*/
 
 // Función para desactivar y eliminar usuario de Firestore y Firebase Authentication
 window.desactivarUsuario = async function(email) {
@@ -772,105 +671,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /////////// ACCIONES CON BOTONES USUARIO////////////////////////
-
-
-
-
-
-/*
-window.desactivarUsuario = async function(uid) {
-    try {
-        // Obtener referencia del usuario en Firestore
-        const userDoc = await getDoc(doc(db, 'usuarios', uid));
-        const userData = userDoc.data();
-
-        // Actualizar estado en Firestore
-        await updateDoc(doc(db, 'usuarios', uid), {
-            estado: 'inactivo'
-        });
-
-        // En Authentication, puedes actualizar el perfil
-        const user = auth.currentUser;
-        await updateProfile(user, {
-            displayName: `[INACTIVO] ${userData.nombre} ${userData.apellidos}`
-        });
-
-        alert('Usuario desactivado exitosamente');
-        
-        // Recargar lista de usuarios
-        //window.cargarUsuarios();
-    } catch (error) {
-        console.error("Error al desactivar usuario:", error);
-        alert('No se pudo desactivar el usuario');
-    }
-}
-*/
-// Función para cargar datos de usuario en modal de modificación
-window.cargarDatosModificacion = async function(uid) {
-    try {
-        // Obtener documento del usuario
-        const userDoc = await getDoc(doc(db, 'usuarios', uid));
-        const userData = userDoc.data();
-
-        // Llenar campos del modal
-        document.getElementById('modificar-nombre').value = userData.nombre;
-        document.getElementById('modificar-apellidos').value = userData.apellidos;
-        document.getElementById('modificar-email').value = userData.email;
-        document.getElementById('modificar-dni').value = userData.dni;
-        document.getElementById('modificar-rol').value = userData.rol;
-        document.getElementById('modificar-empresa').value = userData.empresa;
-
-        // Mostrar modal
-        const modalModificar = new bootstrap.Modal(document.getElementById('modalModificarUsuario'));
-        modalModificar.show();
-
-        // Guardar UID para uso posterior
-        document.getElementById('modalModificarUsuario').dataset.uid = uid;
-    } catch (error) {
-        console.error("Error al cargar datos de usuario:", error);
-        alert('No se pudieron cargar los datos del usuario');
-    }
-}
-
-// Función para guardar modificaciones
-window.guardarModificacionUsuario = async function() {
-    const uid = document.getElementById('modalModificarUsuario').dataset.uid;
-    
-    try {
-        // Recoger datos modificados
-        const datosModificados = {
-            nombre: document.getElementById('modificar-nombre').value,
-            apellidos: document.getElementById('modificar-apellidos').value,
-            dni: document.getElementById('modificar-dni').value,
-            rol: document.getElementById('modificar-rol').value,
-            empresa: document.getElementById('modificar-empresa').value
-        };
-
-        // Actualizar en Firestore
-        await updateDoc(doc(db, 'usuarios', uid), datosModificados);
-
-        // Actualizar email si es necesario (requiere re-autenticación)
-        const nuevoEmail = document.getElementById('modificar-email').value;
-        const user = auth.currentUser;
-        if (nuevoEmail !== user.email) {
-            await updateEmail(user, nuevoEmail);
-        }
-
-        // Cerrar modal
-        const modalModificar = bootstrap.Modal.getInstance(document.getElementById('modalModificarUsuario'));
-        modalModificar.hide();
-
-        // Recargar lista de usuarios
-        //window.cargarUsuarios();
-
-        alert('Usuario modificado exitosamente');
-    } catch (error) {
-        console.error("Error al modificar usuario:", error);
-        alert('No se pudo modificar el usuario');
-    }
-}
-//import { onAuthStateChanged } from "firebase/auth";
-//import { doc, getDoc } from "firebase/firestore";
 
 // Obtener referencia al div de contenido
 const content = document.getElementById('content');
