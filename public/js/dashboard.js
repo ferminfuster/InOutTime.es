@@ -947,7 +947,7 @@ function imprimirInforme() {
           </head>
           <body>
               <div class="header">
-                  <img src="/ruta/a/tu/logo.png" alt="Logo de la Empresa" class="logo">
+              <img src="images/logo.png" alt="InOutTime Logo" class="logo">
                   <div class="header-info">
                       <h2>Informe de Horas Trabajadas</h2>
                       <p>Empleado: ${user ? user.displayName || user.email : 'Usuario'}</p>
