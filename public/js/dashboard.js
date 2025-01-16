@@ -950,7 +950,7 @@ function imprimirInforme() {
               <img src="images/logo.png" alt="InOutTime Logo" class="logo">
                   <div class="header-info">
                       <h2>Informe de Horas Trabajadas</h2>
-                      <p>Empleado: ${user ? user.displayName || user.email : 'Usuario'}</p>
+                      <p>Empleado: ${user ? user.email || user.email : 'Usuario'}</p>
                       <p>Fecha de generación: ${new Date().toLocaleDateString('es-ES')}</p>
                   </div>
               </div>
