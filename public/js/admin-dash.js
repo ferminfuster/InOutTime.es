@@ -352,8 +352,8 @@ window.restablecerUsuario = function(email) {
      
         if (email) {
           Swal.fire({
-            title: '¿Deseas cambiar tu contraseña de ${email}?',
-            text: "Se enviará un correo de restablecimiento a ${email}.",
+            title: `¿Deseas cambiar tu contraseña de ${email}?`,
+            text: `Se enviará un correo de restablecimiento a ${email}.`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Sí, enviar correo',
