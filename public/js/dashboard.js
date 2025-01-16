@@ -651,247 +651,258 @@ window.cambiarPassword = function() {
 };
 ///
 // Mis Informes
-//
-window.mostrarMisInformes = async function() {
+//window.mostrarMisInformes = async function() {
   try {
-      const user = auth.currentUser;
-      if (!user) {
-          Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'No hay un usuario autenticado.'
-          });
-          return;
-      }
+    // Obtener el usuario autenticado
+    const user = auth.currentUser;
+    if (!user) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No hay un usuario autenticado.'
+        });
+        return;
+    }
 
-      const userId = user.uid;
+    const userId = user.uid;
 
-      // Consulta con índice compuesto
-      const q = query(
-          collection(db, "registros"), 
-          where("userId", "==", userId),
-          orderBy("fecha", "desc")
-      );
+    // Consulta con el índice correcto
+    const q = query(
+        collection(db, "registros"), 
+        where("userId", "==", userId),
+        orderBy("fecha", "desc")
+    );
 
-      const registrosSnapshot = await getDocs(q);
+    const registrosSnapshot = await getDocs(q);
 
-      const registros = registrosSnapshot.docs
-          .map(doc => ({
-              id: doc.id,
-              ...doc.data()
-          }))
-          // Filtro adicional por si acaso
-          .filter(registro => registro.userId === userId);
+    const registros = registrosSnapshot.docs
+        .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }))
+        .filter(registro => registro.userId === userId);
 
-      if (registros.length === 0) {
-          Swal.fire({
-              icon: 'info',
-              title: 'Sin Registros',
-              text: 'No hay registros disponibles.'
-          });
-          return;
-      }
+    if (registros.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Sin Registros',
+            text: 'No hay registros disponibles.'
+        });
+        return;
+    }
 
-      // Procesar registros
-      const registrosProcesados = procesarRegistrosDiarios(registros);
+    // Procesar registros para crear resumen diario
+    const registrosProcesados = procesarRegistrosDiarios(registros);
 
-      // Mostrar modal
-      Swal.fire({
-          title: 'Mis Informes',
-          html: generarTablaRegistros(registrosProcesados),
-          showConfirmButton: false,
-          width: '90%',
-          didRender: () => {
-              document.getElementById('btnDescargarInforme').addEventListener('click', () => descargarInformeCSV(registrosProcesados));
-              document.getElementById('btnEnviarInforme').addEventListener('click', () => enviarInformePorEmail(registrosProcesados, user));
-              document.getElementById('btnImprimirInforme').addEventListener('click', imprimirInforme);
-          }
-      });
+    // Mostrar modal con los registros
+    Swal.fire({
+        title: 'Mis Informes',
+        html: `
+            <style>
+                .informes-modal {
+                    width: 100%;
+                    max-width: 800px;
+                }
+                .tabla-informes {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                .tabla-informes th, .tabla-informes td {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    text-align: center;
+                }
+                .tabla-informes thead {
+                    background-color: #f2f2f2;
+                }
+                .acciones-informes {
+                    display: flex;
+                    justify-content: space-around;
+                    margin-top: 20px;
+                }
+            </style>
+            <div class="informes-modal">
+                <table class="tabla-informes">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora Entrada</th>
+                            <th>Hora Salida</th>
+                            <th>Horas Trabajadas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${registrosProcesados.map(registro => `
+                            <tr>
+                                <td>${registro.fecha}</td>
+                                <td>${registro.entrada}</td>
+                                <td>${registro.salida}</td>
+                                <td>${registro.horasTrabajadas}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div class="acciones-informes">
+                    <button id="btnDescargarInforme" class="btn btn-primary">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                    <button id="btnEnviarInforme" class="btn btn-success">
+                        <i class="fas fa-envelope"></i> Enviar por Email
+                    </button>
+                    <button id="btnImprimirInforme" class="btn btn-info">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        `,
+        showConfirmButton: false,
+        width: '90%',
+        didRender: () => {
+            // Eventos para los botones
+            document.getElementById('btnDescargarInforme').addEventListener('click', () => descargarInformeCSV(registrosProcesados));
+            document.getElementById('btnEnviarInforme').addEventListener('click', () => enviarInformePorEmail(registrosProcesados, user));
+            document.getElementById('btnImprimirInforme').addEventListener('click', imprimirInforme);
+        }
+    });
 
-  } catch (error) {
-      console.error("Error al mostrar informes:", error);
-      
-      // Manejo específico de errores de índice
-      if (error.message.includes("requires an index")) {
-          Swal.fire({
-              icon: 'warning',
-              title: 'Índice Necesario',
-              html: `
-                  <p>Se requiere crear un índice en Firestore.</p>
-                  <a href="https://console.firebase.google.com/v1/r/project/inouttime-25fe6/firestore/indexes?create_composite" 
-                     target="_blank" class="btn btn-primary">
-                      Crear Índice
-                  </a>
-              `,
-              showConfirmButton: false
-          });
-      } else {
-          Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Ocurrió un error al cargar los registros: ' + error.message
-          });
-      }
-  }
-};
-
-// Función para generar HTML de tabla
-function generarTablaRegistros(registrosProcesados) {
-  return `
-      <style>
-          .informes-modal {
-              width: 100%;
-              max-width: 800px;
-          }
-          .tabla-informes {
-              width: 100%;
-              border-collapse: collapse;
-          }
-          .tabla-informes th, .tabla-informes td {
-              border: 1px solid #ddd;
-              padding: 8px;
-              text-align: center;
-          }
-          .tabla-informes thead {
-              background-color: #f2f2f2;
-          }
-          .acciones-informes {
-              display: flex;
-              justify-content: space-around;
-              margin-top: 20px;
-          }
-      </style>
-      <div class="informes-modal">
-          <table class="tabla-informes">
-              <thead>
-                  <tr>
-                      <th>Fecha</th>
-                      <th>Hora Entrada</th>
-                      <th>Hora Salida</th>
-                      <th>Horas Trabajadas</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  ${registrosProcesados.map(registro => `
-                      <tr>
-                          <td>${registro.fecha}</td>
-                          <td>${registro.entrada}</td>
-                          <td>${registro.salida}</td>
-                          <td>${registro.horasTrabajadas}</td>
-                      </tr>
-                  `).join('')}
-              </tbody>
-          </table>
-          <div class="acciones-informes">
-              <button id="btnDescargarInforme" class="btn btn-primary">
-                  <i class="fas fa-download"></i> Descargar
-              </button>
-              <button id="btnEnviarInforme" class="btn btn-success">
-                  <i class="fas fa-envelope"></i> Enviar por Email
-              </button>
-              <button id="btnImprimirInforme" class="btn btn-info">
-                  <i class="fas fa-print"></i> Imprimir
-              </button>
-          </div>
-      </div>
-  `;
+} catch (error) {
+    console.error("Error al mostrar informes:", error);
+    
+    // Manejo específico de errores de índice
+    if (error.message.includes("requires an index")) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Índice Necesario',
+            html: `
+                <p>Se requiere crear un índice en Firestore.</p>
+                <a href="https://console.firebase.google.com/v1/r/project/inouttime-25fe6/firestore/indexes?create_composite" 
+                   target="_blank" class="btn btn-primary">
+                    Crear Índice
+                </a>
+            `,
+            showConfirmButton: false
+        });
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al cargar los registros: ' + error.message
+        });
+    }
 }
 
-// Resto de funciones igual que en el ejemplo anterior
-          showConfirmButton: false,
-          width: '90%',
-          didRender: () => {
-              // Eventos para los botones
-              document.getElementById('btnDescargarInforme').addEventListener('click', () => descargarInformeCSV(registrosProcesados));
-              document.getElementById('btnEnviarInforme').addEventListener('click', () => enviarInformePorEmail(registrosProcesados, user));
-              document.getElementById('btnImprimirInforme').addEventListener('click', imprimirInforme);
-          }
-      });
-
-  } catch (error) {
-      console.error("Error al mostrar informes:", error);
-      Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un error al cargar los registros: ' + error.message
-      });
-  }
-};
 
 // Función para procesar registros
 function procesarRegistrosDiarios(registros) {
-  const registrosPorFecha = {};
+const registrosPorFecha = {};
 
-  // Ordenar registros por fecha
-  registros.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
+// Ordenar registros por fecha
+registros.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
 
-  registros.forEach(registro => {
-      const fecha = registro.fecha.toDate();
-      const fechaKey = fecha.toLocaleDateString('es-ES');
+registros.forEach(registro => {
+    const fecha = registro.fecha.toDate();
+    const fechaKey = fecha.toLocaleDateString('es-ES');
 
-      if (!registrosPorFecha[fechaKey]) {
-          registrosPorFecha[fechaKey] = {
-              entrada: null,
-              salida: null
-          };
-      }
+    if (!registrosPorFecha[fechaKey]) {
+        registrosPorFecha[fechaKey] = {
+            entrada: null,
+            salida: null
+        };
+    }
 
-      if (registro.accion_registro === 'entrada' && (!registrosPorFecha[fechaKey].entrada || registro.fecha.toDate() < registrosPorFecha[fechaKey].entrada)) {
-          registrosPorFecha[fechaKey].entrada = registro.fecha.toDate();
-      } else if (registro.accion_registro === 'salida' && (!registrosPorFecha[fechaKey].salida || registro.fecha.toDate() > registrosPorFecha[fechaKey].salida)) {
-          registrosPorFecha[fechaKey].salida = registro.fecha.toDate();
-      }
-  });
+    if (registro.accion_registro === 'entrada' && (!registrosPorFecha[fechaKey].entrada || registro.fecha.toDate() < registrosPorFecha[fechaKey].entrada)) {
+        registrosPorFecha[fechaKey].entrada = registro.fecha.toDate();
+    } else if (registro.accion_registro === 'salida' && (!registrosPorFecha[fechaKey].salida || registro.fecha.toDate() > registrosPorFecha[fechaKey].salida)) {
+        registrosPorFecha[fechaKey].salida = registro.fecha.toDate();
+    }
+});
 
-  return Object.entries(registrosPorFecha).map(([fecha, registroDia]) => {
-      const { entrada, salida } = registroDia;
-      let horasTrabajadas = 'N/A';
+return Object.entries(registrosPorFecha).map(([fecha, registroDia]) => {
+    const { entrada, salida } = registroDia;
+    let horasTrabajadas = 'N/A';
 
-      if (entrada && salida) {
-          const diferenciaMs = salida - entrada;
-          const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
-          const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
-          horasTrabajadas = `${horas} horas ${minutos} minutos`;
-      }
+    if (entrada && salida) {
+        const diferenciaMs = salida - entrada;
+        const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+        const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+        horasTrabajadas = `${horas} horas ${minutos} minutos`;
+    }
 
-      return {
-          fecha,
-          entrada: entrada ? entrada.toLocaleTimeString('es-ES') : 'N/A',
-          salida: salida ? salida.toLocaleTimeString('es-ES') : 'N/A',
-          horasTrabajadas
-      };
-  });
+    return {
+        fecha,
+        entrada: entrada ? entrada.toLocaleTimeString('es-ES') : 'N/A',
+        salida: salida ? salida.toLocaleTimeString('es-ES') : 'N/A',
+        horasTrabajadas
+    };
+});
 }
 
-// Resto de las funciones de descarga, email e impresión igual que antes
 // Función para descargar CSV
 function descargarInformeCSV(registros) {
-  const encabezados = ["Fecha", "Hora Entrada", "Hora Salida", "Horas Trabajadas"];
-  
-  const filas = registros.map(registro => 
-      [registro.fecha, registro.entrada, registro.salida, registro.horasTrabajadas]
-          .map(valor => `"${valor.replace(/"/g, '""')}"`)
-          .join(",")
-  );
+const encabezados = ["Fecha", "Hora Entrada", "Hora Salida", "Horas Trabajadas"];
+
+const filas = registros.map(registro => 
+    [registro.fecha, registro.entrada, registro.salida, registro.horasTrabajadas]
+        .map(valor => `"${valor.replace(/"/g, '""')}"`)
+        .join(",")
+);
 
   const contenidoCSV = [encabezados.join(","), ...filas].join("\n");
 
-  const blob = new Blob([contenidoCSV], { type: "text/csv;charset=utf-8;" });
-  const enlace = document.createElement("a");
-  enlace.href = URL.createObjectURL(blob);
-  enlace.download = `informe_horas_${new Date().toISOString().split('T')[0]}.csv`;
-  enlace.click();
+const blob = new Blob([contenidoCSV], { type: "text/csv;charset=utf-8;" });
+const enlace = document.createElement("a");
+enlace.href = URL.createObjectURL(blob);
+enlace.download = `informe_horas_${new Date().toISOString().split('T')[0]}.csv`;
+enlace.click();
 }
 
-// Funciones de envío de email e impresión (placeholders)
+// Función de envío de email (placeholder)
 function enviarInformePorEmail(registros, user) {
-  Swal.fire({
-      icon: 'info',
-      title: 'Enviar Informe',
-      text: 'Funcionalidad de envío por email próximamente.'
-  });
+Swal.fire({
+    icon: 'info',
+    title: 'Enviar Informe',
+    text: 'Funcionalidad de envío por email próximamente.',
+    confirmButtonText: 'Entendido'
+});
 }
 
+// Función de impresión
 function imprimirInforme() {
-  window.print();
+const contenidoImpresion = document.querySelector('.tabla-informes').outerHTML;
+
+const ventanaImpresion = window.open('', '', 'width=600,height=800');
+ventanaImpresion.document.open();
+ventanaImpresion.document.write(`
+    <html>
+        <head>
+            <title>Informe de Horas</title>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-bottom: 20px;
+                }
+                th, td { 
+                    border: 1px solid #ddd; 
+                    padding: 8px; 
+                    text-align: center; 
+                }
+                th { background-color: #f2f2f2; }
+                @media print {
+                    body { margin: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2>Informe de Horas Trabajadas</h2>
+            <p>Fecha de generación: ${new Date().toLocaleDateString('es-ES')}</p>
+            ${contenidoImpresion}
+        </body>
+    </html>
+`);
+ventanaImpresion.document.close();
+
+// Abrir diálogo de impresión
+ventanaImpresion.print();
 }
