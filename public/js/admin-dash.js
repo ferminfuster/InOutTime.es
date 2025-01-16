@@ -178,7 +178,7 @@ async function cargarUsuarios() {
                             <button class="btn btn-warning btn-sm" onclick="restablecerUsuario('${usuario.email}')">
                                 <i class="fas fa-key"></i>
                             </button>
-                            <button class="btn btn-info btn-sm" onclick="modificarUsuario('${documento.id}')">
+                            <button class="btn btn-info btn-sm" onclick="modificarUsuario('${usuario.email}')">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="btn btn-danger btn-sm" onclick="desactivarUsuario('${usuario.email}')">
@@ -365,7 +365,7 @@ window.restablecerUsuario = function(email) {
                 Swal.fire({
                   icon: 'success',
                   title: 'Correo enviado',
-                  text: 'Revisa tu bandeja de entrada.',
+                  text: `Se ha enviado un correo al usuario ${email}.`,
                   toast: true,
                   position: 'top-end',
                   showConfirmButton: false,
@@ -394,11 +394,120 @@ window.restablecerUsuario = function(email) {
 
 
 
-window.modificarUsuario = function(id) {
-    console.log("Modificar usuario: ", id);
-    // Implementar lógica de modificación de usuario
-    alert('Funcionalidad de modificar usuario pendiente');
-}
+      window.modificarUsuario = async function(email) {
+        try {
+            // 1. Verificar permisos (solo admin o root)
+            const userActual = auth.currentUser;
+            const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+            const datosUsuarioActual = userDoc.data();
+            
+            if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
+                throw new Error('No tienes permisos para modificar usuarios');
+            }
+    
+            // 2. Buscar datos del usuario a modificar
+            const usuarioQuery = await getDocs(
+                query(collection(db, 'usuarios'), where('email', '==', email))
+            );
+    
+            if (usuarioQuery.empty) {
+                throw new Error('Usuario no encontrado');
+            }
+    
+            const usuarioDoc = usuarioQuery.docs[0];
+            const usuarioData = usuarioDoc.data();
+    
+            // 3. Mostrar modal con información del usuario
+            const { value: formValues } = await Swal.fire({
+                title: 'Modificar Usuario',
+                html: `
+                    <div class="swal-form">
+                        <input id="swal-nombre" class="swal2-input" placeholder="Nombre" value="${usuarioData.nombre || ''}">
+                        <input id="swal-apellidos" class="swal2-input" placeholder="Apellidos" value="${usuarioData.apellidos || ''}">
+                        <select id="swal-rol" class="swal2-select">
+                            <option value="usuario" ${usuarioData.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
+                            <option value="admin" ${usuarioData.rol === 'admin' ? 'selected' : ''}>Admin</option>
+                            <option value="root" ${usuarioData.rol === 'root' ? 'selected' : ''}>Root</option>
+                        </select>
+                        <input id="swal-empresa" class="swal2-input" placeholder="ID Empresa" value="${usuarioData.empresaId || ''}">
+                    </div>
+                `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const nombre = document.getElementById('swal-nombre').value;
+                    const apellidos = document.getElementById('swal-apellidos').value;
+                    const rol = document.getElementById('swal-rol').value;
+                    const empresaId = document.getElementById('swal-empresa').value;
+    
+                    // Validaciones básicas
+                    if (!nombre) {
+                        Swal.showValidationMessage('El nombre es obligatorio');
+                        return false;
+                    }
+    
+                    return {
+                        nombre,
+                        apellidos,
+                        rol,
+                        empresaId
+                    };
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Guardar Cambios',
+                cancelButtonText: 'Cancelar'
+            });
+    
+            // 4. Si se confirman los cambios
+            if (formValues) {
+                // Preparar datos para actualización
+                const datosActualizados = {
+                    nombre: formValues.nombre,
+                    apellidos: formValues.apellidos,
+                    rol: formValues.rol,
+                    empresaId: formValues.empresaId
+                };
+    
+                // 5. Actualizar en Firestore
+                await updateDoc(usuarioDoc.ref, datosActualizados);
+    
+                // 6. Log de modificación
+                await addDoc(collection(db, 'logs_modificaciones'), {
+                    usuarioModificado: email,
+                    modificadoPor: {
+                        uid: userActual.uid,
+                        email: userActual.email
+                    },
+                    fechaModificacion: new Date(),
+                    cambiosRealizados: datosActualizados
+                });
+    
+                // 7. Notificación de éxito
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario Modificado',
+                    text: `Los datos de ${email} han sido actualizados correctamente`,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+    
+                // 8. Recargar lista de usuarios
+                await cargarUsuarios();
+    
+            }
+    
+        } catch (error) {
+            console.error("Error al modificar usuario:", error);
+    
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message,
+                confirmButtonText: 'Entendido'
+            });
+        }
+    };
 /*
 window.desactivarUsuario = function(id) {
     console.log("Desactivar usuario: ", id);
