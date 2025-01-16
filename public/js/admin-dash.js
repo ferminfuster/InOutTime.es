@@ -420,6 +420,116 @@ window.crearNuevoUsuario = async function (event) {
     }
 };
 
+
+/////// Para borrar ////
+// Función de actualización de contactos
+async function actualizarContactosLocalmente() {
+    try {
+        // Verificar permisos
+        const userActual = auth.currentUser;
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const datosUsuarioActual = userDoc.data();
+        
+        if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
+            throw new Error('No tienes permisos para realizar esta acción');
+        }
+
+        // Mostrar confirmación
+        const confirmacion = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción añadirá información de contacto por defecto a usuarios existentes sin ella.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, actualizar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!confirmacion.isConfirmed) return;
+
+        // Mostrar loading
+        Swal.fire({
+            title: 'Actualizando usuarios...',
+            html: 'Por favor, espera.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Obtener usuarios
+        const usuariosQuery = await getDocs(collection(db, 'usuarios'));
+        
+        // Contador de actualizaciones
+        let actualizados = 0;
+
+        // Procesar cada usuario
+        const batch = writeBatch(db);
+        
+        // Convertir a array y procesar
+        const usuarios = usuariosQuery.docs;
+        for (const usuarioDoc of usuarios) {
+            const userData = usuarioDoc.data();
+
+            // Si no tiene contactoPersonal
+            if (!userData.contactoPersonal) {
+                const userRef = doc(db, 'usuarios', usuarioDoc.id);
+                
+                batch.update(userRef, {
+                    contactoPersonal: {
+                        telefono: {
+                            prefijo: '+34',
+                            numero: '',
+                            tipo: 'móvil'
+                        },
+                        direccion: {
+                            calle: '',
+                            codigoPostal: '',
+                            ciudad: '',
+                            provincia: '',
+                            pais: 'España'
+                        }
+                    }
+                });
+
+                actualizados++;
+
+                // Dividir batch si supera el límite de Firestore (500 operaciones)
+                if (actualizados % 500 === 0) {
+                    await batch.commit();
+                    batch = writeBatch(db);
+                }
+            }
+        }
+
+        // Commit del batch final
+        if (actualizados % 500 !== 0) {
+            await batch.commit();
+        }
+
+        // Notificación
+        Swal.fire({
+            icon: 'success',
+            title: 'Actualización Completada',
+            text: `Se han actualizado ${actualizados} usuarios con información de contacto por defecto.`
+        });
+
+    } catch (error) {
+        console.error("Error al actualizar contactos:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message
+        });
+    }
+}
+
+// Añadir al objeto window para poder llamarla globalmente
+window.actualizarContactosLocalmente = actualizarContactosLocalmente;
+
+/// Para borrar
+
 // Función para generar una contraseña temporal segura
 window.generarPasswordTemporal = function() {
     const longitud = 12;
