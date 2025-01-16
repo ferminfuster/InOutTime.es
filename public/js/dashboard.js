@@ -904,8 +904,9 @@ function imprimirInforme() {
                       margin-bottom: 20px;
                   }
                   .logo {
-                      max-width: 150px;
-                      max-height: 80px;
+                      max-width: 80px;  // Reducido de 150px a 80px
+                      max-height: 50px; // Reducido de 80px a 50px
+                      object-fit: contain; // Mantiene la proporción
                   }
                   .header-info {
                       text-align: right;
@@ -946,7 +947,7 @@ function imprimirInforme() {
           </head>
           <body>
               <div class="header">
-                <img src="images/logo.png" alt="InOutTime Logo">
+                  <img src="/ruta/a/tu/logo.png" alt="Logo de la Empresa" class="logo">
                   <div class="header-info">
                       <h2>Informe de Horas Trabajadas</h2>
                       <p>Empleado: ${user ? user.displayName || user.email : 'Usuario'}</p>
