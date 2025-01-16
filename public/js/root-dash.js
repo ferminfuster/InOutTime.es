@@ -19,6 +19,8 @@ import {
     deleteDoc    
 } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
 
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js";
+
 // Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBF7gSoZD2mebyD_Kwl-sq5y1ZfErYZfrs",
@@ -34,6 +36,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functions = getFunctions(app); 
 
 // Definir todas las funciones como globales desde el principio
 window.abrirModalNuevaEmpresa = function() {
@@ -277,7 +280,7 @@ window.cargarUsuarios = async function() {
                             <button class="btn btn-info btn-sm" onclick="modificarUsuario('${documento.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-danger btn-sm" onclick="desactivarUsuario('${documento.id}')">
+                            <button class="btn btn-danger btn-sm" onclick="desactivarUsuario('${usuario.email}')">
                                 <i class="fas fa-user-slash"></i>
                             </button>
                         </div>
@@ -662,3 +665,94 @@ window.logout = async function() {
         console.error("Error al cerrar sesión:", error);
     }
 }
+
+// Función para desactivar y eliminar usuario de Firestore y Firebase Authentication
+window.desactivarUsuario = async function(email) {
+    try {
+        // Verificar permisos (ROOT o ADMIN)
+        const userActual = auth.currentUser;
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const datosUsuarioActual = userDoc.data();
+
+        if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
+            throw new Error('No tienes permisos para eliminar usuarios');
+        }
+
+        // Confirmar eliminación
+        const confirmacion = await Swal.fire({
+            title: '¿Estás seguro?',
+            html: `Vas a eliminar al usuario con email: <strong>${email}</strong>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!confirmacion.isConfirmed) return;
+
+        // Buscar usuario a eliminar en Firestore
+        const usuarioQuery = await getDocs(
+            query(collection(db, 'usuarios'), where('email', '==', email))
+        );
+
+        if (usuarioQuery.empty) {
+            throw new Error('Usuario no encontrado en Firestore');
+        }
+
+        const usuarioDoc = usuarioQuery.docs[0];
+        const usuarioData = usuarioDoc.data();
+
+        // Registrar usuario eliminado en otra colección
+        await addDoc(collection(db, 'usuarios_eliminados'), {
+            email: usuarioData.email,
+            nombre: usuarioData.nombre,
+            apellidos: usuarioData.apellidos || '',
+            empresaId: usuarioData.empresaId || null,
+            eliminadoPor: {
+                uid: userActual.uid,
+                email: userActual.email,
+                rol: datosUsuarioActual.rol
+            },
+            fechaEliminacion: new Date(),
+            datosOriginales: usuarioData
+        });
+
+        // Eliminar usuario de Firestore
+        try {
+            await deleteDoc(usuarioDoc.ref); // Intentar eliminar el documento de Firestore
+            console.log(`Usuario ${email} eliminado de Firestore`);
+        } catch (error) {
+            console.error("Error al eliminar usuario de Firestore:", error);
+            throw new Error('Error al eliminar usuario de Firestore');
+        }
+
+        // Llamar a la función de Cloud Functions para eliminar de Authentication
+        const deleteUserFunction = httpsCallable(functions, 'deleteUser');
+        await deleteUserFunction({ email });
+
+        // Notificación de éxito
+        await Swal.fire({
+            icon: 'success',
+            title: 'Usuario Eliminado',
+            html: `
+                <p>El usuario <strong>${usuarioData.nombre} ${usuarioData.apellidos || ''}</strong> ha sido eliminado de Firestore y Firebase Authentication.</p>
+            `,
+            confirmButtonText: 'Entendido'
+        });
+
+        // Recargar lista de usuarios
+        await cargarUsuarios();
+
+    } catch (error) {
+        console.error("Error al eliminar usuario:", error);
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message,
+            confirmButtonText: 'Entendido'
+        });
+    }
+};
