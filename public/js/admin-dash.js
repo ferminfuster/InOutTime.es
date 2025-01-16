@@ -177,6 +177,9 @@ async function cargarUsuarios() {
                     <td>${usuario.rol || 'Sin rol'}</td>
                     <td>
                         <div class="btn-group" role="group">
+                            <button class="btn btn-success btn-sm" onclick="mostrarInformacionUsuario('${usuario.email}')">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
                             <button class="btn btn-warning btn-sm" onclick="restablecerUsuario('${usuario.email}')">
                                 <i class="fas fa-key"></i>
                             </button>
