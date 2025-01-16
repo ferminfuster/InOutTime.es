@@ -134,6 +134,7 @@ window.abrirModalNuevoUsuario = function() {
 
 ////////////////////////
 //funcion CargarUsuario
+////////////////////////
 async function cargarUsuarios() {
     try {
         console.log("Iniciando carga de usuarios");
@@ -217,7 +218,7 @@ async function cargarUsuarios() {
 //////////////////////////
 // CREAR NUEVO USUARIO //
 ////////////////////////
-
+/*
 window.crearNuevoUsuario = async function (event) {
     event.preventDefault();
 
@@ -249,16 +250,6 @@ window.crearNuevoUsuario = async function (event) {
         }
         console.log("ID de la empresa del usuario actual:", empresaId);
 
-        /* Obtener el nombre de la empresa
-        let nombreEmpresa = 'Sin empresa';
-        try {
-            const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
-            if (empresaDoc.exists()) {
-                nombreEmpresa = empresaDoc.data().nombre_empresa;
-            }
-        } catch (empresaError) {
-            console.error("Error al obtener nombre de empresa:", empresaError);
-        }*/
 
         // Generar contraseña temporal
         const passwordTemporal = window.generarPasswordTemporal();
@@ -315,7 +306,119 @@ window.crearNuevoUsuario = async function (event) {
     }
 };
 
+*/
 
+window.crearNuevoUsuario = async function (event) {
+    event.preventDefault();
+
+    // Obtener valores del formulario
+    const nombre = document.getElementById("nombre").value;
+    const apellidos = document.getElementById("apellidos").value;
+    const dni = document.getElementById("dni").value;
+    const email = document.getElementById("email").value;
+    const rol = document.getElementById("rol").value;
+
+    // Datos de contacto
+    const telefonoPrefijo = document.getElementById("telefonoPrefijo").value;
+    const telefonoNumero = document.getElementById("telefonoNumero").value;
+    const direccionCalle = document.getElementById("direccionCalle").value;
+    const direccionCodigoPostal = document.getElementById("direccionCodigoPostal").value;
+    const direccionCiudad = document.getElementById("direccionCiudad").value;
+    const direccionProvincia = document.getElementById("direccionProvincia").value;
+    const direccionPais = document.getElementById("direccionPais").value;
+
+    try {
+        // Verificar usuario autenticado
+        const userActual = auth.currentUser;
+        if (!userActual) {
+            throw new Error("Usuario no autenticado. Por favor, inicie sesión.");
+        }
+
+        // Obtener datos del usuario autenticado desde Firestore
+        const userDoc = await getDoc(doc(db, "usuarios", userActual.uid));
+        if (!userDoc.exists()) {
+            throw new Error("No se encontraron datos del usuario actual en Firestore.");
+        }
+
+        // Obtener el ID de la empresa del usuario actual
+        const empresaId = userDoc.data().empresa;
+        if (!empresaId) {
+            throw new Error("El usuario autenticado no tiene asignada una empresa.");
+        }
+
+        // Validaciones adicionales
+        if (telefonoNumero && !/^\d{9}$/.test(telefonoNumero)) {
+            throw new Error("Número de teléfono inválido. Debe contener 9 dígitos.");
+        }
+
+        // Generar contraseña temporal
+        const passwordTemporal = window.generarPasswordTemporal();
+
+        // Llamar a la Cloud Function para crear el usuario
+        const createUserFunction = httpsCallable(functions, 'createUser');
+        const result = await createUserFunction({
+            nombre,
+            apellidos,
+            dni,
+            email,
+            empresa: empresaId,
+            rol,
+            password: passwordTemporal,
+            contactoPersonal: {
+                telefono: {
+                    prefijo: telefonoPrefijo,
+                    numero: telefonoNumero,
+                    tipo: 'móvil'
+                },
+                direccion: {
+                    calle: direccionCalle,
+                    codigoPostal: direccionCodigoPostal,
+                    ciudad: direccionCiudad,
+                    provincia: direccionProvincia,
+                    pais: direccionPais
+                }
+            }
+        });
+
+        if (result.data && result.data.success) {
+            // Mostrar confirmación con SweetAlert2
+            await Swal.fire({
+                icon: 'success',
+                title: '✅ Usuario Creado',
+                html: `
+                    <p>El usuario <strong>${nombre} ${apellidos}</strong> ha sido creado exitosamente.</p>
+                    <p>📧 <strong>Email:</strong> ${email}</p>
+                    <p>🏢 <strong>Empresa:</strong> ${empresaId}</p>
+                    <p>🔑 <strong>Contraseña Temporal:</strong> <code>${result.data.passwordTemporal}</code></p>
+                    <p>✅ Pídele que cambie su contraseña al iniciar sesión.</p>
+                `,
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#3085d6'
+            });
+
+            // Cerrar modal
+            const modalElement = document.getElementById("modalNuevoUsuario");
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+
+            // Limpiar formulario
+            event.target.reset();
+
+            // Recargar lista de usuarios
+            await cargarUsuarios();
+        } else {
+            throw new Error(result.data.message || "Error desconocido al crear el usuario.");
+        }
+    } catch (error) {
+        console.error("Error al crear usuario:", error);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error al Crear Usuario',
+            text: error.message,
+            confirmButtonText: 'Cerrar'
+        });
+    }
+};
 
 // Función para generar una contraseña temporal segura
 window.generarPasswordTemporal = function() {
