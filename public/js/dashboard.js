@@ -667,7 +667,7 @@ window.mostrarMisInformes = async function() {
 
       const userId = user.uid;
 
-      // Obtener los registros desde Firestore
+      // Consulta con el índice correcto
       const registrosSnapshot = await getDocs(
           query(
               collection(db, "registros"), 
@@ -676,7 +676,10 @@ window.mostrarMisInformes = async function() {
           )
       );
 
-      const registros = registrosSnapshot.docs.map(doc => doc.data());
+      const registros = registrosSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+      }));
 
       if (registros.length === 0) {
           Swal.fire({
@@ -766,7 +769,7 @@ window.mostrarMisInformes = async function() {
       Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Ocurrió un error al cargar los registros.'
+          text: 'Ocurrió un error al cargar los registros: ' + error.message
       });
   }
 };
@@ -774,6 +777,9 @@ window.mostrarMisInformes = async function() {
 // Función para procesar registros
 function procesarRegistrosDiarios(registros) {
   const registrosPorFecha = {};
+
+  // Ordenar registros por fecha
+  registros.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
 
   registros.forEach(registro => {
       const fecha = registro.fecha.toDate();
@@ -786,10 +792,10 @@ function procesarRegistrosDiarios(registros) {
           };
       }
 
-      if (registro.accion_registro === 'entrada') {
-          registrosPorFecha[fechaKey].entrada = fecha;
-      } else if (registro.accion_registro === 'salida') {
-          registrosPorFecha[fechaKey].salida = fecha;
+      if (registro.accion_registro === 'entrada' && (!registrosPorFecha[fechaKey].entrada || registro.fecha.toDate() < registrosPorFecha[fechaKey].entrada)) {
+          registrosPorFecha[fechaKey].entrada = registro.fecha.toDate();
+      } else if (registro.accion_registro === 'salida' && (!registrosPorFecha[fechaKey].salida || registro.fecha.toDate() > registrosPorFecha[fechaKey].salida)) {
+          registrosPorFecha[fechaKey].salida = registro.fecha.toDate();
       }
   });
 
@@ -813,6 +819,7 @@ function procesarRegistrosDiarios(registros) {
   });
 }
 
+// Resto de las funciones de descarga, email e impresión igual que antes
 // Función para descargar CSV
 function descargarInformeCSV(registros) {
   const encabezados = ["Fecha", "Hora Entrada", "Hora Salida", "Horas Trabajadas"];
