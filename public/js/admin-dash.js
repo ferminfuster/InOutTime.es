@@ -1004,13 +1004,12 @@ window.modificarUsuario = async function(email) {
                                    value="${usuarioData.contactoPersonal?.direccion?.provincia || ''}">
                             <select id="swal-direccion-pais" class="swal2-select">
                                 <option value="España" ${usuarioData.contactoPersonal?.direccion?.pais === 'España' ? 'selected' : ''}>España</option>
-                                <option value="Portugal" ${usuarioData.contactoPersonal?.direccion?.pais === 'Portugal' ? 'selected' : ''}>Portugal</option>
                             </select>
                         </div>
                     </div>
                 </div>
             `,
-            width: '800px',
+            width: '900px',
             background: '#f4f4f4',
             focusConfirm: false,
             preConfirm: () => {
