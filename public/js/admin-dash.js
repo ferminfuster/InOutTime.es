@@ -177,16 +177,24 @@ async function cargarUsuarios() {
                     <td>${usuario.rol || 'Sin rol'}</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <button class="btn btn-success btn-sm" onclick="mostrarInformacionUsuario('${usuario.email}')">
+                            <button class="btn btn-success btn-sm" 
+                                    onclick="mostrarInformacionUsuario('${usuario.email}')"
+                                    title="Mostrar Información">
                                 <i class="fas fa-info-circle"></i>
                             </button>
-                            <button class="btn btn-warning btn-sm" onclick="restablecerUsuario('${usuario.email}')">
+                            <button class="btn btn-warning btn-sm" 
+                                    onclick="restablecerUsuario('${usuario.email}')"
+                                    title="Restablecer Contraseña">
                                 <i class="fas fa-key"></i>
                             </button>
-                            <button class="btn btn-info btn-sm" onclick="modificarUsuario('${usuario.email}')">
+                            <button class="btn btn-info btn-sm" 
+                                    onclick="modificarUsuario('${usuario.email}')"
+                                    title="Editar Usuario">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-danger btn-sm" onclick="desactivarUsuario('${usuario.email}')">
+                            <button class="btn btn-danger btn-sm" 
+                                    onclick="desactivarUsuario('${usuario.email}')"
+                                    title="Desactivar Usuario">
                                 <i class="fas fa-user-slash"></i>
                             </button>
                         </div>
