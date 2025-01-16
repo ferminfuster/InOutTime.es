@@ -1000,7 +1000,11 @@ window.desactivarUsuario = async function(email) {
 */
 window.modificarUsuario = async function(email) {
     try {
+        console.log("Iniciando modificación de usuario con email:", email);
+
         const userActual = auth.currentUser;
+        console.log("Usuario actual:", userActual);
+
         const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
         const datosUsuarioActual = userDoc.data();
         
@@ -1009,6 +1013,7 @@ window.modificarUsuario = async function(email) {
         }
 
         const usuarioQuery = await getDocs(query(collection(db, 'usuarios'), where('email', '==', email)));
+        console.log("Resultado de la consulta de usuario:", usuarioQuery);
 
         if (usuarioQuery.empty) {
             throw new Error('Usuario no encontrado');
@@ -1016,9 +1021,103 @@ window.modificarUsuario = async function(email) {
 
         const usuarioDoc = usuarioQuery.docs[0];
         const usuarioData = usuarioDoc.data();
+        console.log("Datos del usuario a modificar:", usuarioData);
 
         const { value: formValues } = await Swal.fire({
-            // ... (código HTML anterior sin cambios)
+            title: `Modificar Usuario: ${usuarioData.nombre} ${usuarioData.apellidos}`,
+            html: `
+                <style>
+                    .swal-form {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 15px;
+                        text-align: left;
+                    }
+                    .swal-section-title {
+                        grid-column: 1 / 3;
+                        font-weight: bold;
+                        border-bottom: 2px solid #3085d6;
+                        padding-bottom: 10px;
+                        margin-bottom: 15px;
+                        color: #3085d6;
+                    }
+                    .swal2-input, .swal2-select {
+                        width: 100%;
+                        box-sizing: border-box;
+                    }
+                </style>
+                <div class="swal-form">
+                    <div class="swal-section-title">Información Personal</div>
+                    <div>
+                        <label>Nombre</label>
+                        <input id="swal-nombre" class="swal2-input" placeholder="Nombre" value="${usuarioData.nombre || ''}">
+                    </div>
+                    <div>
+                        <label>Apellidos</label>
+                        <input id="swal-apellidos" class="swal2-input" placeholder="Apellidos" value="${usuarioData.apellidos || ''}">
+                    </div>
+                    <div>
+                        <label>Rol</label>
+                        <select id="swal-rol" class="swal2-select">
+                            <option value="usuario" ${usuarioData.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
+                            <option value="admin" ${usuarioData.rol === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Email</label>
+                        <input id="swal-email" class="swal2-input" value="${usuarioData.email}" readonly>
+                    </div>
+
+                    <div class="swal-section-title">Información de Contacto</div>
+                    <div>
+                        <label>Teléfono</label>
+                        <div class="input-group">
+                            <select id="swal-telefono-prefijo" class="swal2-select" style="max-width: 100px;">
+                                <option value="+34" ${usuarioData.contactoPersonal?.telefono?.prefijo === '+34' ? 'selected' : ''}>+34</option>
+                                <option value="+351" ${usuarioData.contactoPersonal?.telefono?.prefijo === '+351' ? 'selected' : ''}>+351</option>
+                            </select>
+                            <input type="tel" id="swal-telefono-numero" class="swal2-input" 
+                                   placeholder="Número de teléfono" 
+                                   value="${usuarioData.contactoPersonal?.telefono?.numero || ''}" 
+                                   pattern="[0-9]{9}">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Dirección</label>
+                        <input id="swal-direccion-calle" class="swal2-input" 
+                               placeholder="Calle y número" 
+                               value="${usuarioData.contactoPersonal?.direccion?.calle || ''}">
+                    </div>
+                    <div class="input-group">
+                        <input id="swal-direccion-codigo-postal" class="swal2-input" 
+                               placeholder="Código Postal" 
+                               value="${usuarioData.contactoPersonal?.direccion?.codigoPostal || ''}" 
+                               pattern="[0-9]{5}">
+                        <input id="swal-direccion-ciudad" class="swal2-input" 
+                               placeholder="Ciudad" 
+                               value="${usuarioData.contactoPersonal?.direccion?.ciudad || ''}">
+                    </div>
+                    <div>
+                        <label>Provincia y País</label>
+                        <div class="input-group">
+                            <input id="swal-direccion-provincia" class="swal2-input" 
+                                   placeholder="Provincia" 
+                                   value="${usuarioData.contactoPersonal?.direccion?.provincia || ''}">
+                            <select id="swal-direccion-pais" class="swal2-select">
+                                <option value="España" ${usuarioData.contactoPersonal?.direccion?.pais === 'España' ? 'selected' : ''}>España</option>
+                                <option value="Portugal" ${usuarioData.contactoPersonal?.direccion?.pais === 'Portugal' ? 'selected' : ''}>Portugal</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `,
+            width: '800px',
+            background: '#f4f4f4',
+            showCancelButton: true,
+            confirmButtonText: 'Guardar Cambios',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
             focusConfirm: false,
             preConfirm: () => {
                 const nombre = document.getElementById('swal-nombre').value.trim();
@@ -1034,9 +1133,23 @@ window.modificarUsuario = async function(email) {
                 const direccionProvincia = document.getElementById('swal-direccion-provincia').value.trim();
                 const direccionPais = document.getElementById('swal-direccion-pais').value;
 
+                console.log("Valores del formulario:", {
+                    nombre,
+                    apellidos,
+                    rol,
+                    telefonoPrefijo,
+                    telefonoNumero,
+                    direccionCalle,
+                    direccionCodigoPostal,
+                    direccionCiudad,
+                    direccionProvincia,
+                    direccionPais
+                });
+
                 // Validaciones
                 if (!nombre) {
-                    Swal.showValidationMessage('El nombre es obligatorio');
+                    Swal.show
+					                    Swal.showValidationMessage('El nombre es obligatorio');
                     return false;
                 }
 
@@ -1071,20 +1184,26 @@ window.modificarUsuario = async function(email) {
                         }
                     }
                 };
-            },
-            // Resto de las opciones anteriores
+            }
         });
 
-        // Si se confirman los cambios
+        // Verificar si se han proporcionado valores
+        console.log("Valores del formulario recibidos:", formValues);
+
         if (formValues) {
             // Actualizar en Firestore
-            await updateDoc(usuarioDoc.ref, {
+            const usuarioRef = doc(db, 'usuarios', usuarioDoc.id);
+            console.log("Referencia del usuario a actualizar:", usuarioRef);
+
+            await updateDoc(usuarioRef, {
                 nombre: formValues.nombre,
                 apellidos: formValues.apellidos,
                 rol: formValues.rol,
                 contactoPersonal: formValues.contactoPersonal,
                 fechaUltimaModificacion: serverTimestamp()
             });
+
+            console.log("Usuario actualizado correctamente");
 
             // Log de modificación
             await addDoc(collection(db, 'logs_modificaciones'), {
@@ -1109,21 +1228,26 @@ window.modificarUsuario = async function(email) {
             });
 
             // Recargar lista de usuarios
-            await cargarUsuarios();
+            if (typeof cargarUsuarios === 'function') {
+                await cargarUsuarios();
+            } else {
+                console.warn('La función cargarUsuarios no está definida');
+            }
         }
 
     } catch (error) {
-        console.error("Error al modificar usuario:", error);
+        console.error("Error completo al modificar usuario:", error);
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: error.message,
+            text: error.message || 'Ocurrió un error al modificar el usuario',
             confirmButtonText: 'Entendido'
         });
     }
 };
 
-
+// Añadir al objeto window para poder llamarla globalmente
+window.modificarUsuario = modificarUsuario;
 
 
 
