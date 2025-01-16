@@ -764,6 +764,7 @@ window.mostrarMisInformes = async function() {
               document.getElementById('btnDescargarInforme').addEventListener('click', () => descargarInformeCSV(registrosProcesados));
               document.getElementById('btnEnviarInforme').addEventListener('click', () => enviarInformePorEmail(registrosProcesados, user));
               document.getElementById('btnImprimirInforme').addEventListener('click', imprimirInforme);
+              document.getElementById('btnCerrarModal').addEventListener('click', () => Swal.close());
           }
       });
 
