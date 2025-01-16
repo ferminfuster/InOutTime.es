@@ -57,13 +57,11 @@ exports.deleteUser = functions.https.onCall(async (data, context) => {
 //*************************************** */
 //ELIMINAR USUARIO -- FIN
 //*************************************** */
+
+
 //*************************************** */
 //CREAR USUARIO -- INICIO
 //*************************************** */
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-
-admin.initializeApp();
 
 exports.createUser = functions.https.onCall(async (data, context) => {
     // Validar si el usuario que llama tiene permisos
