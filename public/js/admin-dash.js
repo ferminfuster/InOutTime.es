@@ -605,119 +605,184 @@ window.restablecerUsuario = function(email) {
           });
         }
       };
-
-
+////////////////////
+//Modificar usuario
+///////////////////
 window.modificarUsuario = async function(email) {
-        try {
-            // 1. Verificar permisos (solo admin o root)
-            const userActual = auth.currentUser;
-            const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
-            const datosUsuarioActual = userDoc.data();
-            
-            if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
-                throw new Error('No tienes permisos para modificar usuarios');
-            }
-    
-            // 2. Buscar datos del usuario a modificar
-            const usuarioQuery = await getDocs(
-                query(collection(db, 'usuarios'), where('email', '==', email))
-            );
-    
-            if (usuarioQuery.empty) {
-                throw new Error('Usuario no encontrado');
-            }
-    
-            const usuarioDoc = usuarioQuery.docs[0];
-            const usuarioData = usuarioDoc.data();
-    
-            // 3. Mostrar modal con información del usuario
-            const { value: formValues } = await Swal.fire({
-                title: 'Modificar Usuario',
-                html: `
-                    <div class="swal-form">
-                        <input id="swal-nombre" class="swal2-input" placeholder="Nombre" value="${usuarioData.nombre || ''}">
-                        <input id="swal-apellidos" class="swal2-input" placeholder="Apellidos" value="${usuarioData.apellidos || ''}">
-                        <select id="swal-rol" class="swal2-select">
-                            <option value="usuario" ${usuarioData.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
-                            <option value="admin" ${usuarioData.rol === 'admin' ? 'selected' : ''}>Admin</option>
-                        </select>
-                    </div>
-                `,
-                focusConfirm: false,
-                preConfirm: () => {
-                    const nombre = document.getElementById('swal-nombre').value;
-                    const apellidos = document.getElementById('swal-apellidos').value;
-                    const rol = document.getElementById('swal-rol').value;
-                    
-    
-                    // Validaciones básicas
-                    if (!nombre) {
-                        Swal.showValidationMessage('El nombre es obligatorio');
-                        return false;
-                    }
-    
-                    return {
-                        nombre,
-                        apellidos,
-                        rol,
-                        
-                    };
-                },
-                showCancelButton: true,
-                confirmButtonText: 'Guardar Cambios',
-                cancelButtonText: 'Cancelar'
-            });
-    
-            // 4. Si se confirman los cambios
-            if (formValues) {
-                // Preparar datos para actualización
-                const datosActualizados = {
-                    nombre: formValues.nombre,
-                    apellidos: formValues.apellidos,
-                    rol: formValues.rol,
-                };
-    
-                // 5. Actualizar en Firestore
-                await updateDoc(usuarioDoc.ref, datosActualizados);
-    
-                // 6. Log de modificación
-                await addDoc(collection(db, 'logs_modificaciones'), {
-                    usuarioModificado: email,
-                    modificadoPor: {
-                        uid: userActual.uid,
-                        email: userActual.email
-                    },
-                    fechaModificacion: new Date(),
-                    cambiosRealizados: datosActualizados
-                });
-    
-                // 7. Notificación de éxito
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'Usuario Modificado',
-                    text: `Los datos de ${email} han sido actualizados correctamente`,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-    
-                // 8. Recargar lista de usuarios
-                await cargarUsuarios();
-    
-            }
-    
-        } catch (error) {
-            console.error("Error al modificar usuario:", error);
-    
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.message,
-                confirmButtonText: 'Entendido'
-            });
+    try {
+        // 1. Verificar permisos (solo admin o root)
+        const userActual = auth.currentUser;
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const datosUsuarioActual = userDoc.data();
+        
+        if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
+            throw new Error('No tienes permisos para modificar usuarios');
         }
-    };
+
+        // 2. Buscar datos del usuario a modificar
+        const usuarioQuery = await getDocs(
+            query(collection(db, 'usuarios'), where('email', '==', email))
+        );
+
+        if (usuarioQuery.empty) {
+            throw new Error('Usuario no encontrado');
+        }
+
+        const usuarioDoc = usuarioQuery.docs[0];
+        const usuarioData = usuarioDoc.data();
+
+        // 3. Mostrar modal con información del usuario
+        const { value: formValues } = await Swal.fire({
+            title: 'Modificar Usuario',
+            html: `
+                <div class="swal-form">
+                    <h3>Información Personal</h3>
+                    <input id="swal-nombre" class="swal2-input" placeholder="Nombre" value="${usuarioData.nombre || ''}">
+                    <input id="swal-apellidos" class="swal2-input" placeholder="Apellidos" value="${usuarioData.apellidos || ''}">
+                    <select id="swal-rol" class="swal2-select">
+                        <option value="usuario" ${usuarioData.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
+                        <option value="admin" ${usuarioData.rol === 'admin' ? 'selected' : ''}>Admin</option>
+                    </select>
+
+                    <h3>Información de Contacto</h3>
+                    <div class="input-group mb-2">
+                        <select id="swal-telefono-prefijo" class="form-control" style="max-width: 100px;">
+                            <option value="+34" ${usuarioData.contactoPersonal?.telefono?.prefijo === '+34' ? 'selected' : ''}>+34</option>
+                            <option value="+351" ${usuarioData.contactoPersonal?.telefono?.prefijo === '+351' ? 'selected' : ''}>+351</option>
+                        </select>
+                        <input type="tel" id="swal-telefono-numero" class="form-control" 
+                               placeholder="Número de teléfono" 
+                               value="${usuarioData.contactoPersonal?.telefono?.numero || ''}"
+                               pattern="[0-9]{9}">
+                    </div>
+
+                    <h3>Dirección</h3>
+                    <input id="swal-direccion-calle" class="swal2-input" 
+                           placeholder="Calle y número" 
+                           value="${usuarioData.contactoPersonal?.direccion?.calle || ''}">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input id="swal-direccion-codigo-postal" class="swal2-input" 
+                                   placeholder="Código Postal" 
+                                   value="${usuarioData.contactoPersonal?.direccion?.codigoPostal || ''}"
+                                   pattern="[0-9]{5}">
+                        </div>
+                        <div class="col-md-8">
+                            <input id="swal-direccion-ciudad" class="swal2-input" 
+                                   placeholder="Ciudad" 
+                                   value="${usuarioData.contactoPersonal?.direccion?.ciudad || ''}">
+                        </div>
+                    </div>
+                    <input id="swal-direccion-provincia" class="swal2-input" 
+                           placeholder="Provincia" 
+                           value="${usuarioData.contactoPersonal?.direccion?.provincia || ''}">
+                    <select id="swal-direccion-pais" class="swal2-select">
+                        <option value="España" ${usuarioData.contactoPersonal?.direccion?.pais === 'España' ? 'selected' : ''}>España</option>
+                        <option value="Portugal" ${usuarioData.contactoPersonal?.direccion?.pais === 'Portugal' ? 'selected' : ''}>Portugal</option>
+                    </select>
+                </div>
+            `,
+            focusConfirm: false,
+            preConfirm: () => {
+                const nombre = document.getElementById('swal-nombre').value;
+                const apellidos = document.getElementById('swal-apellidos').value;
+                const rol = document.getElementById('swal-rol').value;
+                
+                // Datos de contacto
+                const telefonoPrefijo = document.getElementById('swal-telefono-prefijo').value;
+                const telefonoNumero = document.getElementById('swal-telefono-numero').value;
+                const direccionCalle = document.getElementById('swal-direccion-calle').value;
+                const direccionCodigoPostal = document.getElementById('swal-direccion-codigo-postal').value;
+                const direccionCiudad = document.getElementById('swal-direccion-ciudad').value;
+                const direccionProvincia = document.getElementById('swal-direccion-provincia').value;
+                const direccionPais = document.getElementById('swal-direccion-pais').value;
+
+                // Validaciones básicas
+                if (!nombre) {
+                    Swal.showValidationMessage('El nombre es obligatorio');
+                    return false;
+                }
+
+                // Validación de teléfono (opcional)
+                if (telefonoNumero && !/^\d{9}$/.test(telefonoNumero)) {
+                    Swal.showValidationMessage('Número de teléfono inválido');
+                    return false;
+                }
+
+                return {
+                    nombre,
+                    apellidos,
+                    rol,
+                    contactoPersonal: {
+                        telefono: {
+                            prefijo: telefonoPrefijo,
+                            numero: telefonoNumero,
+                            tipo: 'móvil'
+                        },
+                        direccion: {
+                            calle: direccionCalle,
+                            codigoPostal: direccionCodigoPostal,
+                            ciudad: direccionCiudad,
+                            provincia: direccionProvincia,
+                            pais: direccionPais
+                        }
+                    }
+                };
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Guardar Cambios',
+            cancelButtonText: 'Cancelar'
+        });
+
+        // 4. Si se confirman los cambios
+        if (formValues) {
+            // 5. Actualizar en Firestore
+            await updateDoc(usuarioDoc.ref, {
+                nombre: formValues.nombre,
+                apellidos: formValues.apellidos,
+                rol: formValues.rol,
+                contactoPersonal: formValues.contactoPersonal,
+                fechaUltimaModificacion: new Date()
+            });
+
+            // 6. Log de modificación
+            await addDoc(collection(db, 'logs_modificaciones'), {
+                usuarioModificado: email,
+                modificadoPor: {
+                    uid: userActual.uid,
+                    email: userActual.email
+                },
+                fechaModificacion: new Date(),
+                cambiosRealizados: formValues
+            });
+
+            // 7. Notificación de éxito
+            await Swal.fire({
+                icon: 'success',
+                title: 'Usuario Modificado',
+                text: `Los datos de ${email} han sido actualizados correctamente`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            // 8. Recargar lista de usuarios
+            await cargarUsuarios();
+
+        }
+
+    } catch (error) {
+        console.error("Error al modificar usuario:", error);
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message,
+            confirmButtonText: 'Entendido'
+        });
+    }
+};
 
 
 // Función para desactivar y eliminar usuario de Firestore y Firebase Authentication
