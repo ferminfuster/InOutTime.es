@@ -651,6 +651,7 @@ window.cambiarPassword = function() {
 };
 ///
 // Mis Informes
+// Función principal para mostrar informes
 window.mostrarMisInformes = async function() {
   try {
       // Obtener el usuario autenticado
@@ -669,8 +670,7 @@ window.mostrarMisInformes = async function() {
       // Consulta con el índice correcto
       const q = query(
           collection(db, "registros"), 
-          where("userId", "==", userId),
-          orderBy("fecha", "desc")
+          where("userId", "==", userId)
       );
 
       const registrosSnapshot = await getDocs(q);
@@ -680,7 +680,9 @@ window.mostrarMisInformes = async function() {
               id: doc.id,
               ...doc.data()
           }))
-          .filter(registro => registro.userId === userId);
+          .filter(registro => registro.userId === userId)
+          // Ordenar manualmente
+          .sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
 
       if (registros.length === 0) {
           Swal.fire({
@@ -775,7 +777,7 @@ window.mostrarMisInformes = async function() {
               title: 'Índice Necesario',
               html: `
                   <p>Se requiere crear un índice en Firestore.</p>
-                  <a href="https://console.firebase.google.com/v1/r/project/inouttime-25fe6/firestore/indexes?create_composite" 
+                  <a href="https://console.firebase.google.com/v1/r/project/inouttime-25fe6/firestore/indexes" 
                      target="_blank" class="btn btn-primary">
                       Crear Índice
                   </a>
@@ -791,3 +793,134 @@ window.mostrarMisInformes = async function() {
       }
   }
 };
+
+// Función para procesar registros
+function procesarRegistrosDiarios(registros) {
+  const registrosPorFecha = {};
+
+  registros.forEach(registro => {
+      const fecha = registro.fecha.toDate();
+      const fechaKey = fecha.toLocaleDateString('es-ES');
+
+      if (!registrosPorFecha[fechaKey]) {
+          registrosPorFecha[fechaKey] = {
+              entrada: null,
+              salida: null
+          };
+      }
+
+      if (registro.accion_registro === 'entrada' && 
+          (!registrosPorFecha[fechaKey].entrada || 
+           registro.fecha.toDate() < registrosPorFecha[fechaKey].entrada)) {
+          registrosPorFecha[fechaKey].entrada = registro.fecha.toDate();
+      } else if (registro.accion_registro === 'salida' && 
+                 (!registrosPorFecha[fechaKey].salida || 
+                  registro.fecha.toDate() > registrosPorFecha[fechaKey].salida)) {
+          registrosPorFecha[fechaKey].salida = registro.fecha.toDate();
+      }
+  });
+
+  return Object.keys(registrosPorFecha).map(fechaKey => {
+      const registroDia = registrosPorFecha[fechaKey];
+      const { entrada, salida } = registroDia;
+      
+      let horasTrabajadas = 'N/A';
+
+      if (entrada && salida) {
+          const diferenciaMs = salida - entrada;
+          const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+          const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+          horasTrabajadas = `${horas} horas ${minutos} minutos`;
+      }
+
+      return {
+          fecha: fechaKey,
+          entrada: entrada ? entrada.toLocaleTimeString('es-ES') : 'N/A',
+          salida: salida ? salida.toLocaleTimeString('es-ES') : 'N/A',
+          horasTrabajadas
+      };
+  });
+}
+
+// Función para descargar CSV
+function descargarInformeCSV(registros) {
+  const encabezados = ["Fecha", "Hora Entrada", "Hora Salida", "Horas Trabajadas"];
+  
+  const filas = registros.map(registro => 
+      [registro.fecha, registro.entrada, registro.salida, registro.horasTrabajadas]
+                      .map(valor => `"${valor.replace(/"/g, '""')}"`)
+          .join(",")
+  );
+
+  const contenidoCSV = [encabezados.join(","), ...filas].join("\n");
+
+  const blob = new Blob([contenidoCSV], { type: "text/csv;charset=utf-8;" });
+  const enlace = document.createElement("a");
+  enlace.href = URL.createObjectURL(blob);
+  enlace.download = `informe_horas_${new Date().toISOString().split('T')[0]}.csv`;
+  enlace.click();
+}
+
+// Función de envío de email (placeholder)
+function enviarInformePorEmail(registros, user) {
+  Swal.fire({
+      icon: 'info',
+      title: 'Enviar Informe',
+      text: 'Funcionalidad de envío por email próximamente.',
+      confirmButtonText: 'Entendido'
+  });
+}
+
+// Función de impresión
+function imprimirInforme() {
+  const contenidoImpresion = document.querySelector('.tabla-informes').outerHTML;
+  
+  const ventanaImpresion = window.open('', '', 'width=600,height=800');
+  ventanaImpresion.document.open();
+  ventanaImpresion.document.write(`
+      <html>
+          <head>
+              <title>Informe de Horas</title>
+              <style>
+                  body { 
+                      font-family: Arial, sans-serif; 
+                      margin: 20px;
+                  }
+                  table { 
+                      width: 100%; 
+                      border-collapse: collapse; 
+                      margin-bottom: 20px;
+                  }
+                  th, td { 
+                      border: 1px solid #ddd; 
+                      padding: 8px; 
+                      text-align: center; 
+                  }
+                  th { 
+                      background-color: #f2f2f2; 
+                  }
+                  @media print {
+                      body { 
+                          margin: 0; 
+                      }
+                  }
+              </style>
+          </head>
+          <body>
+              <h2>Informe de Horas Trabajadas</h2>
+              <p>Fecha de generación: ${new Date().toLocaleDateString('es-ES')}</p>
+              ${contenidoImpresion}
+              <p>Informe generado por InOutTime</p>
+          </body>
+      </html>
+  `);
+  ventanaImpresion.document.close();
+  
+  // Abrir diálogo de impresión
+  ventanaImpresion.print();
+}
+
+// Exportar funciones globalmente si es necesario
+window.descargarInformeCSV = descargarInformeCSV;
+window.enviarInformePorEmail = enviarInformePorEmail;
+window.imprimirInforme = imprimirInforme;
