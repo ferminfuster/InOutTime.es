@@ -249,7 +249,7 @@ window.crearNuevoUsuario = async function (event) {
         }
         console.log("ID de la empresa del usuario actual:", empresaId);
 
-        // Obtener el nombre de la empresa
+        /* Obtener el nombre de la empresa
         let nombreEmpresa = 'Sin empresa';
         try {
             const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
@@ -258,7 +258,7 @@ window.crearNuevoUsuario = async function (event) {
             }
         } catch (empresaError) {
             console.error("Error al obtener nombre de empresa:", empresaError);
-        }
+        }*/
 
         // Generar contraseña temporal
         const passwordTemporal = window.generarPasswordTemporal();
@@ -270,7 +270,7 @@ window.crearNuevoUsuario = async function (event) {
             apellidos,
             dni,
             email,
-            empresa: nombreEmpresa,
+            empresa: empresaId,
             rol,
             password: passwordTemporal
         });
