@@ -214,7 +214,9 @@ async function cargarUsuarios() {
 
 
 
-//////////////////
+//////////////////////////
+// CREAR NUEVO USUARIO //
+////////////////////////
 
 window.crearNuevoUsuario = async function (event) {
     event.preventDefault();
@@ -233,15 +235,11 @@ window.crearNuevoUsuario = async function (event) {
             throw new Error("Usuario no autenticado. Por favor, inicie sesión.");
         }
 
-        console.log("Usuario autenticado UID:", userActual.uid);
-
         // Obtener datos del usuario autenticado desde Firestore
         const userDoc = await getDoc(doc(db, "usuarios", userActual.uid));
         if (!userDoc.exists()) {
             throw new Error("No se encontraron datos del usuario actual en Firestore.");
         }
-
-        console.log("Datos del usuario autenticado:", userDoc.data());
 
         // Obtener el ID de la empresa del usuario actual
         const empresaId = userDoc.data().empresa;
@@ -249,77 +247,72 @@ window.crearNuevoUsuario = async function (event) {
             throw new Error("El usuario autenticado no tiene asignada una empresa.");
         }
 
-        console.log("ID de la empresa del usuario actual:", empresaId);
-
-        // Generar contraseña temporal
-        const passwordTemporal = generarPasswordTemporal();
-
-        // Crear usuario en Firebase Authentication
-        const userCredential = await createUserWithEmailAndPassword(auth, email, passwordTemporal);
-        const user = userCredential.user;
-
-        console.log("Usuario creado en Authentication con UID:", user.uid);
-
-        // Datos del nuevo usuario
-        const userData = {
-            nombre: nombre,
-            apellidos: apellidos,
-            dni: dni,
-            email: email,
-            empresa: empresaId,
-            rol: rol,
-            uid: user.uid,
-            fechaRegistro: new Date(),
-            estado: "activo",
-        };
-
-        // Guardar información en Firestore
-        await setDoc(doc(db, "usuarios", user.uid), userData);
-        console.log("Datos del nuevo usuario guardados en Firestore.");
-
-        // Cerrar modal
-        const modalElement = document.getElementById("modalNuevoUsuario");
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        modal.hide();
-
-        // Limpiar formulario
-        event.target.reset();
-
-        // Recargar lista de usuarios
-        //window.cargarUsuarios();
-
-        // Mostrar contraseña temporal
-        Swal.fire({
-            icon: 'success',
-            title: 'Usuario Creado Exitosamente',
-            text: 'Usuario Creado con Exito',
-            showConfirmButton: true,
-            confirmButtonText: 'Entendido',
-            //timer: 6000,
-            timerProgressBar: true
-        });
-        
-    } catch (error) {
-        console.error("Error completo al crear usuario: ", error);
-
-        let mensajeError = "No se pudo crear el usuario";
-        switch (error.code) {
-            case "auth/email-already-in-use":
-                mensajeError = "El correo electrónico ya está registrado.";
-                break;
-            case "auth/invalid-email":
-                mensajeError = "El correo electrónico no es válido.";
-                break;
-            case "auth/weak-password":
-                mensajeError = "La contraseña es demasiado débil.";
-                break;
-            default:
-                mensajeError = error.message || "Error desconocido al crear usuario.";
+        // Obtener el nombre de la empresa
+        let nombreEmpresa = 'Sin empresa';
+        try {
+            const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
+            if (empresaDoc.exists()) {
+                nombreEmpresa = empresaDoc.data().nombre_empresa;
+            }
+        } catch (empresaError) {
+            console.error("Error al obtener nombre de empresa:", empresaError);
         }
 
-        alert(mensajeError);
+        // Generar contraseña temporal
+        const passwordTemporal = window.generarPasswordTemporal();
+
+        // Llamar a la Cloud Function para crear el usuario
+        const createUserFunction = httpsCallable(functions, 'createUser');
+        const result = await createUserFunction({
+            nombre,
+            apellidos,
+            dni,
+            email,
+            empresa: nombreEmpresa,
+            rol,
+            password: passwordTemporal
+        });
+
+        if (result.data && result.data.success) {
+            // Mostrar confirmación con SweetAlert2
+            await Swal.fire({
+                icon: 'success',
+                title: '✅ Usuario Creado',
+                html: `
+                    <p>El usuario <strong>${nombre} ${apellidos}</strong> ha sido creado exitosamente.</p>
+                    <p>📧 <strong>Email:</strong> ${email}</p>
+                    <p>🏢 <strong>Empresa:</strong> ${nombreEmpresa}</p>
+                    <p>🔑 <strong>Contraseña Temporal:</strong> <code>${result.data.passwordTemporal}</code></p>
+                    <p>✅ Pídele que cambie su contraseña al iniciar sesión.</p>
+                `,
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#3085d6'
+            });
+
+            // Cerrar modal
+            const modalElement = document.getElementById("modalNuevoUsuario");
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+
+            // Limpiar formulario
+            event.target.reset();
+
+            // Recargar lista de usuarios
+            window.cargarUsuarios();
+        } else {
+            throw new Error(result.data.message || "Error desconocido al crear el usuario.");
+        }
+    } catch (error) {
+        console.error("Error al crear usuario:", error);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error al Crear Usuario',
+            text: error.message,
+            confirmButtonText: 'Cerrar'
+        });
     }
 };
+
 
 
 // Función para generar una contraseña temporal segura
