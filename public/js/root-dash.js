@@ -306,8 +306,9 @@ window.cargarUsuarios = async function() {
     }
 }
 
-// Función para crear nuevo usuario
-// Función para crear nuevo usuario
+// Función para crear nuevo usuario 
+// Función para crear nuevo usuario FUNCIONA
+/*
 window.crearNuevoUsuario = async function(event) {
     event.preventDefault();
 
@@ -373,6 +374,47 @@ Por favor, indique al usuario que cambie su contraseña al iniciar sesión por p
 
     } catch (error) {
         console.error("Error completo al crear usuario: ", error);
+        alert("No se pudo crear el usuario: " + error.message);
+    }
+};
+*/
+window.crearNuevoUsuario = async function(event) {
+    event.preventDefault();
+
+    const nombre = document.getElementById('nombre').value;
+    const apellidos = document.getElementById('apellidos').value;
+    const dni = document.getElementById('dni').value;
+    const email = document.getElementById('email').value;
+    const empresaId = document.getElementById('empresa').value;
+    const rol = document.getElementById('rol').value;
+
+    try {
+        const passwordTemporal = window.generarPasswordTemporal();
+
+        // Llamar a la Cloud Function
+        const createUserFunction = httpsCallable(functions, 'createUser');
+        const result = await createUserFunction({
+            nombre,
+            apellidos,
+            dni,
+            email,
+            empresa: empresaId,
+            rol,
+            password: passwordTemporal
+        });
+
+        if (result.data.success) {
+            alert(`Usuario creado exitosamente. Contraseña temporal: ${passwordTemporal}`);
+            const modalElement = document.getElementById('modalNuevoUsuario');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+
+            event.target.reset();
+            window.cargarUsuarios();
+        }
+
+    } catch (error) {
+        console.error("Error al crear usuario:", error);
         alert("No se pudo crear el usuario: " + error.message);
     }
 };
