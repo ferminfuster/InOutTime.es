@@ -874,6 +874,9 @@ function enviarInformePorEmail(registros, user) {
 
 // Función de impresión
 function imprimirInforme() {
+  // Obtener el usuario actual
+  const user = auth.currentUser;
+  
   const contenidoImpresion = document.querySelector('.tabla-informes').outerHTML;
   
   const ventanaImpresion = window.open('', '', 'width=600,height=800');
@@ -883,35 +886,79 @@ function imprimirInforme() {
           <head>
               <title>Informe de Horas</title>
               <style>
+                  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+                  
                   body { 
-                      font-family: Arial, sans-serif; 
-                      margin: 20px;
+                      font-family: 'Roboto', Arial, sans-serif; 
+                      margin: 0;
+                      padding: 20px;
+                      line-height: 1.6;
+                      color: #333;
+                  }
+                  .header {
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      border-bottom: 2px solid #007bff;
+                      padding-bottom: 15px;
+                      margin-bottom: 20px;
+                  }
+                  .logo {
+                      max-width: 150px;
+                      max-height: 80px;
+                  }
+                  .header-info {
+                      text-align: right;
                   }
                   table { 
                       width: 100%; 
                       border-collapse: collapse; 
                       margin-bottom: 20px;
+                      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
                   }
                   th, td { 
                       border: 1px solid #ddd; 
-                      padding: 8px; 
+                      padding: 10px; 
                       text-align: center; 
                   }
                   th { 
-                      background-color: #f2f2f2; 
+                      background-color: #f8f9fa;
+                      font-weight: 600;
+                      color: #333;
+                  }
+                  .footer {
+                      text-align: center;
+                      border-top: 1px solid #ddd;
+                      padding-top: 10px;
+                      font-size: 0.9em;
+                      color: #666;
                   }
                   @media print {
                       body { 
                           margin: 0; 
+                          padding: 0;
+                      }
+                      .no-print {
+                          display: none;
                       }
                   }
               </style>
           </head>
           <body>
-              <h2>Informe de Horas Trabajadas</h2>
-              <p>Fecha de generación: ${new Date().toLocaleDateString('es-ES')}</p>
+              <div class="header">
+                <img src="images/logo.png" alt="InOutTime Logo">
+                  <div class="header-info">
+                      <h2>Informe de Horas Trabajadas</h2>
+                      <p>Empleado: ${user ? user.displayName || user.email : 'Usuario'}</p>
+                      <p>Fecha de generación: ${new Date().toLocaleDateString('es-ES')}</p>
+                  </div>
+              </div>
+
               ${contenidoImpresion}
-              <p>Informe generado por InOutTime</p>
+
+              <div class="footer">
+                  <p>Informe generado por InOutTime | © ${new Date().getFullYear()} Tu Empresa</p>
+              </div>
           </body>
       </html>
   `);
@@ -920,7 +967,6 @@ function imprimirInforme() {
   // Abrir diálogo de impresión
   ventanaImpresion.print();
 }
-
 // Exportar funciones globalmente si es necesario
 window.descargarInformeCSV = descargarInformeCSV;
 window.enviarInformePorEmail = enviarInformePorEmail;
