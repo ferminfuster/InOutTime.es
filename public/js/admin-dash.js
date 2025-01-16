@@ -905,48 +905,62 @@ window.modificarUsuario = async function(email) {
             title: `Modificar Usuario: ${usuarioData.nombre} ${usuarioData.apellidos}`,
             html: `
                 <style>
-                    .swal2-popup .swal-form {
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
+                    .swal2-popup .modal-content {
+                        display: flex;
+                        flex-wrap: wrap;
                         gap: 15px;
-                        text-align: left;
+                        justify-content: space-between;
+                        padding: 10px;
+                        max-width: 100%;
                     }
-                    .swal-section-title {
-                        grid-column: 1 / 3;
+                    .modal-section {
+                        flex-basis: calc(50% - 15px);
+                        margin-bottom: 15px;
+                    }
+                    .modal-section-title {
                         font-weight: bold;
                         border-bottom: 2px solid #3085d6;
                         padding-bottom: 10px;
                         margin-bottom: 15px;
                         color: #3085d6;
-                    }
-                    .swal2-input, .swal2-select {
-                        margin-bottom: 10px;
                         width: 100%;
                     }
-                    .input-group {
+                    .modal-input-group {
                         display: flex;
+                        gap: 10px;
+                        align-items: center;
+                    }
+                    .swal2-input, .swal2-select {
+                        width: 100%;
+                        margin-bottom: 10px;
+                    }
+                    .input-prefix {
+                        max-width: 100px;
+                    }
+                    @media (max-width: 600px) {
+                        .modal-section {
+                            flex-basis: 100%;
+                        }
                     }
                 </style>
-                <div class="swal-form">
-                    <div class="swal-section-title">Información Personal</div>
+                <div class="modal-content">
+                    <div class="modal-section-title">Información Personal</div>
                     
-                    <div>
+                    <div class="modal-section">
                         <label>Nombre</label>
                         <input id="swal-nombre" class="swal2-input" 
                                placeholder="Nombre" 
-                               value="${usuarioData.nombre || ''}"
-                               style="background-color: #f0f0f0;">
+                               value="${usuarioData.nombre || ''}">
                     </div>
                     
-                    <div>
+                    <div class="modal-section">
                         <label>Apellidos</label>
                         <input id="swal-apellidos" class="swal2-input" 
                                placeholder="Apellidos" 
-                               value="${usuarioData.apellidos || ''}"
-                               style="background-color: #f0f0f0;">
+                               value="${usuarioData.apellidos || ''}">
                     </div>
                     
-                    <div>
+                    <div class="modal-section">
                         <label>Rol</label>
                         <select id="swal-rol" class="swal2-select">
                             <option value="usuario" ${usuarioData.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
@@ -954,7 +968,7 @@ window.modificarUsuario = async function(email) {
                         </select>
                     </div>
                     
-                    <div>
+                    <div class="modal-section">
                         <label>Email</label>
                         <input id="swal-email" class="swal2-input" 
                                value="${usuarioData.email}" 
@@ -962,12 +976,12 @@ window.modificarUsuario = async function(email) {
                                style="background-color: #e0e0e0; cursor: not-allowed;">
                     </div>
 
-                    <div class="swal-section-title">Información de Contacto</div>
+                    <div class="modal-section-title">Información de Contacto</div>
                     
-                    <div>
+                    <div class="modal-section">
                         <label>Teléfono</label>
-                        <div class="input-group">
-                            <select id="swal-telefono-prefijo" class="swal2-select" style="max-width: 100px;">
+                        <div class="modal-input-group">
+                            <select id="swal-telefono-prefijo" class="swal2-select input-prefix">
                                 <option value="+34" ${usuarioData.contactoPersonal?.telefono?.prefijo === '+34' ? 'selected' : ''}>+34</option>
                                 <option value="+351" ${usuarioData.contactoPersonal?.telefono?.prefijo === '+351' ? 'selected' : ''}>+351</option>
                             </select>
@@ -978,17 +992,16 @@ window.modificarUsuario = async function(email) {
                         </div>
                     </div>
                     
-                    <div>
+                    <div class="modal-section">
                         <label>Dirección</label>
                         <input id="swal-direccion-calle" class="swal2-input" 
                                placeholder="Calle y número" 
                                value="${usuarioData.contactoPersonal?.direccion?.calle || ''}">
                     </div>
                     
-                    <div class="input-group">
+                    <div class="modal-section modal-input-group">
                         <input id="swal-direccion-codigo-postal" class="swal2-input" 
                                placeholder="Código Postal" 
-                               style="max-width: 150px;"
                                value="${usuarioData.contactoPersonal?.direccion?.codigoPostal || ''}"
                                pattern="[0-9]{5}">
                         <input id="swal-direccion-ciudad" class="swal2-input" 
@@ -996,21 +1009,22 @@ window.modificarUsuario = async function(email) {
                                value="${usuarioData.contactoPersonal?.direccion?.ciudad || ''}">
                     </div>
                     
-                    <div>
-                        <label>Provincia y País</label>
-                        <div class="input-group">
-                            <input id="swal-direccion-provincia" class="swal2-input" 
-                                   placeholder="Provincia" 
-                                   value="${usuarioData.contactoPersonal?.direccion?.provincia || ''}">
-                            <select id="swal-direccion-pais" class="swal2-select">
-                                <option value="España" ${usuarioData.contactoPersonal?.direccion?.pais === 'España' ? 'selected' : ''}>España</option>
-                            </select>
-                        </div>
+                    <div class="modal-section modal-input-group">
+                        <input id="swal-direccion-provincia" class="swal2-input" 
+                               placeholder="Provincia" 
+                               value="${usuarioData.contactoPersonal?.direccion?.provincia || ''}">
+                        <select id="swal-direccion-pais" class="swal2-select">
+                            <option value="España" ${usuarioData.contactoPersonal?.direccion?.pais === 'España' ? 'selected' : ''}>España</option>
+                            <option value="Portugal" ${usuarioData.contactoPersonal?.direccion?.pais === 'Portugal' ? 'selected' : ''}>Portugal</option>
+                        </select>
                     </div>
                 </div>
             `,
-            width: '900px',
+            width: '800px',
             background: '#f4f4f4',
+            customClass: {
+                popup: 'custom-modal-class'
+            },
             focusConfirm: false,
             preConfirm: () => {
                 const nombre = document.getElementById('swal-nombre').value;
