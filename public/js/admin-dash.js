@@ -427,7 +427,6 @@ window.modificarUsuario = async function(email) {
                             <option value="usuario" ${usuarioData.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
                             <option value="admin" ${usuarioData.rol === 'admin' ? 'selected' : ''}>Admin</option>
                         </select>
-                        <input id="swal-empresa" class="swal2-input" placeholder="ID Empresa" value="${usuarioData.empresaId || ''}">
                     </div>
                 `,
                 focusConfirm: false,
@@ -435,7 +434,7 @@ window.modificarUsuario = async function(email) {
                     const nombre = document.getElementById('swal-nombre').value;
                     const apellidos = document.getElementById('swal-apellidos').value;
                     const rol = document.getElementById('swal-rol').value;
-                    const empresaId = document.getElementById('swal-empresa').value;
+                    
     
                     // Validaciones básicas
                     if (!nombre) {
@@ -447,7 +446,7 @@ window.modificarUsuario = async function(email) {
                         nombre,
                         apellidos,
                         rol,
-                        empresaId
+                        
                     };
                 },
                 showCancelButton: true,
