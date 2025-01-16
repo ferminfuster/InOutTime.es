@@ -461,7 +461,6 @@ window.modificarUsuario = async function(email) {
                     nombre: formValues.nombre,
                     apellidos: formValues.apellidos,
                     rol: formValues.rol,
-                    empresaId: formValues.empresaId
                 };
     
                 // 5. Actualizar en Firestore
