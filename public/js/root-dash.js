@@ -416,19 +416,29 @@ window.crearNuevoUsuario = async function(event) {
             password: passwordTemporal
         });
 
-        if (result.data.success) {
-            alert(`Usuario creado exitosamente. Contraseña temporal: ${passwordTemporal}`);
+        console.log("Respuesta de createUser:", result);
+
+        if (result.data && result.data.success) {
+            alert(`✅ Usuario creado exitosamente. 
+Contraseña temporal: ${result.data.passwordTemporal}`);
+
+            // Cerrar modal
             const modalElement = document.getElementById('modalNuevoUsuario');
             const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
 
+            // Limpiar formulario
             event.target.reset();
+
+            // Recargar usuarios
             window.cargarUsuarios();
+        } else {
+            throw new Error(result.data.message || "Error desconocido al crear el usuario.");
         }
 
     } catch (error) {
-        console.error("Error al crear usuario:", error);
-        alert("No se pudo crear el usuario: " + error.message);
+        console.error("❌ Error al crear usuario:", error);
+        alert("❌ No se pudo crear el usuario: " + error.message);
     }
 };
 

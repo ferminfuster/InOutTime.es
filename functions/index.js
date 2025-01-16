@@ -120,6 +120,7 @@ exports.createUser = functions.https.onCall(async (data, context) => {
         });
 
         return {
+            success: true,
             message: `Usuario ${email} creado exitosamente.`,
             passwordTemporal: passwordTemporal
         };
