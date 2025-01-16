@@ -19,7 +19,8 @@ import {
     orderBy,  
     getDocs,     
     addDoc,
-    updateDoc,      
+    updateDoc,
+    writeBatch,      
     deleteDoc    
 } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
 
