@@ -314,34 +314,91 @@ window.modificarEmpresa = async function(empresaId) {
                         margin-bottom: 10px;
                         border-bottom: 1px solid #3085d6;
                         color: #3085d6;
+                        text-align: left;
+                        padding-bottom: 5px;
+                    }
+                    .input-label {
+                        text-align: left;
+                        margin-bottom: 5px;
+                        font-weight: bold;
+                        color: #555;
                     }
                 </style>
                 <div class="form-section">Información Principal</div>
-                <input id="swal-nombre" class="swal2-input" placeholder="Nombre Empresa" value="${empresa.nombre_empresa || ''}">
-                <input id="swal-cif" class="swal2-input" placeholder="CIF" value="${empresa.CIF || ''}">
-                <input id="swal-direccion" class="swal2-input" placeholder="Dirección" value="${empresa.direccion_empresa || ''}">
                 
-                <div class="form-section">Contacto</div>
-                <input id="swal-telefono" class="swal2-input" placeholder="Teléfono" value="${empresa.telefono_empresa || ''}">
-                <input id="swal-email" class="swal2-input" placeholder="Email" value="${empresa.email_empresa || ''}">
-                <input id="swal-responsable" class="swal2-input" placeholder="Responsable" value="${empresa.responsable_empresa || ''}">
+                <div class="input-label">Nombre de la Empresa *</div>
+                <input id="swal-nombre" class="swal2-input" 
+                       placeholder="Nombre completo de la empresa" 
+                       value="${empresa.nombre_empresa || ''}"
+                       title="Nombre legal completo de la empresa">
+                
+                <div class="input-label">CIF / NIF *</div>
+                <input id="swal-cif" class="swal2-input" 
+                       placeholder="Código de Identificación Fiscal" 
+                       value="${empresa.CIF || ''}"
+                       title="Código de Identificación Fiscal de la empresa">
+                
+                <div class="input-label">Dirección de la Empresa</div>
+                <input id="swal-direccion" class="swal2-input" 
+                       placeholder="Dirección completa" 
+                       value="${empresa.direccion_empresa || ''}"
+                       title="Dirección física de la empresa">
+                
+                <div class="form-section">Información de Contacto</div>
+                
+                <div class="input-label">Teléfono de Contacto</div>
+                <input id="swal-telefono" class="swal2-input" 
+                       placeholder="Número de teléfono" 
+                       value="${empresa.telefono_empresa || ''}"
+                       title="Número de teléfono principal de la empresa">
+                
+                <div class="input-label">Email Corporativo</div>
+                <input id="swal-email" class="swal2-input" 
+                       placeholder="Correo electrónico" 
+                       value="${empresa.email_empresa || ''}"
+                       title="Dirección de correo electrónico oficial">
+                
+                <div class="input-label">Responsable de la Empresa</div>
+                <input id="swal-responsable" class="swal2-input" 
+                       placeholder="Nombre del responsable" 
+                       value="${empresa.responsable_empresa || ''}"
+                       title="Nombre de la persona responsable de la empresa">
                 
                 <div class="form-section">Configuración</div>
-                <select id="swal-status" class="swal2-select">
+                
+                <div class="input-label">Estado de la Empresa</div>
+                <select id="swal-status" class="swal2-select"
+                        title="Estado actual de la empresa">
                     <option value="true" ${empresa.status_empresa === true ? 'selected' : ''}>ACTIVA</option>
                     <option value="false" ${empresa.status_empresa === false ? 'selected' : ''}>DESACTIVADA</option>
                 </select>
                 
-                <select id="swal-tipo-licencia" class="swal2-select">
+                <div class="input-label">Tipo de Licencia</div>
+                <select id="swal-tipo-licencia" class="swal2-select"
+                        title="Nivel de licencia contratada">
                     <option value="basic" ${empresa.tipo_licencia === 'basic' ? 'selected' : ''}>Basic</option>
                     <option value="standard" ${empresa.tipo_licencia === 'standard' ? 'selected' : ''}>Standard</option>
                     <option value="prime" ${empresa.tipo_licencia === 'prime' ? 'selected' : ''}>Prime</option>
                 </select>
                 
-                <select id="swal-tipo-contrato" class="swal2-select">
+                <div class="input-label">Tipo de Contrato</div>
+                <select id="swal-tipo-contrato" class="swal2-select"
+                        title="Periodicidad del contrato">
                     <option value="mensual" ${empresa.tipo_contrato === 'mensual' ? 'selected' : ''}>Mensual</option>
                     <option value="anual" ${empresa.tipo_contrato === 'anual' ? 'selected' : ''}>Anual</option>
                 </select>
+                
+                <div class="form-section">Fechas</div>
+                
+                <div class="input-label">Fecha de Alta</div>
+                <input type="date" id="swal-fecha-alta" class="swal2-input"
+                       value="${empresa.fecha_alta.toDate ? empresa.fecha_alta.toDate().toISOString().split('T')[0] : ''}"
+                       title="Fecha de inicio del contrato">
+                
+                <div class="input-label">Fecha de Expiración</div>
+                <input type="date" id="swal-fecha-expiracion" class="swal2-input"
+                       value="${empresa.fecha_expiracion.toDate ? empresa.fecha_expiracion.toDate().toISOString().split('T')[0] : ''}"
+                       title="Fecha de finalización del contrato">
             `,
             width: '600px',
             focusConfirm: false,
@@ -360,6 +417,14 @@ window.modificarEmpresa = async function(empresaId) {
                     return false;
                 }
 
+                // Parsear fechas
+                const fechaAlta = document.getElementById('swal-fecha-alta').value 
+                    ? new Date(document.getElementById('swal-fecha-alta').value) 
+                    : null;
+                const fechaExpiracion = document.getElementById('swal-fecha-expiracion').value 
+                    ? new Date(document.getElementById('swal-fecha-expiracion').value) 
+                    : null;
+
                 return {
                     nombre_empresa: nombre,
                     CIF: cif,
@@ -370,9 +435,8 @@ window.modificarEmpresa = async function(empresaId) {
                     status_empresa: document.getElementById('swal-status').value === 'true',
                     tipo_licencia: document.getElementById('swal-tipo-licencia').value,
                     tipo_contrato: document.getElementById('swal-tipo-contrato').value,
-                    // Mantener fechas originales
-                    fecha_alta: empresa.fecha_alta,
-                    fecha_expiracion: empresa.fecha_expiracion
+                    fecha_alta: fechaAlta,
+                    fecha_expiracion: fechaExpiracion
                 };
             },
             showCancelButton: true,
@@ -382,7 +446,12 @@ window.modificarEmpresa = async function(empresaId) {
 
         if (formValues) {
             // Actualizar documento
-            await updateDoc(doc(db, 'empresas', empresaId), formValues);
+            await updateDoc(doc(db, 'empresas', empresaId), {
+                ...formValues,
+                // Convertir fechas a Timestamp si es necesario
+                fecha_alta: formValues.fecha_alta ? Timestamp.fromDate(formValues.fecha_alta) : null,
+                fecha_expiracion: formValues.fecha_expiracion ? Timestamp.fromDate(formValues.fecha_expiracion) : null
+            });
             
             // Notificación de éxito
             await Swal.fire({
