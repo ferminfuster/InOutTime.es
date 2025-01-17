@@ -798,6 +798,21 @@ Por favor, indique al usuario que cambie su contraseña al iniciar sesión por p
 window.crearNuevoUsuario = async function(event) {
     event.preventDefault();
 
+        // Crear spinner con texto
+        const spinner = Swal.fire({
+            title: 'Creando Usuario',
+            html: `
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+                <p class="mt-2">Procesando solicitud...</p>
+            `,
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+
     // Campos del nuevo modal
     const nombre = document.getElementById('nombre').value;
     const apellidos = document.getElementById('apellidos').value;
