@@ -162,7 +162,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
       // Consultar la empresa por nombre
       const empresaQuery = query(
         collection(db, "empresas"),
-        where("nombre", "==", userData.empresa)
+        where("nombre_empresa", "==", userData.empresa)
       );
 
       const empresaSnapshot = await getDocs(empresaQuery);
