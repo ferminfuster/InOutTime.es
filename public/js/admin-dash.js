@@ -224,6 +224,9 @@ async function cargarUsuarios() {
         });
     }
 }
+////////////////////////////////////////////////////
+//Mostrar Información Usurio en Modal - Inicio /////
+////////////////////////////////////////////////////
 
 window.mostrarInformacionUsuario = async function(email) {
     try {
@@ -433,6 +436,23 @@ window.crearNuevoUsuario = async function (event) {
 
 window.crearNuevoUsuario = async function (event) {
     event.preventDefault();
+
+
+        // Crear spinner con texto
+        const spinner = Swal.fire({
+            title: 'Creando Usuario',
+            html: `
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+                <p class="mt-2">Procesando solicitud...</p>
+            `,
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+
 
     // Obtener valores del formulario
     const nombre = document.getElementById("nombre").value;
@@ -931,6 +951,23 @@ window.desactivarUsuario = async function(email) {
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
         });
+
+
+        // Crear spinner con texto
+        const spinner = Swal.fire({
+            title: 'Eliminando Usuario',
+            html: `
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+                <p class="mt-2">Procesando solicitud...</p>
+            `,
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+
 
         if (!confirmacion.isConfirmed) return;
 
