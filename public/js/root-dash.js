@@ -48,6 +48,9 @@ window.abrirModalNuevaEmpresa = function() {
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
 }
+////////////////////////
+// CREAR NUEVA EMPRESA//
+////////////////////////
 
 window.crearNuevaEmpresa = async function(event) {
     event.preventDefault();
@@ -60,9 +63,14 @@ window.crearNuevaEmpresa = async function(event) {
     const email = document.getElementById('emailEmpresa').value;
     const responsable = document.getElementById('responsableEmpresa').value;
     const statusInput = document.getElementById('statusEmpresa').value;
+    const periodicidad = document.getElementById('periodicidadContrato').value;
 
     // Convertir status a booleano
     const status = statusInput.toUpperCase() === 'ACTIVA' ? true : false;
+
+    // Calcular fechas
+    const fechaAlta = new Date(); // Fecha actual
+    const fechaExpiracion = calcularFechaExpiracion(periodicidad);
 
     try {
         // Añadir documento a Firestore
@@ -73,7 +81,12 @@ window.crearNuevaEmpresa = async function(event) {
             telefono_empresa: telefono,
             email_empresa: email,
             responsable_empresa: responsable,
-            status_empresa: status
+            status_empresa: status,
+            
+            // Nuevos campos
+            fecha_alta: fechaAlta,
+            tipo_contrato: periodicidad,
+            fecha_expiracion: fechaExpiracion
         });
 
         console.log("Empresa creada con ID: ", docRef.id);
@@ -89,13 +102,51 @@ window.crearNuevaEmpresa = async function(event) {
         // Recargar lista de empresas
         window.cargarEmpresas();
 
-        alert('Empresa creada exitosamente');
+        // Notificación de éxito
+        Swal.fire({
+            icon: 'success',
+            title: 'Empresa Creada',
+            text: 'La empresa se ha registrado correctamente',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
     } catch (error) {
         console.error("Error al crear empresa: ", error);
-        alert('No se pudo crear la empresa');
+        
+        // Notificación de error
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo crear la empresa',
+            confirmButtonText: 'Entendido'
+        });
     }
 }
 
+// Función para calcular la fecha de expiración
+function calcularFechaExpiracion(periodicidad) {
+    const fechaActual = new Date();
+    
+    if (periodicidad === 'mensual') {
+        // Añadir 1 mes
+        fechaActual.setMonth(fechaActual.getMonth() + 1);
+    } else if (periodicidad === 'anual') {
+        // Añadir 1 año
+        fechaActual.setFullYear(fechaActual.getFullYear() + 1);
+    }
+    
+    return fechaActual;
+}
+
+// Añadir event listener al formulario
+document.getElementById('formNuevaEmpresa').addEventListener('submit', crearNuevaEmpresa);
+
+///////////////////////////////
+// CREAR NUEVA EMPRESA - FIN //
+//////////////////////////////
 window.cargarEmpresas = async function() {
     try {
         console.log("Iniciando carga de empresas");

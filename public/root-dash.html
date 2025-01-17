@@ -140,6 +140,7 @@
     </div>
 
     <!-- Modal Nueva Empresa -->
+<!-- Modal Nueva Empresa -->
 <div class="modal fade" id="modalNuevaEmpresa">
     <div class="modal-dialog modal-custom">
         <div class="modal-content bg-dark">
@@ -157,19 +158,12 @@
                     <input type="text" class="form-control mb-2" id="responsableEmpresa" placeholder="Responsables">
                     <input type="text" class="form-control mb-2" id="statusEmpresa" placeholder="Estado">
                     
-                    <!-- Nuevos campos -->
-                    <label class="text-white">Fecha de Creación</label>
-                    <input type="date" class="form-control mb-2" id="fechaCreacionEmpresa">
-                    
-                    <label class="text-white">Tipo de Licencia</label>
-                    <select class="form-control mb-2" id="tipoLicenciaEmpresa">
-                        <option value="basic">Basic</option>
-                        <option value="standard">Standard</option>
-                        <option value="prime">Prime</option>
+                    <!-- Nuevo campo de periodicidad -->
+                    <label class="text-white">Tipo de Contrato</label>
+                    <select class="form-control mb-2" id="periodicidadContrato">
+                        <option value="mensual">Mensual</option>
+                        <option value="anual">Anual</option>
                     </select>
-                    
-                    <label class="text-white">Expiración de Contrato</label>
-                    <input type="date" class="form-control mb-2" id="expiracionContratoEmpresa">
                     
                     <button type="submit" class="btn btn-primary">Crear Empresa</button>
                 </form>
