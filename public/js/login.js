@@ -46,7 +46,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Manejar el formulario de login
-
+/*
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -138,7 +138,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     });
   }
 });
-/*
+*/
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -158,6 +158,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     
     if (userDoc.exists()) {
       const userData = userDoc.data();
+      console.log("ID de la empresa:", userData.empresa);
 
       // Verificar el estado de la empresa
       const empresaDoc = await getDoc(doc(db, "empresas", userData.empresa));
@@ -261,7 +262,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     });
   }
 });
-*/
+
 // Manejar recuperación de contraseña
 document.getElementById("forgot-password").addEventListener("click", async (e) => {
   e.preventDefault();
