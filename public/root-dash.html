@@ -181,34 +181,72 @@
     </div>
 </div>
 
-    <!-- Modal Nuevo Usuario -->
-    <div class="modal fade" id="modalNuevoUsuario">
-        <div class="modal-dialog modal-custom">
-            <div class="modal-content bg-dark">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nuevo Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formNuevoUsuario">
-                        <input type="text" class="form-control mb-2" id="nombre" placeholder="Nombre" required>
-                        <input type="text" class="form-control mb-2" id="apellidos" placeholder="Apellidos" required>
-                        <input type="text" class="form-control mb-2" id="dni" placeholder="DNI" required>
-                        <input type="email" class="form-control mb-2" id="email" placeholder="Correo Electrónico" required>
-                         <select class="form-control mb-2" id="empresa" required>
-                            <option value="">Seleccionar Empresa</option>
-                            <!-- Las opciones de empresa se cargarán dinámicamente -->
-                        </select>
-                        <select class="form-control mb-2" id="rol" required>
-                            <option value="user">Usuario</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                        <button type="submit" class="btn btn-primary">Crear Usuario</button>
-                    </form>
-                </div>
+<!-- Modal Nuevo Usuario -->
+<div class="modal fade" id="modalNuevoUsuario">
+    <div class="modal-dialog modal-lg modal-custom">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNuevoUsuario">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Información Personal</h6>
+                            <input type="text" class="form-control mb-2" id="nombre" placeholder="Nombre" required>
+                            <input type="text" class="form-control mb-2" id="apellidos" placeholder="Apellidos" required>
+                            <input type="text" class="form-control mb-2" id="dni" placeholder="DNI" required>
+                            <input type="email" class="form-control mb-2" id="email" placeholder="Correo Electrónico" required>
+                            
+                            <h6>Selección de Empresa</h6>
+                            <select class="form-control mb-2" id="empresa" required>
+                                <option value="">Seleccionar Empresa</option>
+                                <!-- Las opciones de empresa se cargarán dinámicamente -->
+                            </select>
+                            
+                            <h6>Rol de Usuario</h6>
+                            <select class="form-control mb-2" id="rol" required>
+                                <option value="user">Usuario</option>
+                                <option value="admin">Administrador</option>
+                                <option value="root">Root</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Información de Contacto</h6>
+                            <div class="input-group mb-2">
+                                <select class="form-control" id="telefonoPrefijo" style="max-width: 100px;">
+                                    <option value="+34">+34</option>
+                                    <!-- Más prefijos según necesidad -->
+                                </select>
+                                <input type="tel" class="form-control" id="telefonoNumero" placeholder="Número de teléfono" pattern="[0-9]{9}">
+                            </div>
+                            
+                            <h6>Dirección</h6>
+                            <input type="text" class="form-control mb-2" id="direccionCalle" placeholder="Calle y número">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control mb-2" id="direccionCodigoPostal" placeholder="Código Postal" pattern="[0-9]{5}">
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control mb-2" id="direccionCiudad" placeholder="Ciudad">
+                                </div>
+                            </div>
+                            <input type="text" class="form-control mb-2" id="direccionProvincia" placeholder="Provincia">
+                            <select class="form-control mb-2" id="direccionPais">
+                                <option value="España">España</option>
+                                <!-- Más países según necesidad -->
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Crear Usuario</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
+
+
 <div class="modal fade" id="modalModificarUsuario" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
