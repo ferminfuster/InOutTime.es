@@ -583,11 +583,6 @@ async function obtenerDetallesFichajesHoy() {
     }
 }
 
-// Función para actualizar contadores
-function actualizarContadores() {
-    //cargarUsuarios();  // Tu función existente
-    contarFichajesHoy();
-}
 
 // Llamar a la función de actualización cuando sea necesario
 window.addEventListener('load', actualizarContadores);
