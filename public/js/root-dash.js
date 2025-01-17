@@ -293,11 +293,32 @@ window.mostrarInformacionEmpresa = async function(empresaId) {
         });
     }
 }
-
 window.modificarEmpresa = async function(empresaId) {
     try {
         const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
         const empresa = empresaDoc.data();
+
+        // Función para formatear fecha de manera segura
+        const formatearFecha = (fecha) => {
+            // Si es un Timestamp de Firestore
+            if (fecha && fecha.toDate && typeof fecha.toDate === 'function') {
+                return fecha.toDate().toISOString().split('T')[0];
+            }
+            
+            // Si es un objeto Date de JavaScript
+            if (fecha instanceof Date) {
+                return fecha.toISOString().split('T')[0];
+            }
+            
+            // Si es un string de fecha
+            if (typeof fecha === 'string') {
+                const fechaParseada = new Date(fecha);
+                return !isNaN(fechaParseada) ? fechaParseada.toISOString().split('T')[0] : '';
+            }
+            
+            // Si no es un formato reconocido
+            return '';
+        };
 
         const { value: formValues } = await Swal.fire({
             title: `Modificar Empresa: ${empresa.nombre_empresa}`,
@@ -392,12 +413,12 @@ window.modificarEmpresa = async function(empresaId) {
                 
                 <div class="input-label">Fecha de Alta</div>
                 <input type="date" id="swal-fecha-alta" class="swal2-input"
-                       value="${empresa.fecha_alta.toDate ? empresa.fecha_alta.toDate().toISOString().split('T')[0] : ''}"
+                       value="${formatearFecha(empresa.fecha_alta)}"
                        title="Fecha de inicio del contrato">
                 
                 <div class="input-label">Fecha de Expiración</div>
                 <input type="date" id="swal-fecha-expiracion" class="swal2-input"
-                       value="${empresa.fecha_expiracion.toDate ? empresa.fecha_expiracion.toDate().toISOString().split('T')[0] : ''}"
+                       value="${formatearFecha(empresa.fecha_expiracion)}"
                        title="Fecha de finalización del contrato">
             `,
             width: '600px',
@@ -431,7 +452,7 @@ window.modificarEmpresa = async function(empresaId) {
                     direccion_empresa: document.getElementById('swal-direccion').value.trim(),
                     telefono_empresa: document.getElementById('swal-telefono').value.trim(),
                     email_empresa: document.getElementById('swal-email').value.trim(),
-                    responsable_empresa: document.getElementById('swal-responsable').value.trim(),
+					responsable_empresa: document.getElementById('swal-responsable').value.trim(),
                     status_empresa: document.getElementById('swal-status').value === 'true',
                     tipo_licencia: document.getElementById('swal-tipo-licencia').value,
                     tipo_contrato: document.getElementById('swal-tipo-contrato').value,
@@ -445,13 +466,22 @@ window.modificarEmpresa = async function(empresaId) {
         });
 
         if (formValues) {
+            // Preparar objeto para actualizar
+            const updateData = {
+                ...formValues
+            };
+
+            // Convertir fechas a Timestamp solo si existen
+            if (formValues.fecha_alta) {
+                updateData.fecha_alta = Timestamp.fromDate(formValues.fecha_alta);
+            }
+
+            if (formValues.fecha_expiracion) {
+                updateData.fecha_expiracion = Timestamp.fromDate(formValues.fecha_expiracion);
+            }
+
             // Actualizar documento
-            await updateDoc(doc(db, 'empresas', empresaId), {
-                ...formValues,
-                // Convertir fechas a Timestamp si es necesario
-                fecha_alta: formValues.fecha_alta ? Timestamp.fromDate(formValues.fecha_alta) : null,
-                fecha_expiracion: formValues.fecha_expiracion ? Timestamp.fromDate(formValues.fecha_expiracion) : null
-            });
+            await updateDoc(doc(db, 'empresas', empresaId), updateData);
             
             // Notificación de éxito
             await Swal.fire({
@@ -477,6 +507,7 @@ window.modificarEmpresa = async function(empresaId) {
         });
     }
 }
+
 
 window.eliminarEmpresa = async function(empresaId) {
     const result = await Swal.fire({
