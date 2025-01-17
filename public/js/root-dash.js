@@ -795,7 +795,7 @@ Por favor, indique al usuario que cambie su contraseña al iniciar sesión por p
 // CREAR USUARIO - INICIO //
 ///////////////////////////
 
-wwindow.crearNuevoUsuario = async function(event) {
+window.crearNuevoUsuario = async function(event) {
     event.preventDefault();
 
     // Campos del nuevo modal
