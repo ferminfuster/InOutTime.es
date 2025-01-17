@@ -157,6 +157,9 @@ async function cargarUsuarios() {
         // Actualizar contador de usuarios
         document.getElementById('totalUsuarios').textContent = querySnapshot.size;
 
+        // LLamar a la función contarFichajesHoy
+        contarFichajesHoy();
+        
         if (querySnapshot.empty) {
             listaUsuarios.innerHTML = `
                 <tr>
@@ -344,96 +347,6 @@ window.mostrarInformacionUsuario = async function(email) {
 //////////////////////////
 // CREAR NUEVO USUARIO //
 ////////////////////////
-/*
-window.crearNuevoUsuario = async function (event) {
-    event.preventDefault();
-
-    // Obtener valores del formulario
-    const nombre = document.getElementById("nombre").value;
-    const apellidos = document.getElementById("apellidos").value;
-    const dni = document.getElementById("dni").value;
-    const email = document.getElementById("email").value;
-    const rol = document.getElementById("rol").value;
-
-    try {
-        // Verificar usuario autenticado
-        const userActual = auth.currentUser;
-        if (!userActual) {
-            throw new Error("Usuario no autenticado. Por favor, inicie sesión.");
-        }
-
-        // Obtener datos del usuario autenticado desde Firestore
-        const userDoc = await getDoc(doc(db, "usuarios", userActual.uid));
-        if (!userDoc.exists()) {
-            throw new Error("No se encontraron datos del usuario actual en Firestore.");
-        }
-        console.log("Datos del usuario autenticado:", userDoc.data());
-
-        // Obtener el ID de la empresa del usuario actual
-        const empresaId = userDoc.data().empresa;
-        if (!empresaId) {
-            throw new Error("El usuario autenticado no tiene asignada una empresa.");
-        }
-        console.log("ID de la empresa del usuario actual:", empresaId);
-
-
-        // Generar contraseña temporal
-        const passwordTemporal = window.generarPasswordTemporal();
-
-        // Llamar a la Cloud Function para crear el usuario
-        const createUserFunction = httpsCallable(functions, 'createUser');
-        const result = await createUserFunction({
-            nombre,
-            apellidos,
-            dni,
-            email,
-            empresa: empresaId,
-            rol,
-            password: passwordTemporal
-        });
-
-        if (result.data && result.data.success) {
-            // Mostrar confirmación con SweetAlert2
-            await Swal.fire({
-                icon: 'success',
-                title: '✅ Usuario Creado',
-                html: `
-                    <p>El usuario <strong>${nombre} ${apellidos}</strong> ha sido creado exitosamente.</p>
-                    <p>📧 <strong>Email:</strong> ${email}</p>
-                    <p>🏢 <strong>Empresa:</strong> ${empresaId}</p>
-                    <p>🔑 <strong>Contraseña Temporal:</strong> <code>${result.data.passwordTemporal}</code></p>
-                    <p>✅ Pídele que cambie su contraseña al iniciar sesión.</p>
-                `,
-                confirmButtonText: 'Entendido',
-                confirmButtonColor: '#3085d6'
-            });
-
-            // Cerrar modal
-            const modalElement = document.getElementById("modalNuevoUsuario");
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-
-            // Limpiar formulario
-            event.target.reset();
-
-            // Recargar lista de usuarios
-            await cargarUsuarios();
-        } else {
-            throw new Error(result.data.message || "Error desconocido al crear el usuario.");
-        }
-    } catch (error) {
-        console.error("Error al crear usuario:", error);
-        await Swal.fire({
-            icon: 'error',
-            title: 'Error al Crear Usuario',
-            text: error.message,
-            confirmButtonText: 'Cerrar'
-        });
-    }
-};
-
-*/
-
 window.crearNuevoUsuario = async function (event) {
     event.preventDefault();
 
@@ -564,115 +477,61 @@ window.crearNuevoUsuario = async function (event) {
 };
 
 
-/////// Para borrar ////
-// Función de actualización de contactos
-async function actualizarContactosLocalmente() {
+/////////////////////////////////////
+// Añadir fichajes en Dashboard
+/////////////////////////////////////
+async function contarFichajesHoy() {
     try {
-        // Verificar permisos
-        const userActual = auth.currentUser;
-        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
-        const datosUsuarioActual = userDoc.data();
-        
-        if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
-            throw new Error('No tienes permisos para realizar esta acción');
+        if (!window.empresaGlobal) {
+            throw new Error("Empresa no definida");
         }
 
-        // Mostrar confirmación
-        const confirmacion = await Swal.fire({
-            title: '¿Estás seguro?',
-            text: 'Esta acción añadirá información de contacto por defecto a usuarios existentes sin ella.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, actualizar',
-            cancelButtonText: 'Cancelar'
-        });
+        // Obtener la fecha de hoy al inicio del día
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
 
-        if (!confirmacion.isConfirmed) return;
-
-        // Mostrar loading
-        Swal.fire({
-            title: 'Actualizando usuarios...',
-            html: 'Por favor, espera.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        // Obtener usuarios
-        const usuariosQuery = await getDocs(collection(db, 'usuarios'));
+        // Referencia a la colección de registros
+        const registrosRef = collection(db, 'registros');
         
-        // Contador de actualizaciones
-        let actualizados = 0;
+        // Consulta para filtrar registros de hoy de la empresa actual
+        const q = query(
+            registrosRef, 
+            where('empresa', '==', window.empresaGlobal),
+            where('tipo', '==', 'entrada'),
+            where('fecha', '>=', hoy),
+            where('fecha', '<', new Date(hoy.getTime() + 24 * 60 * 60 * 1000))
+        );
 
-        // Procesar cada usuario
-        const batch = writeBatch(db);
-        
-        // Convertir a array y procesar
-        const usuarios = usuariosQuery.docs;
-        for (const usuarioDoc of usuarios) {
-            const userData = usuarioDoc.data();
+        // Obtener snapshot
+        const querySnapshot = await getDocs(q);
 
-            // Si no tiene contactoPersonal
-            if (!userData.contactoPersonal) {
-                const userRef = doc(db, 'usuarios', usuarioDoc.id);
-                
-                batch.update(userRef, {
-                    contactoPersonal: {
-                        telefono: {
-                            prefijo: '+34',
-                            numero: '',
-                            tipo: 'móvil'
-                        },
-                        direccion: {
-                            calle: '',
-                            codigoPostal: '',
-                            ciudad: '',
-                            provincia: '',
-                            pais: 'España'
-                        }
-                    }
-                });
+        // Actualizar contador en el HTML
+        const contadorFichajes = document.getElementById('fichajeshoy');
+        contadorFichajes.textContent = querySnapshot.size;
 
-                actualizados++;
+        console.log(`Usuarios fichados hoy en ${window.empresaGlobal}: ${querySnapshot.size}`);
 
-                // Dividir batch si supera el límite de Firestore (500 operaciones)
-                if (actualizados % 500 === 0) {
-                    await batch.commit();
-                    batch = writeBatch(db);
-                }
-            }
-        }
-
-        // Commit del batch final
-        if (actualizados % 500 !== 0) {
-            await batch.commit();
-        }
-
-        // Notificación
-        Swal.fire({
-            icon: 'success',
-            title: 'Actualización Completada',
-            text: `Se han actualizado ${actualizados} usuarios con información de contacto por defecto.`
-        });
+        return querySnapshot.size;
 
     } catch (error) {
-        console.error("Error al actualizar contactos:", error);
+        console.error("Error al contar fichajes de hoy:", error);
+        
+        // Mostrar 0 en caso de error
+        const contadorFichajes = document.getElementById('fichajeshoy');
+        contadorFichajes.textContent = '0';
+
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: error.message
+            text: 'No se pudo contar los fichajes de hoy',
+            confirmButtonText: 'Entendido'
         });
+
+        return 0;
     }
 }
 
-// Añadir al objeto window para poder llamarla globalmente
-window.actualizarContactosLocalmente = actualizarContactosLocalmente;
-
-/// Para borrar
-
+// FIN AÑADIR FICHAJES EN DASHBOARD ///
 // Función para generar una contraseña temporal segura
 window.generarPasswordTemporal = function() {
     const longitud = 12;
