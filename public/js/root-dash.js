@@ -277,13 +277,24 @@ window.cargarUsuarios = async function() {
                     <td>${usuario.rol || 'Sin rol'}</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <button class="btn btn-warning btn-sm" onclick="restablecerUsuario('${usuario.email}')">
+                            <button class="btn btn-success btn-sm" 
+                                    onclick="mostrarInformacionUsuario('${usuario.email}')"
+                                    title="Mostrar Información">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                            <button class="btn btn-warning btn-sm" 
+                                    onclick="restablecerUsuario('${usuario.email}')"
+                                    title="Restablecer Contraseña">
                                 <i class="fas fa-key"></i>
                             </button>
-                            <button class="btn btn-info btn-sm" onclick="modificarUsuario('${documento.id}')">
+                            <button class="btn btn-info btn-sm" 
+                                    onclick="modificarUsuario('${usuario.email}')"
+                                    title="Editar Usuario">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-danger btn-sm" onclick="desactivarUsuario('${usuario.email}')">
+                            <button class="btn btn-danger btn-sm" 
+                                    onclick="desactivarUsuario('${usuario.email}')"
+                                    title="Desactivar Usuario">
                                 <i class="fas fa-user-slash"></i>
                             </button>
                         </div>
@@ -494,6 +505,125 @@ window.generarPasswordTemporal = function() {
 
 // Funciones de acciones de usuario
 // Funciones de acciones de usuario
+
+////////////////////////////////////////////////////
+//Mostrar Información Usurio en Modal - Inicio /////
+////////////////////////////////////////////////////
+
+window.mostrarInformacionUsuario = async function(email) {
+    try {
+        // 1. Verificar permisos (solo admin o root)
+        const userActual = auth.currentUser;
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const datosUsuarioActual = userDoc.data();
+        
+        if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
+            throw new Error('No tienes permisos para ver información de usuarios');
+        }
+
+        // 2. Buscar datos del usuario
+        const usuarioQuery = await getDocs(
+            query(collection(db, 'usuarios'), where('email', '==', email))
+        );
+
+        if (usuarioQuery.empty) {
+            throw new Error('Usuario no encontrado');
+        }
+
+        const usuarioDoc = usuarioQuery.docs[0];
+        const usuarioData = usuarioDoc.data();
+
+        // 3. Preparar HTML para mostrar información
+        const formatearFecha = (fecha) => {
+            if (!fecha) return 'No disponible';
+            return fecha.toDate ? fecha.toDate().toLocaleString() : 'Formato inválido';
+        };
+
+        await Swal.fire({
+            title: `Información de Usuario: ${usuarioData.nombre} ${usuarioData.apellidos}`,
+            html: `
+                <style>
+                    .user-info-modal {
+                        text-align: left;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 15px;
+                        padding: 20px;
+                    }
+                    .info-section {
+                        border-bottom: 1px solid #e0e0e0;
+                        padding-bottom: 10px;
+                        margin-bottom: 10px;
+                    }
+                    .info-label {
+                        font-weight: bold;
+                        color: #3085d6;
+                        margin-right: 10px;
+                    }
+                </style>
+                <div class="user-info-modal">
+                    <div>
+                        <h4 class="info-section">Información Personal</h4>
+                        <p><span class="info-label">Nombre:</span> ${usuarioData.nombre || 'No disponible'}</p>
+                        <p><span class="info-label">Apellidos:</span> ${usuarioData.apellidos || 'No disponible'}</p>
+                        <p><span class="info-label">Email:</span> ${usuarioData.email || 'No disponible'}</p>
+                        <p><span class="info-label">DNI:</span> ${usuarioData.dni || 'No disponible'}</p>
+                        <p><span class="info-label">Rol:</span> ${usuarioData.rol || 'No disponible'}</p>
+                        <p><span class="info-label">Estado:</span> ${usuarioData.estado || 'No disponible'}</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="info-section">Información de Contacto</h4>
+                        <p><span class="info-label">Teléfono:</span> 
+                            ${usuarioData.contactoPersonal?.telefono?.prefijo || ''} 
+                            ${usuarioData.contactoPersonal?.telefono?.numero || 'No disponible'}
+                        </p>
+                        <p><span class="info-label">Dirección:</span> 
+                            ${usuarioData.contactoPersonal?.direccion?.calle || 'No disponible'}
+                        </p>
+                        <p><span class="info-label">Código Postal:</span> 
+                            ${usuarioData.contactoPersonal?.direccion?.codigoPostal || 'No disponible'}
+                        </p>
+                        <p><span class="info-label">Ciudad:</span> 
+                            ${usuarioData.contactoPersonal?.direccion?.ciudad || 'No disponible'}
+                        </p>
+                        <p><span class="info-label">Provincia:</span> 
+                            ${usuarioData.contactoPersonal?.direccion?.provincia || 'No disponible'}
+                        </p>
+                        <p><span class="info-label">País:</span> 
+                            ${usuarioData.contactoPersonal?.direccion?.pais || 'No disponible'}
+                        </p>
+                    </div>
+                    
+                    <div style="grid-column: 1 / 3;">
+                        <h4 class="info-section">Información del Sistema</h4>
+                        <p><span class="info-label">Fecha de Registro:</span> 
+                            ${formatearFecha(usuarioData.fechaRegistro)}
+                        </p>
+                        <p><span class="info-label">Empresa:</span> 
+                            ${usuarioData.empresa || 'No disponible'}
+                        </p>
+                    </div>
+                </div>
+            `,
+            width: '800px',
+            confirmButtonText: 'Cerrar',
+            confirmButtonColor: '#3085d6'
+        });
+
+    } catch (error) {
+        console.error("Error al mostrar información de usuario:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message,
+            confirmButtonText: 'Entendido'
+        });
+    }
+};
+
+
+
 window.restablecerUsuario = function(email) {
      
         if (email) {
