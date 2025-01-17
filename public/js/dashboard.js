@@ -202,16 +202,35 @@ onAuthStateChanged(auth, async (user) => {
       await mostrarUltimoRegistro(user.uid);
 
     } else {
-      console.log("No se encontraron datos para este usuario.");
-      alert("Usuario no autorizado.");
-      window.location.href = "login.html";
+      //console.log("No se encontraron datos para este usuario.");
+      //alert("Usuario no autorizado.");
+      //window.location.href = "login.html";
+      handleUnauthorizedAccess();
     }
   } else {
     // Si no hay un usuario logueado, redirigir al login y mostrar una alerta
-    alert("Usuario no autorizado.");
-    window.location.href = "login.html";
+    //alert("Usuario no autorizado.");
+    //window.location.href = "login.html";
+    handleUnauthorizedAccess();
   }
 });
+
+// Función centralizada para manejar accesos no autorizados
+function handleUnauthorizedAccess(message = "Acceso denegado") {
+  // Usar SweetAlert para notificaciones
+  Swal.fire({
+      icon: 'error',
+      title: 'Acceso Denegado',
+      text: message,
+      confirmButtonText: 'Entendido'
+  }).then(() => {
+      // Cerrar sesión (por si acaso)
+      signOut(auth).then(() => {
+          // Redirigir al login
+          window.location.href = "login.html";
+      });
+  });
+}
 
 // Función para cerrar sesión
 // Función para cerrar sesión
@@ -292,13 +311,6 @@ window.registrarIncidencia = function() {
     registrarAccion('incidencia');
 };
 
-// Hacer funciones globalmente accesibles
-//window.LogOut = LogOut;
-
-// Exportar funciones si es necesario
-/*export {
-    LogOut
-};*/
 /*
 //////// Mostrar Registros ///////
 // Función para mostrar modal de registros
@@ -513,7 +525,6 @@ async function mostrarUltimoRegistro(userId) {
         <div style="
             padding: 10px;
             border-radius: 10px;
-            background-color: #f0f0f0;
             text-align: center;
         ">
             ❌ No se encontraron registros previos.
@@ -958,7 +969,7 @@ function imprimirInforme() {
               ${contenidoImpresion}
 
               <div class="footer">
-                  <p>Informe generado por InOutTime | © ${new Date().getFullYear()} Tu Empresa</p>
+                  <p>Informe generado por InOutTime | © ${new Date().getFullYear()}</p>
               </div>
           </body>
       </html>
