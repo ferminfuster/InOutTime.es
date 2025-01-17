@@ -44,41 +44,68 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     if (userDoc.exists()) {
       const userData = userDoc.data();
 
-      // Función para mostrar notificación y redirigir
-      const notificarYRedirigir = (mensaje, url) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Inicio de Sesión Exitoso',
-          text: mensaje,
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 2000
-        }).then(() => {
-          window.location.href = url;
-        });
-      };
+      // Verificar el estado de la empresa
+      const empresaDoc = await getDoc(doc(db, "empresas", userData.empresa));
+      
+      if (empresaDoc.exists()) {
+        const empresaData = empresaDoc.data();
 
-      // Redirigir según el rol
-      switch(userData.rol) {
-        case "user":
-          notificarYRedirigir("Bienvenido, usuario", "dashboard.html");
-          break;
-        case "admin":
-          notificarYRedirigir("Bienvenido, administrador", "dashboard.html");
-          break;
-        case "root":
-          notificarYRedirigir("Bienvenido, usuario root", "root-dash.html");
-          break;
-        default:
-          Swal.fire({
+        // Verificar si la empresa está activa
+        if (!empresaData.status_empresa) {
+          // Empresa no activa
+          await Swal.fire({
             icon: 'warning',
-            title: 'Rol no válido',
-            text: 'Serás redirigido a la página principal',
-            confirmButtonText: 'Entendido'
-          }).then(() => {
-            window.location.href = "index.html";
+            title: 'Licencia Expirada',
+            text: 'La licencia de su empresa ha expirado. Por favor, póngase en contacto con su administrador.',
+            confirmButtonText: 'Entendido',
+            footer: '<a href="mailto:soporte@suempresa.com">Contactar Soporte</a>'
           });
+        }
+
+        // Continuar con la autenticación independientemente del estado
+        const notificarYRedirigir = (mensaje, url) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Inicio de Sesión Exitoso',
+            text: mensaje,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+          }).then(() => {
+            window.location.href = url;
+          });
+        };
+
+        // Redirigir según el rol
+        switch(userData.rol) {
+          case "user":
+            notificarYRedirigir("Bienvenido, usuario", "dashboard.html");
+            break;
+          case "admin":
+            notificarYRedirigir("Bienvenido, administrador", "dashboard.html");
+            break;
+          case "root":
+            notificarYRedirigir("Bienvenido, usuario root", "root-dash.html");
+            break;
+          default:
+            Swal.fire({
+              icon: 'warning',
+              title: 'Rol no válido',
+              text: 'Serás redirigido a la página principal',
+              confirmButtonText: 'Entendido'
+            }).then(() => {
+              window.location.href = "index.html";
+            });
+        }
+      } else {
+        // Empresa no encontrada
+        Swal.fire({
+          icon: 'error',
+          title: 'Empresa no encontrada',
+          text: 'No se encontraron datos para la empresa del usuario',
+          confirmButtonText: 'Intentar de nuevo'
+        });
       }
     } else {
       // Usuario no encontrado
@@ -91,7 +118,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     }
     
   } catch (error) {
-    // Manejo de errores de autenticación
+    // Manejo de errores de autenticación (código anterior)
     let errorMessage = "Error de autenticación";
     switch(error.code) {
       case 'auth/user-not-found':
@@ -115,7 +142,6 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     });
   }
 });
-
 // Manejar recuperación de contraseña
 document.getElementById("forgot-password").addEventListener("click", async (e) => {
   e.preventDefault();
