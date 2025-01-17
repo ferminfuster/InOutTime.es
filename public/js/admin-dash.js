@@ -585,7 +585,7 @@ async function obtenerDetallesFichajesHoy() {
 
 
 // Llamar a la función de actualización cuando sea necesario
-window.addEventListener('load', actualizarContadores);
+//window.addEventListener('load', actualizarContadores);
 
 // FIN AÑADIR FICHAJES EN DASHBOARD ///
 // Función para generar una contraseña temporal segura
