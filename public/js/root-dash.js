@@ -302,27 +302,100 @@ window.modificarEmpresa = async function(empresaId) {
         const { value: formValues } = await Swal.fire({
             title: `Modificar Empresa: ${empresa.nombre_empresa}`,
             html: `
-                <!-- Formulario similar al de creación, pero precargado con los datos existentes -->
-                <input id="swal-nombre" class="swal2-input" placeholder="Nombre Empresa" value="${empresa.nombre_empresa}">
-                <input id="swal-cif" class="swal2-input" placeholder="CIF" value="${empresa.CIF}">
-                <!-- Añade más campos según necesites -->
+                <style>
+                    .swal2-input, .swal2-select {
+                        margin-bottom: 10px;
+                        width: 100%;
+                        box-sizing: border-box;
+                    }
+                    .form-section {
+                        font-weight: bold;
+                        margin-top: 15px;
+                        margin-bottom: 10px;
+                        border-bottom: 1px solid #3085d6;
+                        color: #3085d6;
+                    }
+                </style>
+                <div class="form-section">Información Principal</div>
+                <input id="swal-nombre" class="swal2-input" placeholder="Nombre Empresa" value="${empresa.nombre_empresa || ''}">
+                <input id="swal-cif" class="swal2-input" placeholder="CIF" value="${empresa.CIF || ''}">
+                <input id="swal-direccion" class="swal2-input" placeholder="Dirección" value="${empresa.direccion_empresa || ''}">
+                
+                <div class="form-section">Contacto</div>
+                <input id="swal-telefono" class="swal2-input" placeholder="Teléfono" value="${empresa.telefono_empresa || ''}">
+                <input id="swal-email" class="swal2-input" placeholder="Email" value="${empresa.email_empresa || ''}">
+                <input id="swal-responsable" class="swal2-input" placeholder="Responsable" value="${empresa.responsable_empresa || ''}">
+                
+                <div class="form-section">Configuración</div>
+                <select id="swal-status" class="swal2-select">
+                    <option value="true" ${empresa.status_empresa === true ? 'selected' : ''}>ACTIVA</option>
+                    <option value="false" ${empresa.status_empresa === false ? 'selected' : ''}>DESACTIVADA</option>
+                </select>
+                
+                <select id="swal-tipo-licencia" class="swal2-select">
+                    <option value="basic" ${empresa.tipo_licencia === 'basic' ? 'selected' : ''}>Basic</option>
+                    <option value="standard" ${empresa.tipo_licencia === 'standard' ? 'selected' : ''}>Standard</option>
+                    <option value="prime" ${empresa.tipo_licencia === 'prime' ? 'selected' : ''}>Prime</option>
+                </select>
+                
+                <select id="swal-tipo-contrato" class="swal2-select">
+                    <option value="mensual" ${empresa.tipo_contrato === 'mensual' ? 'selected' : ''}>Mensual</option>
+                    <option value="anual" ${empresa.tipo_contrato === 'anual' ? 'selected' : ''}>Anual</option>
+                </select>
             `,
+            width: '600px',
             focusConfirm: false,
             preConfirm: () => {
-                // Validaciones y recopilación de datos
+                // Validaciones
+                const nombre = document.getElementById('swal-nombre').value.trim();
+                const cif = document.getElementById('swal-cif').value.trim();
+                
+                if (!nombre) {
+                    Swal.showValidationMessage('El nombre de la empresa es obligatorio');
+                    return false;
+                }
+                
+                if (!cif) {
+                    Swal.showValidationMessage('El CIF es obligatorio');
+                    return false;
+                }
+
                 return {
-                    nombre_empresa: document.getElementById('swal-nombre').value,
-                    CIF: document.getElementById('swal-cif').value
-                    // Añade más campos
+                    nombre_empresa: nombre,
+                    CIF: cif,
+                    direccion_empresa: document.getElementById('swal-direccion').value.trim(),
+                    telefono_empresa: document.getElementById('swal-telefono').value.trim(),
+                    email_empresa: document.getElementById('swal-email').value.trim(),
+                    responsable_empresa: document.getElementById('swal-responsable').value.trim(),
+                    status_empresa: document.getElementById('swal-status').value === 'true',
+                    tipo_licencia: document.getElementById('swal-tipo-licencia').value,
+                    tipo_contrato: document.getElementById('swal-tipo-contrato').value,
+                    // Mantener fechas originales
+                    fecha_alta: empresa.fecha_alta,
+                    fecha_expiracion: empresa.fecha_expiracion
                 };
             },
             showCancelButton: true,
-            confirmButtonText: 'Guardar Cambios'
+            confirmButtonText: 'Guardar Cambios',
+            cancelButtonText: 'Cancelar'
         });
 
         if (formValues) {
+            // Actualizar documento
             await updateDoc(doc(db, 'empresas', empresaId), formValues);
-            Swal.fire('Empresa actualizada', '', 'success');
+            
+            // Notificación de éxito
+            await Swal.fire({
+                icon: 'success',
+                title: 'Empresa Actualizada',
+                text: `Los datos de ${formValues.nombre_empresa} han sido modificados`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            // Recargar lista de empresas
             cargarEmpresas();
         }
     } catch (error) {
@@ -330,7 +403,8 @@ window.modificarEmpresa = async function(empresaId) {
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudo modificar la empresa'
+            text: 'No se pudo modificar la empresa',
+            footer: error.message
         });
     }
 }
