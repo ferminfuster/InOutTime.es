@@ -64,6 +64,7 @@ window.crearNuevaEmpresa = async function(event) {
     const responsable = document.getElementById('responsableEmpresa').value;
     const statusInput = document.getElementById('statusEmpresa').value;
     const periodicidad = document.getElementById('periodicidadContrato').value;
+    const tipoLicencia = document.getElementById('tipoLicencia').value;
 
     // Convertir status a booleano
     const status = statusInput.toUpperCase() === 'ACTIVA' ? true : false;
@@ -86,7 +87,8 @@ window.crearNuevaEmpresa = async function(event) {
             // Nuevos campos
             fecha_alta: fechaAlta,
             tipo_contrato: periodicidad,
-            fecha_expiracion: fechaExpiracion
+            fecha_expiracion: fechaExpiracion,
+            tipo_licencia: tipoLicencia // Añadido tipo de licencia
         });
 
         console.log("Empresa creada con ID: ", docRef.id);

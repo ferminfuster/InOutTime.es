@@ -139,7 +139,6 @@
         </div>
     </div>
 
-    <!-- Modal Nueva Empresa -->
 <!-- Modal Nueva Empresa -->
 <div class="modal fade" id="modalNuevaEmpresa">
     <div class="modal-dialog modal-custom">
@@ -158,7 +157,15 @@
                     <input type="text" class="form-control mb-2" id="responsableEmpresa" placeholder="Responsables">
                     <input type="text" class="form-control mb-2" id="statusEmpresa" placeholder="Estado">
                     
-                    <!-- Nuevo campo de periodicidad -->
+                    <!-- Tipo de Licencia -->
+                    <label class="text-white">Tipo de Licencia</label>
+                    <select class="form-control mb-2" id="tipoLicencia">
+                        <option value="basic">Basic</option>
+                        <option value="standard">Standard</option>
+                        <option value="prime">Prime</option>
+                    </select>
+                    
+                    <!-- Periodicidad del Contrato -->
                     <label class="text-white">Tipo de Contrato</label>
                     <select class="form-control mb-2" id="periodicidadContrato">
                         <option value="mensual">Mensual</option>
