@@ -149,26 +149,29 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
   try {
     // Iniciar sesión con correo y contraseña
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    
+
     // Obtener el usuario actual
     const user = userCredential.user;
-    
+
     // Obtener los datos del usuario desde Firestore
     const userDoc = await getDoc(doc(db, "usuarios", user.uid));
-    
+
     if (userDoc.exists()) {
       const userData = userDoc.data();
-      console.log("ID de la empresa:", userData.empresa);
 
-      // Verificar el estado de la empresa
-      const empresaDoc = await getDoc(doc(db, "empresas", userData.empresa));
-      
-      if (empresaDoc.exists()) {
-        const empresaData = empresaDoc.data();
+      // Consultar la empresa por nombre
+      const empresaQuery = query(
+        collection(db, "empresas"),
+        where("nombre", "==", userData.empresa)
+      );
+
+      const empresaSnapshot = await getDocs(empresaQuery);
+
+      if (!empresaSnapshot.empty) {
+        const empresaData = empresaSnapshot.docs[0].data();
 
         // Verificar si la empresa NO está activa
         if (empresaData.status_empresa === false) {
-          // Empresa no activa
           await Swal.fire({
             icon: 'warning',
             title: 'Licencia Inactiva',
@@ -182,7 +185,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
           });
         }
 
-        // Continuar con la autenticación 
+        // Continuar con la autenticación
         const notificarYRedirigir = (mensaje, url) => {
           Swal.fire({
             icon: 'success',
@@ -198,7 +201,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
         };
 
         // Redirigir según el rol
-        switch(userData.rol) {
+        switch (userData.rol) {
           case "user":
             notificarYRedirigir("Bienvenido, usuario", "dashboard.html");
             break;
@@ -236,11 +239,10 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
         confirmButtonText: 'Intentar de nuevo'
       });
     }
-    
   } catch (error) {
     // Manejo de errores de autenticación
     let errorMessage = "Error de autenticación";
-    switch(error.code) {
+    switch (error.code) {
       case 'auth/user-not-found':
         errorMessage = "No se encontró un usuario con este correo";
         break;
@@ -262,6 +264,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     });
   }
 });
+
 
 // Manejar recuperación de contraseña
 document.getElementById("forgot-password").addEventListener("click", async (e) => {
