@@ -790,15 +790,41 @@ Por favor, indique al usuario que cambie su contraseña al iniciar sesión por p
     }
 };
 */
-window.crearNuevoUsuario = async function(event) {
+
+//////////////////////////////////
+// CREAR USUARIO - INICIO //
+///////////////////////////
+
+wwindow.crearNuevoUsuario = async function(event) {
     event.preventDefault();
 
+    // Campos del nuevo modal
     const nombre = document.getElementById('nombre').value;
     const apellidos = document.getElementById('apellidos').value;
     const dni = document.getElementById('dni').value;
     const email = document.getElementById('email').value;
     const empresaId = document.getElementById('empresa').value;
     const rol = document.getElementById('rol').value;
+
+    // Nuevos campos de contacto
+    const telefonoPrefijo = document.getElementById('telefonoPrefijo').value;
+    const telefonoNumero = document.getElementById('telefonoNumero').value;
+    const direccionCalle = document.getElementById('direccionCalle').value;
+    const direccionCodigoPostal = document.getElementById('direccionCodigoPostal').value;
+    const direccionCiudad = document.getElementById('direccionCiudad').value;
+    const direccionProvincia = document.getElementById('direccionProvincia').value;
+    const direccionPais = document.getElementById('direccionPais').value;
+
+    // Validaciones adicionales
+    if (!telefonoNumero.match(/^[0-9]{9}$/)) {
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error de Validación',
+            text: 'El número de teléfono debe tener 9 dígitos',
+            confirmButtonText: 'Entendido'
+        });
+        return;
+    }
 
     try {
         const passwordTemporal = window.generarPasswordTemporal();
@@ -816,17 +842,34 @@ window.crearNuevoUsuario = async function(event) {
             }
         }
 
-        // Llamar a la Cloud Function
-        const createUserFunction = httpsCallable(functions, 'createUser');
-        const result = await createUserFunction({
+        // Preparar objeto de datos completo
+        const userData = {
+            // Información personal
             nombre,
             apellidos,
             dni,
             email,
             empresa: nombreEmpresa,
             rol,
-            password: passwordTemporal
-        });
+            password: passwordTemporal,
+
+            // Información de contacto
+            telefono: {
+                prefijo: telefonoPrefijo,
+                numero: telefonoNumero
+            },
+            direccion: {
+                calle: direccionCalle,
+                codigoPostal: direccionCodigoPostal,
+                ciudad: direccionCiudad,
+                provincia: direccionProvincia,
+                pais: direccionPais
+            }
+        };
+
+        // Llamar a la Cloud Function
+        const createUserFunction = httpsCallable(functions, 'createUser');
+        const result = await createUserFunction(userData);
 
         console.log("Respuesta de createUser:", result);
 
@@ -839,6 +882,7 @@ window.crearNuevoUsuario = async function(event) {
                     <p>El usuario <strong>${nombre} ${apellidos}</strong> ha sido creado exitosamente.</p>
                     <p>📧 <strong>Email:</strong> ${email}</p>
                     <p>🏢 <strong>Empresa:</strong> ${nombreEmpresa}</p>
+                    <p>📱 <strong>Teléfono:</strong> ${telefonoPrefijo} ${telefonoNumero}</p>
                     <p>🔑 <strong>Contraseña Temporal:</strong> <code>${result.data.passwordTemporal}</code></p>
                     <p>✅ Pídele que cambie su contraseña al iniciar sesión.</p>
                 `,
@@ -870,7 +914,6 @@ window.crearNuevoUsuario = async function(event) {
         });
     }
 };
-
 
 
 
