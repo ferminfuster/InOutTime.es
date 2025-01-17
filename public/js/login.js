@@ -1,11 +1,32 @@
-// Import the functions you need from the SDKs you need
-//import { initializeApp } from "firebase/app";
-//import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword , sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+import { getAuth, 
+    createUserWithEmailAndPassword, 
+    sendPasswordResetEmail, 
+    updateProfile,
+    fetchSignInMethodsForEmail, 
+    updateEmail, 
+    onAuthStateChanged, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+import { 
+    getFirestore, 
+    doc,
+    query,
+    where, 
+    getDoc,
+    setDoc, 
+    collection,
+    orderBy,  
+    getDocs,     
+    addDoc,
+    updateDoc,
+    writeBatch,
+    Timestamp,
+    serverTimestamp,      
+    deleteDoc    
+} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -24,6 +45,99 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Manejar el formulario de login
+/*
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const errorContainer = document.getElementById("error-container");
+
+  try {
+    // Iniciar sesión con correo y contraseña
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    
+    // Obtener el usuario actual
+    const user = userCredential.user;
+    
+    // Obtener los datos del usuario desde Firestore
+    const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+    
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+
+      // Función para mostrar notificación y redirigir
+      const notificarYRedirigir = (mensaje, url) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Inicio de Sesión Exitoso',
+          text: mensaje,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000
+        }).then(() => {
+          window.location.href = url;
+        });
+      };
+
+      // Redirigir según el rol
+      switch(userData.rol) {
+        case "user":
+          notificarYRedirigir("Bienvenido, usuario", "dashboard.html");
+          break;
+        case "admin":
+          notificarYRedirigir("Bienvenido, administrador", "dashboard.html");
+          break;
+        case "root":
+          notificarYRedirigir("Bienvenido, usuario root", "root-dash.html");
+          break;
+        default:
+          Swal.fire({
+            icon: 'warning',
+            title: 'Rol no válido',
+            text: 'Serás redirigido a la página principal',
+            confirmButtonText: 'Entendido'
+          }).then(() => {
+            window.location.href = "index.html";
+          });
+      }
+    } else {
+      // Usuario no encontrado
+      Swal.fire({
+        icon: 'error',
+        title: 'Usuario no encontrado',
+        text: 'No se encontraron datos para este usuario',
+        confirmButtonText: 'Intentar de nuevo'
+      });
+    }
+    
+  } catch (error) {
+    // Manejo de errores de autenticación
+    let errorMessage = "Error de autenticación";
+    switch(error.code) {
+      case 'auth/user-not-found':
+        errorMessage = "No se encontró un usuario con este correo";
+        break;
+      case 'auth/wrong-password':
+        errorMessage = "Contraseña incorrecta";
+        break;
+      case 'auth/invalid-email':
+        errorMessage = "Correo electrónico inválido";
+        break;
+      default:
+        errorMessage = error.message;
+    }
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de Inicio de Sesión',
+      text: errorMessage,
+      confirmButtonText: 'Intentar de nuevo'
+    });
+  }
+});
+*/
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -50,19 +164,23 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
       if (empresaDoc.exists()) {
         const empresaData = empresaDoc.data();
 
-        // Verificar si la empresa está activa
-        if (!empresaData.status_empresa) {
+        // Verificar si la empresa NO está activa
+        if (empresaData.status_empresa === false) {
           // Empresa no activa
           await Swal.fire({
             icon: 'warning',
-            title: 'Licencia Expirada',
-            text: 'La licencia de su empresa ha expirado. Por favor, póngase en contacto con su administrador.',
+            title: 'Licencia Inactiva',
+            html: `
+              <p>La licencia de su empresa está inactiva.</p>
+              <p>Puede continuar, pero es posible que algunas funcionalidades estén limitadas.</p>
+              <p>Por favor, contacte con su administrador para más información.</p>
+            `,
             confirmButtonText: 'Entendido',
             footer: '<a href="mailto:soporte@suempresa.com">Contactar Soporte</a>'
           });
         }
 
-        // Continuar con la autenticación independientemente del estado
+        // Continuar con la autenticación 
         const notificarYRedirigir = (mensaje, url) => {
           Swal.fire({
             icon: 'success',
@@ -83,7 +201,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
             notificarYRedirigir("Bienvenido, usuario", "dashboard.html");
             break;
           case "admin":
-            notificarYRedirigir("Bienvenido, administrador", "dashboard.html");
+            notificarYRedirigir("Bienvenido, administrador", "admin-dash.html");
             break;
           case "root":
             notificarYRedirigir("Bienvenido, usuario root", "root-dash.html");
@@ -118,7 +236,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     }
     
   } catch (error) {
-    // Manejo de errores de autenticación (código anterior)
+    // Manejo de errores de autenticación
     let errorMessage = "Error de autenticación";
     switch(error.code) {
       case 'auth/user-not-found':
@@ -142,6 +260,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     });
   }
 });
+
 // Manejar recuperación de contraseña
 document.getElementById("forgot-password").addEventListener("click", async (e) => {
   e.preventDefault();
