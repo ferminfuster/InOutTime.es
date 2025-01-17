@@ -159,7 +159,7 @@ async function cargarUsuarios() {
 
         // LLamar a la función contarFichajesHoy
         contarFichajesHoy();
-        
+
         if (querySnapshot.empty) {
             listaUsuarios.innerHTML = `
                 <tr>
@@ -497,9 +497,9 @@ async function contarFichajesHoy() {
         const q = query(
             registrosRef, 
             where('empresa', '==', window.empresaGlobal),
-            where('tipo', '==', 'entrada'),
-            where('fecha', '>=', hoy),
-            where('fecha', '<', new Date(hoy.getTime() + 24 * 60 * 60 * 1000))
+            where('accion_registro', '==', 'entrada'),
+            where('fecha', '>=', Timestamp.fromDate(hoy)),
+            where('fecha', '<', Timestamp.fromDate(new Date(hoy.getTime() + 24 * 60 * 60 * 1000)))
         );
 
         // Obtener snapshot
@@ -510,6 +510,14 @@ async function contarFichajesHoy() {
         contadorFichajes.textContent = querySnapshot.size;
 
         console.log(`Usuarios fichados hoy en ${window.empresaGlobal}: ${querySnapshot.size}`);
+
+        // Si quieres más detalle, puedes hacer un mapeo de usuarios
+        const usuariosFichados = new Set();
+        querySnapshot.forEach((doc) => {
+            usuariosFichados.add(doc.data().email);
+        });
+
+        console.log('Usuarios fichados:', Array.from(usuariosFichados));
 
         return querySnapshot.size;
 
@@ -530,6 +538,58 @@ async function contarFichajesHoy() {
         return 0;
     }
 }
+
+// Función para obtener más detalles de los fichajes de hoy
+async function obtenerDetallesFichajesHoy() {
+    try {
+        if (!window.empresaGlobal) {
+            throw new Error("Empresa no definida");
+        }
+
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        const registrosRef = collection(db, 'registros');
+        
+        const q = query(
+            registrosRef, 
+            where('empresa', '==', window.empresaGlobal),
+            where('accion_registro', '==', 'entrada'),
+            where('fecha', '>=', Timestamp.fromDate(hoy)),
+            where('fecha', '<', Timestamp.fromDate(new Date(hoy.getTime() + 24 * 60 * 60 * 1000)))
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        // Crear un mapa de usuarios fichados con detalles
+        const usuariosFichados = new Map();
+        
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            usuariosFichados.set(data.email, {
+                nombre: data.nombre,
+                email: data.email,
+                lugar: data.lugar,
+                hora: data.fecha.toDate() // Convertir timestamp a Date
+            });
+        });
+
+        return usuariosFichados;
+
+    } catch (error) {
+        console.error("Error al obtener detalles de fichajes:", error);
+        return new Map();
+    }
+}
+
+// Función para actualizar contadores
+function actualizarContadores() {
+    //cargarUsuarios();  // Tu función existente
+    contarFichajesHoy();
+}
+
+// Llamar a la función de actualización cuando sea necesario
+window.addEventListener('load', actualizarContadores);
 
 // FIN AÑADIR FICHAJES EN DASHBOARD ///
 // Función para generar una contraseña temporal segura
