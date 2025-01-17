@@ -196,7 +196,7 @@ window.cargarEmpresas = async function() {
                     <td>${empresa.CIF || 'Sin CIF'}</td>
                     <td>${empresa.email_empresa || 'No especificada'}</td>
                     <td>${empresa.responsable_empresa || 'No especificada'}</td>
-                    <td>${empresa.status_empresa ? 'ACTIVA' : 'DESACTIVADA'}</td>
+                    <td>${empresa.tipo_contrato || 'Contrato'}</td>
                     <td>${empresa.tipo_licencia || 'No especificada'}</td>
                     <td>${formatearFecha(empresa.fecha_alta)}</td>
                     <td>${formatearFecha(empresa.fecha_expiracion)}</td>
