@@ -1662,6 +1662,23 @@ window.desactivarUsuario = async function(email) {
             cancelButtonText: 'Cancelar'
         });
 
+
+        // Crear spinner con texto
+        const spinner = Swal.fire({
+            title: 'Eliminando Usuario',
+            html: `
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+                <p class="mt-2">Procesando solicitud...</p>
+            `,
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+
+
         if (!confirmacion.isConfirmed) return;
 
         // Buscar usuario a eliminar en Firestore
