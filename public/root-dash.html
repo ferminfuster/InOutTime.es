@@ -140,28 +140,43 @@
     </div>
 
     <!-- Modal Nueva Empresa -->
-    <div class="modal fade" id="modalNuevaEmpresa">
-        <div class="modal-dialog modal-custom">
-            <div class="modal-content bg-dark">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nueva Empresa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formNuevaEmpresa">
-                        <input type="text" class="form-control mb-2" id="nombreEmpresa" placeholder="Nombre Empresa" required>
-                        <input type="text" class="form-control mb-2" id="cifEmpresa" placeholder="CIF" required>
-                        <input type="text" class="form-control mb-2" id="direccionEmpresa" placeholder="Dirección">
-                        <input type="tel" class="form-control mb-2" id="telefonoEmpresa" placeholder="Teléfono">
-                        <input type="email" class="form-control mb-2" id="emailEmpresa" placeholder="Email">
-                        <input type="text" class="form-control mb-2" id="responsableEmpresa" placeholder="Responsables">
-                        <input type="text" class="form-control mb-2" id="statusEmpresa" placeholder="Estado">
-                        <button type="submit" class="btn btn-primary">Crear Empresa</button>
-                    </form>
-                </div>
+<div class="modal fade" id="modalNuevaEmpresa">
+    <div class="modal-dialog modal-custom">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title">Nueva Empresa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNuevaEmpresa">
+                    <input type="text" class="form-control mb-2" id="nombreEmpresa" placeholder="Nombre Empresa" required>
+                    <input type="text" class="form-control mb-2" id="cifEmpresa" placeholder="CIF" required>
+                    <input type="text" class="form-control mb-2" id="direccionEmpresa" placeholder="Dirección">
+                    <input type="tel" class="form-control mb-2" id="telefonoEmpresa" placeholder="Teléfono">
+                    <input type="email" class="form-control mb-2" id="emailEmpresa" placeholder="Email">
+                    <input type="text" class="form-control mb-2" id="responsableEmpresa" placeholder="Responsables">
+                    <input type="text" class="form-control mb-2" id="statusEmpresa" placeholder="Estado">
+                    
+                    <!-- Nuevos campos -->
+                    <label class="text-white">Fecha de Creación</label>
+                    <input type="date" class="form-control mb-2" id="fechaCreacionEmpresa">
+                    
+                    <label class="text-white">Tipo de Licencia</label>
+                    <select class="form-control mb-2" id="tipoLicenciaEmpresa">
+                        <option value="basic">Basic</option>
+                        <option value="standard">Standard</option>
+                        <option value="prime">Prime</option>
+                    </select>
+                    
+                    <label class="text-white">Expiración de Contrato</label>
+                    <input type="date" class="form-control mb-2" id="expiracionContratoEmpresa">
+                    
+                    <button type="submit" class="btn btn-primary">Crear Empresa</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal Nuevo Usuario -->
     <div class="modal fade" id="modalNuevoUsuario">
