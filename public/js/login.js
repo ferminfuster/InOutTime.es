@@ -46,7 +46,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Manejar el formulario de login
-/*
+
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -138,7 +138,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     });
   }
 });
-*/
+/*
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -261,7 +261,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     });
   }
 });
-
+*/
 // Manejar recuperación de contraseña
 document.getElementById("forgot-password").addEventListener("click", async (e) => {
   e.preventDefault();
