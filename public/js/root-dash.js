@@ -241,21 +241,44 @@ window.mostrarInformacionEmpresa = async function(empresaId) {
         const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
         const empresa = empresaDoc.data();
 
+        // Función para formatear fechas de manera segura
+        const formatearFecha = (fecha) => {
+            if (!fecha) return 'No especificada';
+            
+            // Si es un Timestamp de Firestore
+            if (fecha.toDate && typeof fecha.toDate === 'function') {
+                return fecha.toDate().toLocaleDateString();
+            }
+            
+            // Si es un objeto Date de JavaScript
+            if (fecha instanceof Date) {
+                return fecha.toLocaleDateString();
+            }
+            
+            // Si es un string de fecha
+            if (typeof fecha === 'string') {
+                const fechaParseada = new Date(fecha);
+                return !isNaN(fechaParseada) ? fechaParseada.toLocaleDateString() : 'Fecha inválida';
+            }
+            
+            return 'Formato de fecha no reconocido';
+        };
+
         Swal.fire({
             title: `Información de Empresa: ${empresa.nombre_empresa}`,
             html: `
                 <div class="text-start">
-                    <p><strong>Nombre:</strong> ${empresa.nombre_empresa}</p>
-                    <p><strong>CIF:</strong> ${empresa.CIF}</p>
-                    <p><strong>Dirección:</strong> ${empresa.direccion_empresa}</p>
-                    <p><strong>Teléfono:</strong> ${empresa.telefono_empresa}</p>
-                    <p><strong>Email:</strong> ${empresa.email_empresa}</p>
-                    <p><strong>Responsable:</strong> ${empresa.responsable_empresa}</p>
+                    <p><strong>Nombre:</strong> ${empresa.nombre_empresa || 'No especificado'}</p>
+                    <p><strong>CIF:</strong> ${empresa.CIF || 'No especificado'}</p>
+                    <p><strong>Dirección:</strong> ${empresa.direccion_empresa || 'No especificada'}</p>
+                    <p><strong>Teléfono:</strong> ${empresa.telefono_empresa || 'No especificado'}</p>
+                    <p><strong>Email:</strong> ${empresa.email_empresa || 'No especificado'}</p>
+                    <p><strong>Responsable:</strong> ${empresa.responsable_empresa || 'No especificado'}</p>
                     <p><strong>Estado:</strong> ${empresa.status_empresa ? 'ACTIVA' : 'DESACTIVADA'}</p>
-                    <p><strong>Tipo de Licencia:</strong> ${empresa.tipo_licencia}</p>
-                    <p><strong>Tipo de Contrato:</strong> ${empresa.tipo_contrato}</p>
-                    <p><strong>Fecha de Alta:</strong> ${empresa.fecha_alta.toDate().toLocaleDateString()}</p>
-                    <p><strong>Fecha de Expiración:</strong> ${empresa.fecha_expiracion.toDate().toLocaleDateString()}</p>
+                    <p><strong>Tipo de Licencia:</strong> ${empresa.tipo_licencia || 'No especificada'}</p>
+                    <p><strong>Tipo de Contrato:</strong> ${empresa.tipo_contrato || 'No especificado'}</p>
+                    <p><strong>Fecha de Alta:</strong> ${formatearFecha(empresa.fecha_alta)}</p>
+                    <p><strong>Fecha de Expiración:</strong> ${formatearFecha(empresa.fecha_expiracion)}</p>
                 </div>
             `,
             confirmButtonText: 'Cerrar'
@@ -265,7 +288,8 @@ window.mostrarInformacionEmpresa = async function(empresaId) {
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudo cargar la información de la empresa'
+            text: 'No se pudo cargar la información de la empresa',
+            footer: error.message
         });
     }
 }
