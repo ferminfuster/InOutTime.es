@@ -149,6 +149,10 @@ document.getElementById('formNuevaEmpresa').addEventListener('submit', crearNuev
 ///////////////////////////////
 // CREAR NUEVA EMPRESA - FIN //
 //////////////////////////////
+
+//////////////////////////////////////////
+// Mostrar lista empresas en ROOT - FIN //
+/////////////////////////////////////////
 window.cargarEmpresas = async function() {
     try {
         console.log("Iniciando carga de empresas");
@@ -168,7 +172,7 @@ window.cargarEmpresas = async function() {
             console.log("No hay empresas en la base de datos");
             listaEmpresas.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center">No hay empresas registradas</td>
+                    <td colspan="8" class="text-center">No hay empresas registradas</td>
                 </tr>
             `;
             return;
@@ -178,6 +182,12 @@ window.cargarEmpresas = async function() {
             const empresa = documento.data();
             console.log("Empresa encontrada:", empresa);
 
+            // Formatear fechas
+            const formatearFecha = (fecha) => {
+                if (!fecha) return 'No especificada';
+                return fecha.toDate ? fecha.toDate().toLocaleDateString() : 'Formato inválido';
+            };
+
             const fila = `
                 <tr data-id="${documento.id}">
                     <td>${empresa.nombre_empresa || 'Sin nombre'}</td>
@@ -185,10 +195,27 @@ window.cargarEmpresas = async function() {
                     <td>${empresa.email_empresa || 'No especificada'}</td>
                     <td>${empresa.responsable_empresa || 'No especificada'}</td>
                     <td>${empresa.status_empresa ? 'ACTIVA' : 'DESACTIVADA'}</td>
+                    <td>${empresa.tipo_licencia || 'No especificada'}</td>
+                    <td>${formatearFecha(empresa.fecha_alta)}</td>
+                    <td>${formatearFecha(empresa.fecha_expiracion)}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm" onclick="eliminarEmpresa('${documento.id}')">
-                            Eliminar
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-success btn-sm" 
+                                    onclick="mostrarInformacionEmpresa('${documento.id}')"
+                                    title="Mostrar Información">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                            <button class="btn btn-info btn-sm" 
+                                    onclick="modificarEmpresa('${documento.id}')"
+                                    title="Editar Empresa">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" 
+                                    onclick="eliminarEmpresa('${documento.id}')"
+                                    title="Eliminar Empresa">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -200,7 +227,7 @@ window.cargarEmpresas = async function() {
         const listaEmpresas = document.getElementById('listaEmpresas');
         listaEmpresas.innerHTML = `
             <tr>
-                <td colspan="6" class="text-center text-danger">
+                <td colspan="8" class="text-center text-danger">
                     Error al cargar empresas: ${error.message}
                 </td>
             </tr>
@@ -208,6 +235,126 @@ window.cargarEmpresas = async function() {
     }
 }
 
+// Funciones de acciones (implementaciones básicas, deberás completarlas)
+window.mostrarInformacionEmpresa = async function(empresaId) {
+    try {
+        const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
+        const empresa = empresaDoc.data();
+
+        Swal.fire({
+            title: `Información de Empresa: ${empresa.nombre_empresa}`,
+            html: `
+                <div class="text-start">
+                    <p><strong>Nombre:</strong> ${empresa.nombre_empresa}</p>
+                    <p><strong>CIF:</strong> ${empresa.CIF}</p>
+                    <p><strong>Dirección:</strong> ${empresa.direccion_empresa}</p>
+                    <p><strong>Teléfono:</strong> ${empresa.telefono_empresa}</p>
+                    <p><strong>Email:</strong> ${empresa.email_empresa}</p>
+                    <p><strong>Responsable:</strong> ${empresa.responsable_empresa}</p>
+                    <p><strong>Estado:</strong> ${empresa.status_empresa ? 'ACTIVA' : 'DESACTIVADA'}</p>
+                    <p><strong>Tipo de Licencia:</strong> ${empresa.tipo_licencia}</p>
+                    <p><strong>Tipo de Contrato:</strong> ${empresa.tipo_contrato}</p>
+                    <p><strong>Fecha de Alta:</strong> ${empresa.fecha_alta.toDate().toLocaleDateString()}</p>
+                    <p><strong>Fecha de Expiración:</strong> ${empresa.fecha_expiracion.toDate().toLocaleDateString()}</p>
+                </div>
+            `,
+            confirmButtonText: 'Cerrar'
+        });
+    } catch (error) {
+        console.error("Error al mostrar información de empresa:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo cargar la información de la empresa'
+        });
+    }
+}
+
+window.modificarEmpresa = async function(empresaId) {
+    try {
+        const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
+        const empresa = empresaDoc.data();
+
+        const { value: formValues } = await Swal.fire({
+            title: `Modificar Empresa: ${empresa.nombre_empresa}`,
+            html: `
+                <!-- Formulario similar al de creación, pero precargado con los datos existentes -->
+                <input id="swal-nombre" class="swal2-input" placeholder="Nombre Empresa" value="${empresa.nombre_empresa}">
+                <input id="swal-cif" class="swal2-input" placeholder="CIF" value="${empresa.CIF}">
+                <!-- Añade más campos según necesites -->
+            `,
+            focusConfirm: false,
+            preConfirm: () => {
+                // Validaciones y recopilación de datos
+                return {
+                    nombre_empresa: document.getElementById('swal-nombre').value,
+                    CIF: document.getElementById('swal-cif').value
+                    // Añade más campos
+                };
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Guardar Cambios'
+        });
+
+        if (formValues) {
+            await updateDoc(doc(db, 'empresas', empresaId), formValues);
+            Swal.fire('Empresa actualizada', '', 'success');
+            cargarEmpresas();
+        }
+    } catch (error) {
+        console.error("Error al modificar empresa:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo modificar la empresa'
+        });
+    }
+}
+
+window.eliminarEmpresa = async function(empresaId) {
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esta acción",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await deleteDoc(doc(db, 'empresas', empresaId));
+            
+            // Notificación de éxito
+            Swal.fire({
+                icon: 'success',
+                title: 'Empresa Eliminada',
+                text: 'La empresa ha sido eliminada correctamente',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            // Recargar lista de empresas
+            cargarEmpresas();
+        } catch (error) {
+            console.error("Error al eliminar empresa:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo eliminar la empresa',
+                confirmButtonText: 'Entendido'
+            });
+        }
+    }
+}
+
+//////////////////////////////////////////
+// Mostrar lista empresas en ROOT - FIN //
+/////////////////////////////////////////
+/*
 window.eliminarEmpresa = async function(id) {
     try {
         await deleteDoc(doc(db, 'empresas', id));
@@ -221,6 +368,7 @@ window.eliminarEmpresa = async function(id) {
         alert('No se pudo eliminar la empresa');
     }
 }
+*/
 
 // Event listener para cargar empresas cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
