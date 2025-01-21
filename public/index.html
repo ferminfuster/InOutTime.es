@@ -137,12 +137,22 @@
 
     <section class="contact">
         <h2>Contáctanos</h2>
-        <form target="_blank" action="https://formsubmit.co/info@inouttime.es" method="POST">
-            <input type="text" placeholder="Tu nombre" required>
-            <input type="email" placeholder="Tu email" required>
-            <input type="telefono" placeholder="Tu telefono" required>
-            <textarea placeholder="Tu mensaje" rows="4" required></textarea>
-            <button type="submit" class="cta-button">Enviar mensaje</button>
+<!-- modify this form HTML and place wherever you want your form -->
+<form
+  action="https://formspree.io/f/xgvvggkn"
+  method="POST"
+>
+  <label>
+    Your email:
+    <input type="email" name="email">
+  </label>
+  <label>
+    Your message:
+    <textarea name="message"></textarea>
+  </label>
+  <!-- your other form fields go here -->
+  <button type="submit">Send</button>
+</form>
         </form>
     </section>
 
