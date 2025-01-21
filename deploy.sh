@@ -7,7 +7,7 @@ firebase deploy
 git add .
 
 # Commit con fecha y hora
-git commit -m "Deploy $(date '+%Y-%m-%d %H:%M:%S')"
+git commit -m "[skip_ci] Deploy $(date '+%Y-%m-%d %H:%M:%S')"
 
 # Push a repositorio
 git push origin main
