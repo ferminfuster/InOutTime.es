@@ -261,13 +261,13 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
         // Redirigir según el rol
         switch (userData.rol) {
           case "user":
-            notificarYRedirigir("Bienvenido, usuario ${userData.nombre}", "dashboard.html");
+            notificarYRedirigir(`Bienvenido, usuario ${userData.nombre}`, "dashboard.html");
             break;
           case "admin":
-            notificarYRedirigir("Bienvenido, administrador ${userData.nombre}", "admin-dash.html");
+            notificarYRedirigir(`Bienvenido, administrador ${userData.nombre}`, "admin-dash.html");
             break;
           case "root":
-            notificarYRedirigir("Bienvenido, usuario root ${userData.nombre}", "root-dash.html");
+            notificarYRedirigir(`Bienvenido, usuario root ${userData.nombre}`, "root-dash.html");
             break;
           default:
             Swal.fire({
