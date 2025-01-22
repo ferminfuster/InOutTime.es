@@ -279,9 +279,9 @@ button:hover {
 }
 /* Estilos para el div que actuará como botón */
 #horasTrabajadasHoy {
-    display: inline-block; /* Asegura que se comporte como un bloque en línea */
+    display: block; /* Asegura que se comporte como un bloque en línea */
     padding: 10px 20px; /* Espaciado interno del "botón" */
-    background-color: #4CAF50; /* Color de fondo */
+    background-color: #334155; /* Color de fondo */
     color: white; /* Color del texto */
     text-align: center; /* Centra el texto */
     font-size: 16px; /* Tamaño del texto */
