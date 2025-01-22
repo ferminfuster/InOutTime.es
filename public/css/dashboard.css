@@ -282,13 +282,11 @@ button:hover {
     display: block; /* Asegura que se comporte como un bloque en línea */
     padding: 10px 20px; /* Espaciado interno del "botón" */
     background-color: #334155; /* Color de fondo */
-    color: white; /* Color del texto */
+    color: #0ea5e9; /* Color del texto */
     text-align: center; /* Centra el texto */
     font-size: 16px; /* Tamaño del texto */
     border: none; /* Eliminar bordes por defecto */
     border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer; /* Cambia el cursor al pasar el ratón */
-    transition: background-color 0.3s ease; /* Transición suave al pasar el ratón */
   }
   
   #horasTrabajadasHoy:hover {
