@@ -563,11 +563,6 @@ statusUser.innerHTML = `
                 ${config.texto}
             </span>
         </div>
-        <div class="${config.clase}-style">
-            Acción: 
-            <span class="user-status-action">
-                ${config.texto}
-            </span>
         </div>
         <div class="${config.clase}-style">
             Fecha: 
