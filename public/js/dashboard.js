@@ -1032,7 +1032,7 @@ async function mostrarHorasTrabajadasHoy() {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No hay un usuario autenticado.'
+        text: 'No hay un usuario autenticado. NUEVA FUNCION'
       });
       return;
     }
