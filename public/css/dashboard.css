@@ -222,3 +222,8 @@ button {
 button:hover {
     background-color: #45a049;
 }
+reloj {
+    font-weight: bold;
+    color: #0ea5e9; /* Cambia según tu diseño */
+    text-align: right;
+}
