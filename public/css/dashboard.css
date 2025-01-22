@@ -302,24 +302,3 @@ button:hover {
 }
 
 /* Responsive */
-@media (max-width: 600px) {
-    .user-status-container {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .user-status-icon {
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-
-    .user-status-date-time {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .user-status-date {
-        margin-right: 0;
-        margin-bottom: 5px;
-    }
-}
