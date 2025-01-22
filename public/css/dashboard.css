@@ -224,20 +224,24 @@ button:hover {
 }
 /* CSS Adicional */
 .user-status-container {
+    --user-status-title-color: #ffffff;
+    --user-status-entrada-color: #22c55e;
+    --user-status-salida-color: #ef4444;
+    --user-status-incidencia-color: #f59e0b;
+    --user-status-background: #334155;
+
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    font-weight: bold;
-    font-size: 1em;
+    justify-content: center;
     text-align: center;
-    background-color: var(--card-background);
+    background-color: var(--user-status-background);
     border-radius: 8px;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     width: 100%;
 }
 
-.user-status-icon {
+.user-status-container .user-status-icon {
     margin-right: 10px;
     display: flex;
     align-items: center;
@@ -249,76 +253,29 @@ button:hover {
     color: var(--primary-color);
 }
 
-.user-status-details {
-    display: flex;
+.user-status-container .user-status-details {
+    display: inline-flex;
     align-items: center;
-    flex-wrap: nowrap;
-    overflow: hidden;
-    flex-grow: 1;
 }
 
-.user-status-title {
+.user-status-container .user-status-title {
+    color: var(--user-status-title-color);
     margin-right: 15px;
-    display: flex;
-    align-items: center;
 }
 
-.user-status-badge {
+.user-status-container .user-status-badge {
     margin-left: 10px;
-    padding: 3px 6px;
-    border-radius: 4px;
-    font-size: 0.8em;
 }
 
-.user-status-date {
-    margin-right: 10px;
-    color: var(--text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/* Modificadores de estado */
+.user-status-container .status-entrada {
+    color: var(--user-status-entrada-color);
 }
 
-.user-status-time {
-    color: var(--text-color);
-    white-space: nowrap;
+.user-status-container .status-salida {
+    color: var(--user-status-salida-color);
 }
 
-/* Variantes de estado */
-.status-entrada {
-    background-color: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
-}
-
-.status-salida {
-    background-color: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
-}
-
-.status-incidencia {
-    background-color: rgba(245, 158, 11, 0.2);
-    color: #f59e0b;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-    .user-status-container {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .user-status-icon {
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-
-    .user-status-details {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .user-status-title,
-    .user-status-date,
-    .user-status-time {
-        margin: 5px 0;
-    }
+.user-status-container .status-incidencia {
+    color: var(--user-status-incidencia-color);
 }
