@@ -555,11 +555,11 @@ async function mostrarUltimoRegistro(userId) {
       const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
 
       statusUser.innerHTML = `
-      
+      <div class="user-status-container">
           <div class="user-status-element ${config.clase}">
               <span>${config.texto} el ${fechaFormateada} a las ${horaFormateada}</spam>
           </div>
-      
+      </div>
   `;
 
   } else {
