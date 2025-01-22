@@ -557,13 +557,7 @@ async function mostrarUltimoRegistro(userId) {
       statusUser.innerHTML = `
       <div class="user-status-container">
           <div class="user-status-element ${config.clase}">
-              <span>Acción: ${config.texto}</span>
-          </div>
-          <div class="user-status-element ${config.clase}">
-              <span>Fecha: ${fechaFormateada}</span>
-          </div>
-          <div class="user-status-element ${config.clase}">
-              <span>Hora: ${horaFormateada}</span>
+              <span>Acción: ${config.texto} Fecha: ${fechaFormateada} Hora: ${horaFormateada}</spam>
           </div>
       </div>
   `;
