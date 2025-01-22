@@ -223,7 +223,6 @@ button:hover {
     background-color: #45a049;
 }
 /* CSS Adicional */
-/* Modificamos el contenedor para que todo se muestre en una sola línea */
 .user-status-container {
     --user-status-title-color: #ffffff;
     --user-status-entrada-bg: #c8e6c9; /* Fondo de entrada */
@@ -232,38 +231,41 @@ button:hover {
     --user-status-salida-color: #b71c1c; /* Texto de salida */
     --user-status-incidencia-bg: #fff3e0; /* Fondo de incidencia */
     --user-status-incidencia-color: #ff8f00; /* Texto de incidencia */
-    --user-status-background: #334155; /* Fondo gris que quieres eliminar */
 
-    /* Eliminamos los estilos relacionados con el fondo gris aquí */
+    /* Quitamos el fondo gris */
+    background-color: transparent; 
+    border: none; /* Eliminamos bordes, si es necesario */
+    padding: 0; /* Ajustamos los espacios */
+    box-shadow: none; /* Quitamos posibles sombras */
 }
 
-.user-status-container .user-status-element {
+.user-status-element {
     padding: 10px;
     margin: 0 10px;
     font-size: 1em;
     text-align: center;
     border-radius: 8px;
-    flex: 1;
     display: inline-block;
+    width: 100%; /* Se asegura que el ancho sea correcto */
 }
 
-.user-status-container .user-status-element span {
+.user-status-element span {
     display: block;
 }
 
-.user-status-container .status-entrada {
+.status-entrada {
     background-color: var(--user-status-entrada-bg);
     color: var(--user-status-entrada-color);
     border: 1px solid #4CAF50;
 }
 
-.user-status-container .status-salida {
+.status-salida {
     background-color: var(--user-status-salida-bg);
     color: var(--user-status-salida-color);
     border: 1px solid #ef5350;
 }
 
-.user-status-container .status-incidencia {
+.status-incidencia {
     background-color: var(--user-status-incidencia-bg);
     color: var(--user-status-incidencia-color);
     border: 1px solid #ffb300;
