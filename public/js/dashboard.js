@@ -564,11 +564,11 @@ async function mostrarUltimoRegistro(userId) {
 
   } else {
       statusUser.innerHTML = `
-          <div class="user-status-container">
+         
               <div class="user-status-element">
                   <span>Sin Registros</span>
               </div>
-          </div>
+          
       `;
   }
 }
