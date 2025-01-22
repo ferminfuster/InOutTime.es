@@ -156,6 +156,8 @@ async function registrarAccion(accion) {
 
     // Notificación de éxito con mensaje personalizado
     mostrarNotificacionExito(`¡${accion.charAt(0).toUpperCase() + accion.slice(1)} registrada correctamente!`);
+    await mostrarUltimoRegistro(user.uid);
+ 
 
   } catch (error) {
     console.error(`Error al registrar ${accion}:`, error);
