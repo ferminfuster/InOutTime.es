@@ -502,6 +502,7 @@ function exportarPDF() {
 }
 */
 //// Mostrar Información del último registro
+//// Mostrar Información del último registro
 async function mostrarUltimoRegistro(userId) {
   const statusUser = document.getElementById("statusUser");
 
@@ -592,7 +593,6 @@ async function mostrarUltimoRegistro(userId) {
       `;
   }
 }
-
 
 //// Descargar csv
 // Función para descargar registros como CSV
