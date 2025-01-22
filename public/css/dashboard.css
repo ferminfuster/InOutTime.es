@@ -277,3 +277,26 @@ button:hover {
     color: var(--user-status-incidencia-color);
     border: 1px solid #ffb300;
 }
+/* Estilos para el div que actuará como botón */
+#horasTrabajadasHoy {
+    display: inline-block; /* Asegura que se comporte como un bloque en línea */
+    padding: 10px 20px; /* Espaciado interno del "botón" */
+    background-color: #4CAF50; /* Color de fondo */
+    color: white; /* Color del texto */
+    text-align: center; /* Centra el texto */
+    font-size: 16px; /* Tamaño del texto */
+    border: none; /* Eliminar bordes por defecto */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar el ratón */
+    transition: background-color 0.3s ease; /* Transición suave al pasar el ratón */
+  }
+  
+  #horasTrabajadasHoy:hover {
+    background-color: #45a049; /* Cambio de color al pasar el ratón */
+  }
+  
+  /* Estilo adicional para el texto dentro */
+  #horasHoy {
+    font-weight: bold; /* Resaltar el texto de las horas trabajadas */
+  }
+  
