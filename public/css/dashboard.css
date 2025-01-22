@@ -245,8 +245,10 @@ button:hover {
     font-size: 1em;
     text-align: center;
     border-radius: 8px;
-    display: inline-block;
+    display: block;
     width: 100%; /* Se asegura que el ancho sea correcto */
+    font-weight: bold;
+
 }
 
 .user-status-element span {
