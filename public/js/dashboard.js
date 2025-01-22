@@ -1025,6 +1025,7 @@ window.imprimirInforme = imprimirInforme;
 
 
 window.calcularHorasTrabajadasHoy = async function() {
+  console.log("Acabo de entrar en la función Horas trabajadas");
   try {
     const user = auth.currentUser;
     if (!user) {
