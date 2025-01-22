@@ -552,11 +552,9 @@ async function mostrarUltimoRegistro(userId) {
 
       const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
 
-      statusUser .innerHTML = `
+      statusUser.innerHTML = `
       <div class="user-status-container">
-          <div class="user-status-icon">
-              <i class="${config.icono}"></i>
-          </div>
+          <i class="${config.icono} user-status-icon"></i>
           <div class="user-status-details">
               <div class="user-status-title">
                   Último Registro
@@ -570,7 +568,7 @@ async function mostrarUltimoRegistro(userId) {
               </div>
           </div>
       </div>
-      `;
+  `;
   } else {
       statusUser.innerHTML = `
           <div class="user-status-icon">
