@@ -1024,97 +1024,79 @@ window.enviarInformePorEmail = enviarInformePorEmail;
 window.imprimirInforme = imprimirInforme;
 
 
-window.calcularHorasTrabajadasHoy() = async function() {
-//async function calcularHorasTrabajadasHoy() {
+window.calcularHorasTrabajadasHoy = async function() {
   try {
-      // Obtener el usuario autenticado
-      const user = auth.currentUser;
-      if (!user) {
-          document.getElementById('horasHoy').textContent = 'N/A';
-          return;
-      }
+    const user = auth.currentUser;
+    if (!user) {
+        document.getElementById('horasHoy').textContent = 'N/A';
+        return;
+    }
 
-      const userId = user.uid;
+    const userId = user.uid;
 
-      // Obtener la fecha de hoy al inicio del día
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
 
-      // Obtener la fecha de mañana al inicio del día
-      const mañana = new Date(hoy);
-      mañana.setDate(hoy.getDate() + 1);
+    const mañana = new Date(hoy);
+    mañana.setDate(hoy.getDate() + 1);
 
-      // Consulta para obtener registros de hoy
-      const q = query(
-          collection(db, "registros"),
-          where("userId", "==", userId),
-          where("fecha", ">=", hoy),
-          where("fecha", "<", mañana)
-      );
+    const q = query(
+        collection(db, "registros"),
+        where("userId", "==", userId),
+        where("fecha", ">=", hoy),
+        where("fecha", "<", mañana),
+        orderBy("fecha")
+    );
 
-      const registrosSnapshot = await getDocs(q);
+    const registrosSnapshot = await getDocs(q);
+    const registros = registrosSnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => a.fecha.toDate() - b.fecha.toDate()); // En caso de que la consulta no lo ordene bien
 
-      const registros = registrosSnapshot.docs
-          .map(doc => ({
-              id: doc.id,
-              ...doc.data()
-          }))
-          .sort((a, b) => a.fecha.toDate() - b.fecha.toDate());
+    let primeraEntrada = null;
+    let ultimaSalida = null;
 
-      // Encontrar la primera entrada y la última salida de hoy
-      let primeraEntrada = null;
-      let ultimaSalida = null;
+    registros.forEach(registro => {
+        if (registro.accion_registro === 'entrada') {
+            if (!primeraEntrada || registro.fecha.toDate() < primeraEntrada) {
+                primeraEntrada = registro.fecha.toDate();
+            }
+        } else if (registro.accion_registro === 'salida') {
+            if (!ultimaSalida || registro.fecha.toDate() > ultimaSalida) {
+                ultimaSalida = registro.fecha.toDate();
+            }
+        }
+    });
 
-      registros.forEach(registro => {
-          if (registro.accion_registro === 'entrada') {
-              if (!primeraEntrada || registro.fecha.toDate() < primeraEntrada) {
-                  primeraEntrada = registro.fecha.toDate();
-              }
-          } else if (registro.accion_registro === 'salida') {
-              if (!ultimaSalida || registro.fecha.toDate() > ultimaSalida) {
-                  ultimaSalida = registro.fecha.toDate();
-              }
-          }
-      });
+    let horasTrabajadasHoy = 'N/A';
+    if (primeraEntrada && ultimaSalida) {
+        const diferenciaMs = ultimaSalida - primeraEntrada;
+        const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+        const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+        horasTrabajadasHoy = `${horas} horas ${minutos} minutos`;
+    } else if (primeraEntrada && !ultimaSalida) {
+        const ahora = new Date();
+        const diferenciaMs = ahora - primeraEntrada;
+        const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+        const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+        horasTrabajadasHoy = `${horas} horas ${minutos} minutos (en curso)`;
+    }
 
-      // Calcular horas trabajadas
-      let horasTrabajadasHoy = 'N/A';
-      if (primeraEntrada && ultimaSalida) {
-          const diferenciaMs = ultimaSalida - primeraEntrada;
-          const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
-          const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
-          
-          horasTrabajadasHoy = `${horas} horas ${minutos} minutos`;
-      } else if (primeraEntrada && !ultimaSalida) {
-          // Si hay entrada pero no salida (sesión actual)
-          const ahora = new Date();
-          const diferenciaMs = ahora - primeraEntrada;
-          const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
-          const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
-          
-          horasTrabajadasHoy = `${horas} horas ${minutos} minutos (en curso)`;
-      }
-
-      // Actualizar el DOM
-      document.getElementById('horasHoy').textContent = horasTrabajadasHoy;
-
+    document.getElementById('horasHoy').textContent = horasTrabajadasHoy;
   } catch (error) {
-      console.error("Error al calcular horas trabajadas hoy:", error);
-      document.getElementById('horasHoy').textContent = 'Error';
+    console.error("Error al calcular horas trabajadas hoy:", error);
+    document.getElementById('horasHoy').textContent = 'Error';
   }
-}
+};
 
-// Llamar a la función cuando la página se cargue
 document.addEventListener('DOMContentLoaded', () => {
-  // Si el usuario está autenticado
   if (auth.currentUser) {
-      calcularHorasTrabajadasHoy();
+    calcularHorasTrabajadasHoy();
   }
 });
 
-// Opcional: Actualizar cada cierto tiempo
 setInterval(() => {
   if (auth.currentUser) {
-      calcularHorasTrabajadasHoy();
+    calcularHorasTrabajadasHoy();
   }
-}, 60000); // Actualizar cada minuto
+}, 60000); // Actualiza cada minuto
