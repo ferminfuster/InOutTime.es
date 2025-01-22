@@ -277,18 +277,18 @@ button:hover {
 #horasTrabajadasHoy {
     display: block; /* Asegura que se comporte como un bloque en línea */
     padding: 10px 20px; /* Espaciado interno del "botón" */
-    background-color: #334155; /* Color de fondo */
     color: #0ea5e9; /* Color del texto */
     text-align: center; /* Centra el texto */
     font-size: 16px; /* Tamaño del texto */
     border: none; /* Eliminar bordes por defecto */
     border-radius: 5px; /* Bordes redondeados */
+        /* Quitamos el fondo gris */
+        background-color: transparent; 
+        border: none; /* Eliminamos bordes, si es necesario */
+        padding: 0; /* Ajustamos los espacios */
+        box-shadow: none; /* Quitamos posibles sombras */
   }
-  
-  #horasTrabajadasHoy:hover {
-    background-color: #45a049; /* Cambio de color al pasar el ratón */
-  }
-  
+
   /* Estilo adicional para el texto dentro */
   #horasHoy {
     font-weight: bold; /* Resaltar el texto de las horas trabajadas */
