@@ -552,7 +552,8 @@ async function mostrarUltimoRegistro(userId) {
 
       const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
 
-      statusUser.innerHTML = `
+      statusUser .innerHTML = `
+      <div class="user-status-container">
           <div class="user-status-icon">
               <i class="${config.icono}"></i>
           </div>
@@ -563,13 +564,12 @@ async function mostrarUltimoRegistro(userId) {
                       ${config.texto}
                   </span>
               </div>
-              <div class="user-status-date">
-                  ${fechaFormateada}
-              </div>
-              <div class="user-status-time">
-                  ${horaFormateada}
+              <div class="user-status-date-time">
+                  <span class="user-status-date">${fechaFormateada}</span>
+                  <span class="user-status-time">${horaFormateada}</span>
               </div>
           </div>
+      </div>
       `;
   } else {
       statusUser.innerHTML = `
