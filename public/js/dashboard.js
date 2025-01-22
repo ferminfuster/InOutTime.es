@@ -240,6 +240,7 @@ onAuthStateChanged(auth, async (user) => {
       }
       // Mostrar último registro del usuario
       await mostrarUltimoRegistro(user.uid);
+      await calcularHorasTrabajadasHoy();
 
     } else {
       //console.log("No se encontraron datos para este usuario.");
