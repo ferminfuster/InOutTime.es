@@ -553,24 +553,27 @@ async function mostrarUltimoRegistro(userId) {
         const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
 
         statusUser.innerHTML = `
-            <div class="user-status-icon">
+        <div style="display: flex; align-items: center; justify-content: flex-start; font-weight: bold; font-size: 1em; text-align: center;">
+            <div class="user-status-icon" style="margin-right: 10px;">
                 <i class="${config.icono}"></i>
             </div>
-            <div class="user-status-details">
-                <div class="user-status-title">
+            <div class="user-status-details" style="display: flex; align-items: center; flex-wrap: nowrap;">
+                <div class="user-status-title" style="margin-right: 15px;">
                     Último Registro
-                    <span class="user-status-badge ${config.clase}">
+                    <span class="user-status-badge ${config.clase}" style="margin-left: 10px;">
                         ${config.texto}
                     </span>
                 </div>
-                <div class="user-status-date">
+                <div class="user-status-date" style="margin-right: 10px;">
                     ${fechaFormateada}
                 </div>
                 <div class="user-status-time">
                     ${horaFormateada}
                 </div>
             </div>
-        `;
+        </div>
+    `;
+    
     } else {
         statusUser.innerHTML = `
             <div class="user-status-icon">
