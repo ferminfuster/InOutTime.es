@@ -1023,7 +1023,9 @@ window.descargarInformeCSV = descargarInformeCSV;
 window.enviarInformePorEmail = enviarInformePorEmail;
 window.imprimirInforme = imprimirInforme;
 
-async function calcularHorasTrabajadasHoy() {
+
+window.calcularHorasTrabajadasHoy() = async function() {
+//async function calcularHorasTrabajadasHoy() {
   try {
       // Obtener el usuario autenticado
       const user = auth.currentUser;
