@@ -235,7 +235,7 @@ button:hover {
     /* Quitamos el fondo gris */
     background-color: transparent; 
     border: none; /* Eliminamos bordes, si es necesario */
-    padding: 0; /* Ajustamos los espacios */
+    padding: 12px; /* Ajustamos los espacios */
     box-shadow: none; /* Quitamos posibles sombras */
 }
 
