@@ -272,7 +272,7 @@ button:hover {
 
 .user-status-date {
     margin-right: 10px;
-    color: var(--secondary-color);
+    color: var(--text-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
