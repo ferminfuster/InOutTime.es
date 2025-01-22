@@ -504,90 +504,89 @@ function exportarPDF() {
 //// Mostrar Información del utlimo registro
 async function mostrarUltimoRegistro(userId) {
   const statusUser = document.getElementById("statusUser");
-
+  
   if (!statusUser) {
-    console.error("Elemento 'statusUser' no encontrado en el DOM.");
-    return;
+      console.error("Elemento 'statusUser' no encontrado en el DOM.");
+      return;
   }
 
   const ultimoRegistro = await obtenerUltimoRegistro(userId);
 
   if (ultimoRegistro) {
-    const fechaRegistro = ultimoRegistro.fecha.toDate(); // Convertir a Date
-    const fechaFormateada = fechaRegistro.toLocaleString("es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false
-    });
+      const fechaRegistro = ultimoRegistro.fecha.toDate();
+      const fechaFormateada = fechaRegistro.toLocaleString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+      });
 
-    // Seleccionar icono y color según la acción
-    let icono, colorFondo, colorTexto;
-    switch (ultimoRegistro.accion_registro.toLowerCase()) {
-      case "entrada":
-        icono = "🟢"; // Icono de entrada
-        colorFondo = "#e8f5e9"; // Verde suave
-        colorTexto = "#388e3c"; // Verde oscuro
-        break;
-      case "salida":
-        icono = "🔴"; // Icono de salida
-        colorFondo = "#ffebee"; // Rojo suave
-        colorTexto = "#c62828"; // Rojo oscuro
-        break;
-      case "incidencia":
-        icono = "⚠️"; // Icono de incidencia
-        colorFondo = "#fff3e0"; // Amarillo suave
-        colorTexto = "#f57c00"; // Naranja oscuro
-        break;
-      default:
-        icono = "❓"; // Icono de desconocido
-        colorFondo = "#e0e0e0"; // Gris suave
-        colorTexto = "#9e9e9e"; // Gris oscuro
-    }
+      const horaFormateada = fechaRegistro.toLocaleString("es-ES", {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+      });
 
-    // Aplicar estilo y contenido al contenedor
-    statusUser.innerHTML = `
-        <div style="
-            padding: 15px;
-            border-radius: 10px;
-            background-color: ${colorFondo};
-            color: ${colorTexto};
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border: 2px solid ${colorTexto};
-            margin-top: 20px;
-        ">
-            <span style="font-size: 2em; margin-right: 15px;">${icono}</span>
-            <div>
-                <div style="font-size: 1.2em;">Última acción: ${ultimoRegistro.accion_registro || "Desconocida"}</div>
-                <div style="font-size: 1em;">📅 Fecha: ${fechaFormateada}</div>
-            </div>
-        </div>
-    `;
+      const configuraciones = {
+          "entrada": {
+              icono: "fas fa-sign-in-alt",
+              clase: "status-entrada",
+              texto: "Entrada"
+          },
+          "salida": {
+              icono: "fas fa-sign-out-alt",
+              clase: "status-salida",
+              texto: "Salida"
+          },
+          "incidencia": {
+              icono: "fas fa-exclamation-triangle",
+              clase: "status-incidencia",
+              texto: "Incidencia"
+          },
+          "default": {
+              icono: "fas fa-question",
+              clase: "",
+              texto: "Desconocida"
+          }
+      };
+
+      const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
+
+      statusUser.innerHTML = `
+          <div class="user-status-icon">
+              <i class="${config.icono}"></i>
+          </div>
+          <div class="user-status-details">
+              <div class="user-status-title">
+                  Último Registro
+                  <span class="user-status-badge ${config.clase}">
+                      ${config.texto}
+                  </span>
+              </div>
+              <div class="user-status-date">
+                  ${fechaFormateada}
+              </div>
+              <div class="user-status-time">
+                  ${horaFormateada}
+              </div>
+          </div>
+      `;
   } else {
-    statusUser.innerHTML = `
-        <div style="
-            padding: 15px;
-            border-radius: 10px;
-            background-color: #f8d7da;
-            color: #721c24;
-            text-align: center;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        ">
-            ❌ No se encontraron registros previos.
-        </div>
-    `;
+      statusUser.innerHTML = `
+          <div class="user-status-icon">
+              <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="user-status-details">
+              <div class="user-status-title">
+                  Sin Registros
+              </div>
+              <div class="user-status-date">
+                  No se encontraron registros previos
+              </div>
+          </div>
+      `;
   }
 }
-
 
 //// Descargar csv
 // Función para descargar registros como CSV
