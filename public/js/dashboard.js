@@ -569,7 +569,7 @@ async function mostrarUltimoRegistro(userId) {
                   <span class="${config.clase}"> ${fechaFormateada} </span>
               </div>
               <div class="user-status-time">
-                   Hora: 
+                   " Hora:" 
                   <span class="${config.clase}"> ${horaFormateada} </span>
               </div>
           </div>
