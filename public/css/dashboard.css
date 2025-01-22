@@ -223,7 +223,7 @@ button:hover {
     background-color: #45a049;
 }
 /* CSS Adicional */
-..user-status-container {
+.user-status-container {
     display: flex;
     align-items: center;
     justify-content: center; /* Centrado horizontal */
