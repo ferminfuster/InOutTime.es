@@ -232,18 +232,9 @@ button:hover {
     --user-status-salida-color: #b71c1c; /* Texto de salida */
     --user-status-incidencia-bg: #fff3e0; /* Fondo de incidencia */
     --user-status-incidencia-color: #ff8f00; /* Texto de incidencia */
-    --user-status-background: #334155;
-    
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-align: center;
-    background-color: var(--user-status-background);
-    border-radius: 8px;
-    padding: 10px;
-    font-weight: bold;
-    width: 100%;
-    box-sizing: border-box;
+    --user-status-background: #334155; /* Fondo gris que quieres eliminar */
+
+    /* Eliminamos los estilos relacionados con el fondo gris aquí */
 }
 
 .user-status-container .user-status-element {
@@ -277,6 +268,7 @@ button:hover {
     color: var(--user-status-incidencia-color);
     border: 1px solid #ffb300;
 }
+
 /* Estilos para el div que actuará como botón */
 #horasTrabajadasHoy {
     display: block; /* Asegura que se comporte como un bloque en línea */
