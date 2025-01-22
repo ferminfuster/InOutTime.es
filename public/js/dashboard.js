@@ -1023,3 +1023,17 @@ function imprimirInforme() {
 window.descargarInformeCSV = descargarInformeCSV;
 window.enviarInformePorEmail = enviarInformePorEmail;
 window.imprimirInforme = imprimirInforme;
+
+//FUNCION RELOJ
+function actualizarReloj() {
+  const reloj = document.getElementById("reloj");
+  if (reloj) {
+      const ahora = new Date();
+      const horaFormateada = ahora.toLocaleTimeString("es-ES", { hour12: false });
+      reloj.textContent = horaFormateada;
+  }
+}
+
+// Actualizar el reloj cada segundo
+setInterval(actualizarReloj, 1000);
+actualizarReloj(); // Llamada inicial
