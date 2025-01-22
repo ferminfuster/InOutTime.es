@@ -224,46 +224,59 @@ button:hover {
 }
 /* CSS Adicional */
 .user-status-container {
+    --user-status-title-color: #ffffff;
+    --user-status-entrada-color: #22c55e;
+    --user-status-salida-color: #ef4444;
+    --user-status-incidencia-color: #f59e0b;
+    --user-status-background: #334155;
+
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    background-color: var(--user-status-background);
     border-radius: 8px;
     padding: 10px;
+    font-weight: bold;
     width: 100%;
-    margin: 10px 0;
-    transition: all 0.3s ease;
+    
 }
 
-.user-status-container.entry {
-    background-color: #c8e6c9; /* Color de fondo de entrada */
-    color: #1B5E20; /* Color de texto de entrada */
-    border: 1px solid #4CAF50; /* Borde de entrada */
+.user-status-container .user-status-icon {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(14, 165, 233, 0.1);
+    color: var(--primary-color);
 }
 
-.user-status-container.entry:hover {
-    background-color: #4CAF50; /* Color de fondo al pasar el mouse */
-    color: white; /* Color de texto al pasar el mouse */
+.user-status-container .user-status-details {
+    display: inline-flex;
+    align-items: center;
 }
 
-.user-status-container.exit {
-    background-color: #ffcdd2; /* Color de fondo de salida */
-    color: #b71c1c; /* Color de texto de salida */
-    border: 1px solid #ef5350; /* Borde de salida */
+.user-status-container .user-status-title {
+    color: var(--user-status-title-color);
+    margin-right: 15px;
 }
 
-.user-status-container.exit:hover {
-    background-color: #ef5350; /* Color de fondo al pasar el mouse */
-    color: white; /* Color de texto al pasar el mouse */
+.user-status-container .user-status-badge {
+    margin-left: 10px;
 }
 
-.user-status-container.incidence {
-    background-color: #fff3e0; /* Color de fondo de incidencia */
-    color: #ff8f00; /* Color de texto de incidencia */
-    border: 1px solid #ffb300; /* Borde de incidencia */
+/* Modificadores de estado */
+.user-status-container .status-entrada {
+    color: var(--user-status-entrada-color);
 }
 
-.user-status-container.incidence:hover {
-    background-color: #ffb300; /* Color de fondo al pasar el mouse */
-    color: white; /* Color de texto al pasar el mouse */
+.user-status-container .status-salida {
+    color: var(--user-status-salida-color);
+}
+
+.user-status-container .status-incidencia {
+    color: var(--user-status-incidencia-color);
 }
