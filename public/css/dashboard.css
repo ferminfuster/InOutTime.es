@@ -282,7 +282,7 @@ button:hover {
     font-size: 16px; /* Tamaño del texto */
     border: none; /* Eliminar bordes por defecto */
     border-radius: 5px; /* Bordes redondeados */
-    background-color: #1e293b; 
+    background-color: #334155; 
     border: none; /* Eliminamos bordes, si es necesario */
     box-shadow: none; /* Quitamos posibles sombras */
   }
