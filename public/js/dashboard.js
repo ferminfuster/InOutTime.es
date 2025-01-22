@@ -1023,82 +1023,96 @@ window.descargarInformeCSV = descargarInformeCSV;
 window.enviarInformePorEmail = enviarInformePorEmail;
 window.imprimirInforme = imprimirInforme;
 
-// Función para calcular las horas trabajadas hoy
-async function mostrarHorasTrabajadasHoy() {
+async function calcularHorasTrabajadasHoy() {
   try {
-    // Obtener el usuario autenticado
-    const user = auth.currentUser;
-    if (!user) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No hay un usuario autenticado. NUEVA FUNCION'
+      // Obtener el usuario autenticado
+      const user = auth.currentUser;
+      if (!user) {
+          document.getElementById('horasHoy').textContent = 'N/A';
+          return;
+      }
+
+      const userId = user.uid;
+
+      // Obtener la fecha de hoy al inicio del día
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+
+      // Obtener la fecha de mañana al inicio del día
+      const mañana = new Date(hoy);
+      mañana.setDate(hoy.getDate() + 1);
+
+      // Consulta para obtener registros de hoy
+      const q = query(
+          collection(db, "registros"),
+          where("userId", "==", userId),
+          where("fecha", ">=", hoy),
+          where("fecha", "<", mañana)
+      );
+
+      const registrosSnapshot = await getDocs(q);
+
+      const registros = registrosSnapshot.docs
+          .map(doc => ({
+              id: doc.id,
+              ...doc.data()
+          }))
+          .sort((a, b) => a.fecha.toDate() - b.fecha.toDate());
+
+      // Encontrar la primera entrada y la última salida de hoy
+      let primeraEntrada = null;
+      let ultimaSalida = null;
+
+      registros.forEach(registro => {
+          if (registro.accion_registro === 'entrada') {
+              if (!primeraEntrada || registro.fecha.toDate() < primeraEntrada) {
+                  primeraEntrada = registro.fecha.toDate();
+              }
+          } else if (registro.accion_registro === 'salida') {
+              if (!ultimaSalida || registro.fecha.toDate() > ultimaSalida) {
+                  ultimaSalida = registro.fecha.toDate();
+              }
+          }
       });
-      return;
-    }
 
-    const userId = user.uid;
+      // Calcular horas trabajadas
+      let horasTrabajadasHoy = 'N/A';
+      if (primeraEntrada && ultimaSalida) {
+          const diferenciaMs = ultimaSalida - primeraEntrada;
+          const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+          const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+          
+          horasTrabajadasHoy = `${horas} horas ${minutos} minutos`;
+      } else if (primeraEntrada && !ultimaSalida) {
+          // Si hay entrada pero no salida (sesión actual)
+          const ahora = new Date();
+          const diferenciaMs = ahora - primeraEntrada;
+          const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+          const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+          
+          horasTrabajadasHoy = `${horas} horas ${minutos} minutos (en curso)`;
+      }
 
-    // Obtener registros de hoy
-    const hoy = new Date();
-    const fechaHoy = hoy.toLocaleDateString('es-ES'); // Formato dd/mm/yyyy
+      // Actualizar el DOM
+      document.getElementById('horasHoy').textContent = horasTrabajadasHoy;
 
-    const q = query(
-      collection(db, "registros"),
-      where("userId", "==", userId),
-      where("fecha", ">=", new Date(hoy.setHours(0, 0, 0, 0))),  // Desde las 00:00 del día de hoy
-      where("fecha", "<", new Date(hoy.setHours(23, 59, 59, 999)))  // Hasta las 23:59 del día de hoy
-    );
-
-    const registrosSnapshot = await getDocs(q);
-
-    const registros = registrosSnapshot.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
-      .filter(registro => registro.userId === userId)
-      .sort((a, b) => a.fecha.toDate() - b.fecha.toDate());  // Ordenar por fecha
-
-    if (registros.length === 0) {
-      document.getElementById("horasHoy").textContent = "No hay registros para hoy.";
-      return;
-    }
-
-    // Procesar registros para calcular las horas trabajadas hoy
-    const horasTrabajadasHoy = calcularHorasTrabajadasHoy(registros);
-    document.getElementById("horasHoy").textContent = horasTrabajadasHoy;
   } catch (error) {
-    console.error("Error al calcular las horas trabajadas hoy:", error);
-    document.getElementById("horasHoy").textContent = "Error al calcular las horas.";
+      console.error("Error al calcular horas trabajadas hoy:", error);
+      document.getElementById('horasHoy').textContent = 'Error';
   }
 }
 
-// Función para calcular las horas trabajadas hoy
-function calcularHorasTrabajadasHoy(registros) {
-  let entrada = null;
-  let salida = null;
-
-  // Filtrar solo entradas y salidas
-  registros.forEach(registro => {
-    if (registro.accion_registro === 'entrada' && (!entrada || registro.fecha.toDate() < entrada)) {
-      entrada = registro.fecha.toDate();
-    } else if (registro.accion_registro === 'salida' && (!salida || registro.fecha.toDate() > salida)) {
-      salida = registro.fecha.toDate();
-    }
-  });
-
-  if (!entrada || !salida) {
-    return "Entrada o salida no registrada.";
+// Llamar a la función cuando la página se cargue
+document.addEventListener('DOMContentLoaded', () => {
+  // Si el usuario está autenticado
+  if (auth.currentUser) {
+      calcularHorasTrabajadasHoy();
   }
+});
 
-  // Calcular las horas trabajadas
-  const diferenciaMs = salida - entrada;
-  const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
-  const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
-
-  return `${horas} horas ${minutos} minutos`;
-}
-
-// Llamar a la función al cargar la página o después de que el usuario inicie sesión
-window.onload = mostrarHorasTrabajadasHoy;
+// Opcional: Actualizar cada cierto tiempo
+setInterval(() => {
+  if (auth.currentUser) {
+      calcularHorasTrabajadasHoy();
+  }
+}, 60000); // Actualizar cada minuto
