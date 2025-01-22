@@ -222,47 +222,49 @@ button {
 button:hover {
     background-color: #45a049;
 }
-/* CSS Adicional 
-.status-container {
-    background-color: var(--card-background);
-    border-radius: 15px;
+/* CSS Adicional */
+.user-status-container {
+    background: linear-gradient(135deg, var(--card-background) 0%, rgba(51, 65, 85, 0.8) 100%);
+    border-radius: 12px;
     padding: 15px;
     margin: 15px 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
     transition: all 0.3s ease;
 }
 
-.status-content {
+.user-status-icon {
+    font-size: 3em;
+    margin-right: 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background-color: rgba(14, 165, 233, 0.1);
+    border-radius: 50%;
+    color: var(--primary-color);
 }
 
-.status-icon {
-    font-size: 2.5em;
-    margin-right: 15px;
-}
-
-.status-details {
+.user-status-details {
     flex-grow: 1;
 }
 
-.status-action {
-    font-weight: bold;
-    color: var(--primary-color);
+.user-status-title {
     font-size: 1.2em;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
 }
 
-.status-date {
-    color: var(--secondary-color);
-    font-size: 0.9em;
-    margin-top: 5px;
-}
-
-.status-badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.8em;
+.user-status-badge {
+    margin-left: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7em;
     font-weight: bold;
 }
 
@@ -280,4 +282,26 @@ button:hover {
     background-color: rgba(245, 158, 11, 0.2);
     color: #f59e0b;
 }
-*/
+
+.user-status-date {
+    color: var(--secondary-color);
+    font-size: 0.9em;
+}
+
+.user-status-time {
+    color: var(--text-color);
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+@media (max-width: 600px) {
+    .user-status-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-status-icon {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+}
