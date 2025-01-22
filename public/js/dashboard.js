@@ -503,10 +503,10 @@ function exportarPDF() {
 */
 //// Mostrar Información del utlimo registro
 async function mostrarUltimoRegistro(userId) {
-  const statusUser  = document.getElementById("statusUser ");
+  const statusUser = document.getElementById("statusUser");
   
-  if (!statusUser ) {
-      console.error("Elemento 'statusUser ' no encontrado en el DOM.");
+  if (!statusUser) {
+      console.error("Elemento 'statusUser' no encontrado en el DOM.");
       return;
   }
 
@@ -552,56 +552,47 @@ async function mostrarUltimoRegistro(userId) {
 
       const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
 
-      statusUser .innerHTML = `
-          <div class="user-status-container">
-              <div class="user-status-icon">
-                  <i class="${config.icono}"></i>
-              </div>
-              <div class="user-status-details">
-                  <div class="user-status-title" style="color: var(--user-status-title-color);">
-                      Acción:
-                      <span class="user-status-badge ${config.clase}" style="color: ${getColor(config.texto)};">
-                          ${config.texto}
-                      </span>
-                  </div>
-                  <div class="user-status-date" style="color: var(--user-status-title-color);">
-                      Fecha: 
-                      <span style="color: ${getColor(config.texto)};">${fechaFormateada}</span>
-                  </div>
-                  <div class="user-status-time" style="color: var(--user-status-title-color);">
-                      Hora: 
-                      <span style="color: ${getColor(config.texto)};">${horaFormateada}</span>
-                  </div>
-              </div>
-          </div>
-      `;
+statusUser.innerHTML = `
+    <div class="user-status-icon">
+        <i class="${config.icono}"></i>
+    </div>
+    <div class="user-status-details">
+        <div class="user-status-title">
+            Acción
+            <span class="user-status-badge ${config.clase}">
+                ${config.texto}
+            </span>
+        </div>
+        </div>
+        <div class="${config.clase}-style">
+            Fecha: 
+            <span class="user-status-date">  
+                ${fechaFormateada}
+            </span>
+        </div>
+        <div class="${config.clase}-style">
+            Hora: 
+            <span class="user-status-time">  
+                ${horaFormateada}
+            </span>
+        </div>
+    </div>
+`;
   } else {
-      statusUser .innerHTML = `
-          <div class="user-status-container">
-              <div class="user-status-icon">
-                  <i class="fas fa-times-circle"></i>
+      statusUser.innerHTML = `
+          <div class="user-status-icon">
+              <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="user-status-details">
+              <div class="user-status-title">
+                  Sin Registros
               </div>
-              <div class="user-status-details">
-                  <div class="user-status-title" style="color: var(--user-status-title-color);">
-                      Sin Registros
-                  </div>
-                  <div class="user-status-date" style="color: var(--user-status-title-color);">
-                      No se encontraron registros previos
-                  </div>
+              <div class="user-status-date">
+                  No se encontraron registros previos
               </div>
           </div>
       `;
   }
-}
-
-// Función para obtener el color según el tipo de acción
-function getColor(accion) {
-  const colores = {
-      "entrada": "#22c55e", // Verde
-      "salida": "#ef4444", // Rojo
-      "incidencia": "#f59e0b" // Naranja
-  };
-  return colores[accion.toLowerCase()] || "#000"; // Color por defecto
 }
 
 //// Descargar csv
