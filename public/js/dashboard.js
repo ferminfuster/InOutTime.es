@@ -552,32 +552,52 @@ async function mostrarUltimoRegistro(userId) {
 
       const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
 
-statusUser.innerHTML = `
-    <div class="user-status-icon">
-        <i class="${config.icono}"></i>
-    </div>
-    <div class="user-status-details">
-        <div class="user-status-title">
-            Acción
-            <span class="user-status-badge ${config.clase}">
-                ${config.texto}
-            </span>
-        </div>
-        </div>
-        <div class="${config.clase}-style">
-            Fecha: 
-            <span class="user-status-date">  
-                ${fechaFormateada}
-            </span>
-        </div>
-        <div class="${config.clase}-style">
-            Hora: 
-            <span class="user-status-time">  
-                ${horaFormateada}
-            </span>
-        </div>
-    </div>
-`;
+      statusUser.innerHTML = `
+
+      <div class="user-status-container">
+
+          <div class="user-status-icon">
+
+              <i class="${config.icono}"></i>
+
+          </div>
+
+          <div class="user-status-details">
+
+              <div class="user-status-title">
+
+                  Acción:
+
+                  <span class="user-status-badge ${config.clase}">
+
+                      ${config.texto}
+
+                  </span>
+
+              </div>
+
+              <div class="user-status-date">
+
+                  Fecha: 
+
+                  <span class="${config.clase}">${fechaFormateada}</span>
+
+              </div>
+
+              <div class="user-status-time">
+
+                  Hora: 
+
+                  <span class="${config.clase}">${horaFormateada}</span>
+
+              </div>
+
+          </div>
+
+      </div>
+
+  `;
+
   } else {
       statusUser.innerHTML = `
           <div class="user-status-icon">
