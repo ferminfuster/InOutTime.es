@@ -225,9 +225,9 @@ button:hover {
 /* CSS Adicional */
 .user-status-container {
     --user-status-title-color: #ffffff;
-    --user-status-entrada-color: #22c55e;
-    --user-status-salida-color: #ef4444;
-    --user-status-incidencia-color: #f59e0b;
+    --user-status-entrada-color: #1B5E20; /* Color del botón de entrada */
+    --user-status-salida-color: #b71c1c; /* Color del botón de salida */
+    --user-status-incidencia-color: #ff8f00; /* Color del botón de incidencia */
     --user-status-background: #334155;
 
     display: flex;
@@ -239,7 +239,6 @@ button:hover {
     padding: 10px;
     font-weight: bold;
     width: 100%;
-    
 }
 
 .user-status-container .user-status-icon {
@@ -270,13 +269,13 @@ button:hover {
 
 /* Modificadores de estado */
 .user-status-container .status-entrada {
-    color: var(--user-status-entrada-color);
+    color: var(--user-status-entrada-color); /* Color de entrada */
 }
 
 .user-status-container .status-salida {
-    color: var(--user-status-salida-color);
+    color: var(--user-status-salida-color); /* Color de salida */
 }
 
 .user-status-container .status-incidencia {
-    color: var(--user-status-incidencia-color);
+    color: var(--user-status-incidencia-color); /* Color de incidencia */
 }

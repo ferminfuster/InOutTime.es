@@ -501,10 +501,10 @@ function exportarPDF() {
     });
 }
 */
-//// Mostrar Información del utlimo registro
+//// Mostrar Información del último registro
 async function mostrarUltimoRegistro(userId) {
   const statusUser = document.getElementById("statusUser");
-  
+
   if (!statusUser) {
       console.error("Elemento 'statusUser' no encontrado en el DOM.");
       return;
@@ -558,18 +558,18 @@ async function mostrarUltimoRegistro(userId) {
              <i class="${config.icono}"></i>
           </div>
           <div class="user-status-details">
-              <div class="user-status-title">
+              <div class="user-status-title ${config.clase}">
                   Acción:
                   <span class="user-status-badge ${config.clase}">
                       ${config.texto}
                   </span>
               </div>
-              <div class="user-status-date">
+              <div class="user-status-date ${config.clase}">
                   Fecha: 
                   <span class="${config.clase}"> ${fechaFormateada} </span>
               </div>
-              <div class="user-status-time">
-                   " Hora:" 
+              <div class="user-status-time ${config.clase}">
+                   Hora: 
                   <span class="${config.clase}"> ${horaFormateada} </span>
               </div>
           </div>
@@ -592,6 +592,7 @@ async function mostrarUltimoRegistro(userId) {
       `;
   }
 }
+
 
 //// Descargar csv
 // Función para descargar registros como CSV
