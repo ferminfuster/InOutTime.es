@@ -48,6 +48,7 @@ async function obtenerUltimoRegistro(userId) {
     }
   }
   // Función para validar la acción de registro
+  /*
   async function validarAccionRegistro(accion) {
     try {
       const user = auth.currentUser;
@@ -81,7 +82,44 @@ async function obtenerUltimoRegistro(userId) {
       console.error("Error al validar acción:", error);
       return false;
     }
+  }*/
+
+// Función para validar la acción de registro
+async function validarAccionRegistro(accion) {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      mostrarError("Usuario no autenticado");
+      return false;
+    }
+
+    const ultimoRegistro = await obtenerUltimoRegistro(user.uid);
+
+    // Si no hay registros previos, solo permite entrada
+    if (!ultimoRegistro) {
+      return accion === 'entrada';
+    }
+
+    // Lógica de validación basada en el último registro
+    switch (accion) {
+      case 'entrada':
+        // Permitir entrada si el último registro es salida o incidencia
+        return ultimoRegistro.accion_registro === 'salida' || ultimoRegistro.accion_registro === 'incidencia';
+      case 'salida':
+        // Permitir salida solo si el último registro es entrada
+        return ultimoRegistro.accion_registro === 'entrada';
+      case 'incidencia':
+        // Permitir incidencia solo si el último registro es entrada
+        return ultimoRegistro.accion_registro === 'entrada';
+      default:
+        return false;
+    }
+  } catch (error) {
+    console.error("Error al validar acción:", error);
+    return false;
   }
+}
+
   
   // Función para registrar acción
  // Función para mostrar notificación de éxito
