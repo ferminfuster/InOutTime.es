@@ -235,9 +235,10 @@ button:hover {
     justify-content: center;
     text-align: center;
     background-color: var(--user-status-background);
+    border-radius: 8px;
     padding: 10px;
-    width: 100%;
     font-weight: bold;
+    width: 100%;
 }
 
 .user-status-container .user-status-icon {
