@@ -558,15 +558,15 @@ async function mostrarUltimoRegistro(userId) {
           </div>
           <div class="user-status-details">
               <div class="user-status-title">
-                  Último Registro
+                  Acción
                   <span class="user-status-badge ${config.clase}">
                       ${config.texto}
                   </span>
               </div>
-              <div class="user-status-date">
+              <div class="user-status-date"> Fecha:  
                   ${fechaFormateada}
               </div>
-              <div class="user-status-time">
+              <div class="user-status-time"> Hora: 
                   ${horaFormateada}
               </div>
           </div>
