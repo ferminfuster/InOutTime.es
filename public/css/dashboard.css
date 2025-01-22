@@ -222,10 +222,61 @@ button {
 button:hover {
     background-color: #45a049;
 }
-.reloj {
-    font-weight: bold;
-    color: var(--primary-color);
-    text-align: right;
-    font-size: 1rem;
+/* CSS Adicional */
+.status-container {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    padding: 15px;
+    margin: 15px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
+.status-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.status-icon {
+    font-size: 2.5em;
+    margin-right: 15px;
+}
+
+.status-details {
+    flex-grow: 1;
+}
+
+.status-action {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.2em;
+}
+
+.status-date {
+    color: var(--secondary-color);
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.status-entrada {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.status-salida {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.status-incidencia {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}

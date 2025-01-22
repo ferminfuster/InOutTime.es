@@ -506,72 +506,78 @@ async function mostrarUltimoRegistro(userId) {
   const statusUser = document.getElementById("statusUser");
   
   if (!statusUser) {
-    console.error("Elemento 'statusUser' no encontrado en el DOM.");
-    return;
+      console.error("Elemento 'statusUser' no encontrado en el DOM.");
+      return;
   }
 
   const ultimoRegistro = await obtenerUltimoRegistro(userId);
 
   if (ultimoRegistro) {
-    const fechaRegistro = ultimoRegistro.fecha.toDate(); // Convertir a Date
-    const fechaFormateada = fechaRegistro.toLocaleString("es-ES", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false
-    });
+      const fechaRegistro = ultimoRegistro.fecha.toDate();
+      const fechaFormateada = fechaRegistro.toLocaleString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+      });
 
-    // Seleccionar icono y color según la acción
-    let icono, colorFondo;
-    switch (ultimoRegistro.accion_registro.toLowerCase()) {
-        case "entrada":
-            icono = "🟢"; // Icono de entrada
-            //colorFondo = "#e8f5e9"; // Verde suave
-            break;
-        case "salida":
-            icono = "🔴"; // Icono de salida
-            //colorFondo = "#ffebee"; // Rojo suave
-            break;
-        case "incidencia":
-            icono = "⚠️"; // Icono de incidencia
-            //colorFondo = "#fff3e0"; // Amarillo suave
-            break;
-        default:
-            icono = "❓";
-            //colorFondo = "#e0e0e0"; // Gris suave
-    }
+      // Configuración de iconos y estilos
+      const configuraciones = {
+          "entrada": {
+              icono: "🟢",
+              clase: "status-entrada",
+              texto: "Entrada"
+          },
+          "salida": {
+              icono: "🔴",
+              clase: "status-salida",
+              texto: "Salida"
+          },
+          "incidencia": {
+              icono: "⚠️",
+              clase: "status-incidencia",
+              texto: "Incidencia"
+          },
+          "default": {
+              icono: "❓",
+              clase: "",
+              texto: "Desconocida"
+          }
+      };
 
-    // Aplicar estilo y contenido al contenedor
-    statusUser.innerHTML = `
-        <div style="
-            padding: 10px;
-            border-radius: 10px;
-            //background-color: ${colorFondo};
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        ">
-            <span style="font-size: 1.5em; margin-right: 10px;">${icono}</span>
-            Última acción: ${ultimoRegistro.accion_registro || "Desconocida"}  📅 Fecha: ${fechaFormateada}
-           
-        </div>
-    `;
-} else {
-    statusUser.innerHTML = `
-        <div style="
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-        ">
-            ❌ No se encontraron registros previos.
-        </div>
-    `;
-}
+      const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
 
+      statusUser.innerHTML = `
+          <div class="status-content">
+              <div class="status-icon">${config.icono}</div>
+              <div class="status-details">
+                  <div class="status-action">
+                      Última Acción: 
+                      <span class="status-badge ${config.clase}">
+                          ${config.texto}
+                      </span>
+                  </div>
+                  <div class="status-date">
+                      📅 ${fechaFormateada}
+                  </div>
+              </div>
+          </div>
+      `;
+  } else {
+      statusUser.innerHTML = `
+          <div class="status-content">
+              <div class="status-icon">❌</div>
+              <div class="status-details">
+                  <div class="status-action">
+                      No se encontraron registros previos
+                  </div>
+              </div>
+          </div>
+      `;
+  }
 }
 
 //// Descargar csv
