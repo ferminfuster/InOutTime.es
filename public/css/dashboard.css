@@ -279,10 +279,10 @@ button:hover {
     padding: 12px; /* Espaciado interno del "botón" */
     color: white; /* Color del texto */
     text-align: center; /* Centra el texto */
-    font-size: 16px; /* Tamaño del texto */
+    font-size: 1.2em; /* Tamaño del texto */
     border: none; /* Eliminar bordes por defecto */
     border-radius: 5px; /* Bordes redondeados */
-    background-color: #334155; 
+    background-color: transparent; 
     border: none; /* Eliminamos bordes, si es necesario */
     box-shadow: none; /* Quitamos posibles sombras */
   }
