@@ -503,6 +503,7 @@ function exportarPDF() {
 */
 //// Mostrar Información del último registro
 //// Mostrar Información del último registro
+//// Mostrar Información del último registro
 async function mostrarUltimoRegistro(userId) {
   const statusUser = document.getElementById("statusUser");
 
@@ -555,39 +556,23 @@ async function mostrarUltimoRegistro(userId) {
 
       statusUser.innerHTML = `
       <div class="user-status-container">
-          <div class="user-status-icon">
-             <i class="${config.icono}"></i>
+          <div class="user-status-element ${config.clase}">
+              <span>Acción: ${config.texto}</span>
           </div>
-          <div class="user-status-details">
-              <div class="user-status-title ${config.clase}">
-                  Acción:
-                  <span class="user-status-badge ${config.clase}">
-                      ${config.texto}
-                  </span>
-              </div>
-              <div class="user-status-date ${config.clase}">
-                  Fecha: 
-                  <span class="${config.clase}"> ${fechaFormateada} </span>
-              </div>
-              <div class="user-status-time ${config.clase}">
-                   Hora: 
-                  <span class="${config.clase}"> ${horaFormateada} </span>
-              </div>
+          <div class="user-status-element ${config.clase}">
+              <span>Fecha: ${fechaFormateada}</span>
+          </div>
+          <div class="user-status-element ${config.clase}">
+              <span>Hora: ${horaFormateada}</span>
           </div>
       </div>
   `;
 
   } else {
       statusUser.innerHTML = `
-          <div class="user-status-icon">
-              <i class="fas fa-times-circle"></i>
-          </div>
-          <div class="user-status-details">
-              <div class="user-status-title">
-                  Sin Registros
-              </div>
-              <div class="user-status-date">
-                  No se encontraron registros previos
+          <div class="user-status-container">
+              <div class="user-status-element">
+                  <span>Sin Registros</span>
               </div>
           </div>
       `;

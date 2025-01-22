@@ -223,73 +223,57 @@ button:hover {
     background-color: #45a049;
 }
 /* CSS Adicional */
-/* CSS Adicional */
+/* Modificamos el contenedor para que todo se muestre en una sola línea */
 .user-status-container {
     --user-status-title-color: #ffffff;
-    --user-status-entrada-bg: #c8e6c9; /* Fondo del botón de entrada */
-    --user-status-entrada-color: #1B5E20; /* Texto del botón de entrada */
-    --user-status-salida-bg: #ffcdd2; /* Fondo del botón de salida */
-    --user-status-salida-color: #b71c1c; /* Texto del botón de salida */
-    --user-status-incidencia-bg: #fff3e0; /* Fondo del botón de incidencia */
-    --user-status-incidencia-color: #ff8f00; /* Texto del botón de incidencia */
+    --user-status-entrada-bg: #c8e6c9; /* Fondo de entrada */
+    --user-status-entrada-color: #1B5E20; /* Texto de entrada */
+    --user-status-salida-bg: #ffcdd2; /* Fondo de salida */
+    --user-status-salida-color: #b71c1c; /* Texto de salida */
+    --user-status-incidencia-bg: #fff3e0; /* Fondo de incidencia */
+    --user-status-incidencia-color: #ff8f00; /* Texto de incidencia */
     --user-status-background: #334155;
     
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     text-align: center;
     background-color: var(--user-status-background);
     border-radius: 8px;
     padding: 10px;
     font-weight: bold;
     width: 100%;
+    box-sizing: border-box;
 }
 
-.user-status-container .user-status-icon {
-    margin-right: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: rgba(14, 165, 233, 0.1);
-    color: var(--primary-color);
-}
-
-.user-status-container .user-status-details {
-    display: inline-flex;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-}
-
-.user-status-container .user-status-title,
-.user-status-container .user-status-date,
-.user-status-container .user-status-time {
+.user-status-container .user-status-element {
     padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 8px;
-    font-size: 1.2em;
-    font-weight: bold;
+    margin: 0 10px;
+    font-size: 1em;
     text-align: center;
+    border-radius: 8px;
+    flex: 1;
+    display: inline-block;
 }
 
-/* Estilos de estado */
+.user-status-container .user-status-element span {
+    display: block;
+}
+
 .user-status-container .status-entrada {
-    background-color: var(--user-status-entrada-bg); /* Fondo de entrada */
-    color: var(--user-status-entrada-color); /* Texto de entrada */
+    background-color: var(--user-status-entrada-bg);
+    color: var(--user-status-entrada-color);
     border: 1px solid #4CAF50;
 }
 
 .user-status-container .status-salida {
-    background-color: var(--user-status-salida-bg); /* Fondo de salida */
-    color: var(--user-status-salida-color); /* Texto de salida */
+    background-color: var(--user-status-salida-bg);
+    color: var(--user-status-salida-color);
     border: 1px solid #ef5350;
 }
 
 .user-status-container .status-incidencia {
-    background-color: var(--user-status-incidencia-bg); /* Fondo de incidencia */
-    color: var(--user-status-incidencia-color); /* Texto de incidencia */
+    background-color: var(--user-status-incidencia-bg);
+    color: var(--user-status-incidencia-color);
     border: 1px solid #ffb300;
 }
