@@ -563,10 +563,12 @@ async function mostrarUltimoRegistro(userId) {
                       ${config.texto}
                   </span>
               </div>
-              <div class="user-status-date"> Fecha:  
+              Fecha: 
+              <div class="user-status-date">  
                   ${fechaFormateada}
               </div>
-              <div class="user-status-time"> Hora: 
+              Hora:
+              <div class="user-status-time">  
                   ${horaFormateada}
               </div>
           </div>
