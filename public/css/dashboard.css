@@ -235,10 +235,9 @@ button:hover {
     justify-content: center;
     text-align: center;
     background-color: var(--user-status-background);
-    border-radius: 8px;
     padding: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     width: 100%;
+    font-weight: bold;
 }
 
 .user-status-container .user-status-icon {
