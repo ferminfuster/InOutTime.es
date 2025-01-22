@@ -503,92 +503,89 @@ function exportarPDF() {
 */
 //// Mostrar Información del utlimo registro
 async function mostrarUltimoRegistro(userId) {
-    const statusUser = document.getElementById("statusUser");
-    
-    if (!statusUser) {
-        console.error("Elemento 'statusUser' no encontrado en el DOM.");
-        return;
-    }
+  const statusUser = document.getElementById("statusUser");
+  
+  if (!statusUser) {
+      console.error("Elemento 'statusUser' no encontrado en el DOM.");
+      return;
+  }
 
-    const ultimoRegistro = await obtenerUltimoRegistro(userId);
+  const ultimoRegistro = await obtenerUltimoRegistro(userId);
 
-    if (ultimoRegistro) {
-        const fechaRegistro = ultimoRegistro.fecha.toDate();
-        const fechaFormateada = fechaRegistro.toLocaleString("es-ES", {
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-        });
+  if (ultimoRegistro) {
+      const fechaRegistro = ultimoRegistro.fecha.toDate();
+      const fechaFormateada = fechaRegistro.toLocaleString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+      });
 
-        const horaFormateada = fechaRegistro.toLocaleString("es-ES", {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        });
+      const horaFormateada = fechaRegistro.toLocaleString("es-ES", {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+      });
 
-        const configuraciones = {
-            "entrada": {
-                icono: "fas fa-sign-in-alt",
-                clase: "status-entrada",
-                texto: "Entrada"
-            },
-            "salida": {
-                icono: "fas fa-sign-out-alt",
-                clase: "status-salida",
-                texto: "Salida"
-            },
-            "incidencia": {
-                icono: "fas fa-exclamation-triangle",
-                clase: "status-incidencia",
-                texto: "Incidencia"
-            },
-            "default": {
-                icono: "fas fa-question",
-                clase: "",
-                texto: "Desconocida"
-            }
-        };
+      const configuraciones = {
+          "entrada": {
+              icono: "fas fa-sign-in-alt",
+              clase: "status-entrada",
+              texto: "Entrada"
+          },
+          "salida": {
+              icono: "fas fa-sign-out-alt",
+              clase: "status-salida",
+              texto: "Salida"
+          },
+          "incidencia": {
+              icono: "fas fa-exclamation-triangle",
+              clase: "status-incidencia",
+              texto: "Incidencia"
+          },
+          "default": {
+              icono: "fas fa-question",
+              clase: "",
+              texto: "Desconocida"
+          }
+      };
 
-        const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
+      const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
 
-        statusUser.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: flex-start; font-weight: bold; font-size: 1em; text-align: center;">
-            <div class="user-status-icon" style="margin-right: 10px;">
-                <i class="${config.icono}"></i>
-            </div>
-            <div class="user-status-details" style="display: flex; align-items: center; flex-wrap: nowrap;">
-                <div class="user-status-title" style="margin-right: 15px;">
-                    Último Registro
-                    <span class="user-status-badge ${config.clase}" style="margin-left: 10px;">
-                        ${config.texto}
-                    </span>
-                </div>
-                <div class="user-status-date" style="margin-right: 10px;">
-                    ${fechaFormateada}
-                </div>
-                <div class="user-status-time">
-                    ${horaFormateada}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    } else {
-        statusUser.innerHTML = `
-            <div class="user-status-icon">
-                <i class="fas fa-times-circle"></i>
-            </div>
-            <div class="user-status-details">
-                <div class="user-status-title">
-                    Sin Registros
-                </div>
-                <div class="user-status-date">
-                    No se encontraron registros previos
-                </div>
-            </div>
-        `;
-    }
+      statusUser.innerHTML = `
+          <div class="user-status-icon">
+              <i class="${config.icono}"></i>
+          </div>
+          <div class="user-status-details">
+              <div class="user-status-title">
+                  Último Registro
+                  <span class="user-status-badge ${config.clase}">
+                      ${config.texto}
+                  </span>
+              </div>
+              <div class="user-status-date">
+                  ${fechaFormateada}
+              </div>
+              <div class="user-status-time">
+                  ${horaFormateada}
+              </div>
+          </div>
+      `;
+  } else {
+      statusUser.innerHTML = `
+          <div class="user-status-icon">
+              <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="user-status-details">
+              <div class="user-status-title">
+                  Sin Registros
+              </div>
+              <div class="user-status-date">
+                  No se encontraron registros previos
+              </div>
+          </div>
+      `;
+  }
 }
 
 //// Descargar csv

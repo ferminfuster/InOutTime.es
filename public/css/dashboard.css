@@ -224,65 +224,63 @@ button:hover {
 }
 /* CSS Adicional */
 .user-status-container {
-    background: linear-gradient(135deg, var(--card-background) 0%, rgba(51, 65, 85, 0.8) 100%);
-    border-radius: 12px;
-    padding: 15px;
-    margin: 15px 0;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
-    transition: all 0.3s ease;
+    justify-content: flex-start;
+    font-weight: bold;
+    font-size: 1em;
+    text-align: center;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
 }
 
 .user-status-icon {
-    font-size: 2.5em;
-    margin-right: 20px;
+    margin-right: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 45px;
-    height: 45px;
-    background-color: rgba(14, 165, 233, 0.1);
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    background-color: rgba(14, 165, 233, 0.1);
     color: var(--primary-color);
 }
 
 .user-status-details {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow: hidden;
     flex-grow: 1;
 }
 
 .user-status-title {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: var(--text-color);
-    margin-bottom: 5px;
+    margin-right: 15px;
     display: flex;
     align-items: center;
 }
 
 .user-status-badge {
     margin-left: 10px;
-    padding: 3px 8px;
+    padding: 3px 6px;
     border-radius: 4px;
-    font-size: 0.7em;
-    font-weight: bold;
-}
-
-.user-status-date-time {
-    display: flex;
-    justify-content: space-between;
+    font-size: 0.8em;
 }
 
 .user-status-date {
-    color: var(--secondary-color);
-    font-size: 0.9em;
     margin-right: 10px;
+    color: var(--secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .user-status-time {
     color: var(--text-color);
-    font-weight: bold;
-    font-size: 0.9em;
+    white-space: nowrap;
 }
 
 /* Variantes de estado */
@@ -302,3 +300,25 @@ button:hover {
 }
 
 /* Responsive */
+@media (max-width: 600px) {
+    .user-status-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-status-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .user-status-details {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .user-status-title,
+    .user-status-date,
+    .user-status-time {
+        margin: 5px 0;
+    }
+}
