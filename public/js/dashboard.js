@@ -1023,16 +1023,82 @@ window.descargarInformeCSV = descargarInformeCSV;
 window.enviarInformePorEmail = enviarInformePorEmail;
 window.imprimirInforme = imprimirInforme;
 
-//FUNCION RELOJ
-function actualizarReloj() {
-  const reloj = document.getElementById("reloj");
-  if (reloj) {
-      const ahora = new Date();
-      const horaFormateada = ahora.toLocaleTimeString("es-ES", { hour12: false });
-      reloj.textContent = horaFormateada;
+// Función para calcular las horas trabajadas hoy
+async function mostrarHorasTrabajadasHoy() {
+  try {
+    // Obtener el usuario autenticado
+    const user = auth.currentUser;
+    if (!user) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No hay un usuario autenticado.'
+      });
+      return;
+    }
+
+    const userId = user.uid;
+
+    // Obtener registros de hoy
+    const hoy = new Date();
+    const fechaHoy = hoy.toLocaleDateString('es-ES'); // Formato dd/mm/yyyy
+
+    const q = query(
+      collection(db, "registros"),
+      where("userId", "==", userId),
+      where("fecha", ">=", new Date(hoy.setHours(0, 0, 0, 0))),  // Desde las 00:00 del día de hoy
+      where("fecha", "<", new Date(hoy.setHours(23, 59, 59, 999)))  // Hasta las 23:59 del día de hoy
+    );
+
+    const registrosSnapshot = await getDocs(q);
+
+    const registros = registrosSnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(registro => registro.userId === userId)
+      .sort((a, b) => a.fecha.toDate() - b.fecha.toDate());  // Ordenar por fecha
+
+    if (registros.length === 0) {
+      document.getElementById("horasHoy").textContent = "No hay registros para hoy.";
+      return;
+    }
+
+    // Procesar registros para calcular las horas trabajadas hoy
+    const horasTrabajadasHoy = calcularHorasTrabajadasHoy(registros);
+    document.getElementById("horasHoy").textContent = horasTrabajadasHoy;
+  } catch (error) {
+    console.error("Error al calcular las horas trabajadas hoy:", error);
+    document.getElementById("horasHoy").textContent = "Error al calcular las horas.";
   }
 }
 
-// Actualizar el reloj cada segundo
-setInterval(actualizarReloj, 1000);
-actualizarReloj(); // Llamada inicial
+// Función para calcular las horas trabajadas hoy
+function calcularHorasTrabajadasHoy(registros) {
+  let entrada = null;
+  let salida = null;
+
+  // Filtrar solo entradas y salidas
+  registros.forEach(registro => {
+    if (registro.accion_registro === 'entrada' && (!entrada || registro.fecha.toDate() < entrada)) {
+      entrada = registro.fecha.toDate();
+    } else if (registro.accion_registro === 'salida' && (!salida || registro.fecha.toDate() > salida)) {
+      salida = registro.fecha.toDate();
+    }
+  });
+
+  if (!entrada || !salida) {
+    return "Entrada o salida no registrada.";
+  }
+
+  // Calcular las horas trabajadas
+  const diferenciaMs = salida - entrada;
+  const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+  const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  return `${horas} horas ${minutos} minutos`;
+}
+
+// Llamar a la función al cargar la página o después de que el usuario inicie sesión
+window.onload = mostrarHorasTrabajadasHoy;
