@@ -3,38 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InOutTime - Politica de Cookies</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-        <!-- Agregamos el favicon -->
+    <meta name="description" content="Contacta con InOutTime para soporte y consultas">
+    <meta name="keywords" content="contacto, soporte, InOutTime, atención al cliente">
+    <meta name="author" content="InOutTime">
+    <link rel="canonical" href="https://www.inouttime.es/contacto">
     <link rel="icon" href="/images/logo.ico" type="image/x-icon">
+
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:title" content="Contacto - InOutTime">
+    <meta property="og:description" content="Ponte en contacto con el equipo de InOutTime">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.inouttime.es/contacto">
+    <meta property="og:image" content="https://www.inouttime.es/images/logo.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contacto - InOutTime">
+    <meta name="twitter:description" content="Contacta con nuestro equipo de soporte">
+    
+    <title>InOutTime | Contacto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
     <style>
         body {
+            margin: 0;
             font-family: 'Poppins', sans-serif;
-            background-color: #f9f9f9;
-            padding: 20px;
-            color: #333;
+            background-color: #f4f4f4;
         }
-        h1, h2 {
-            color: #334155;
+        header {
+            background-color: #334155;
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
         }
-        a {
-            color: #ff9800;
-            text-decoration: none;
+        header .logo img {
+            width: 120px;
+            margin-bottom: 20px;
         }
-        a:hover {
-            text-decoration: underline;
+        header h1 {
+            font-size: 2.5em;
+            margin: 10px 0;
         }
-        .container {
-            max-width: 800px;
-            margin: auto;
+        header p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .contact-info {
             background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .contact-details {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .contact-details div {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
+    <header>
+        <div class="logo">
+            <img src="images/logo.png" alt="InOutTime Logo">
+        </div>
+        <div class="header-content">
+            <h1>Optimiza la gestión de tu equipo</h1>
+            <p>Controla entradas, salidas e incidencias de manera rápida y sencilla.</p>
+        </div>
+    </header>
     <div class="container">
         <h1>Política de Cookies</h1>
         <p>En <strong>InOutTime</strong>, utilizamos cookies para mejorar la experiencia de usuario, analizar el tráfico de la web y personalizar contenido.</p>
@@ -56,5 +97,33 @@
 
         <p><a href="index.html">Volver a la página principal</a></p>
     </div>
+    
+    <footer>
+        <p>&copy; <span id="currentYear"></span> InOutTime. Todos los derechos reservados. | 
+        <a href="politica_cookies.html">Política de Cookies</a></p>
+    </footer>
+    
+    <script>
+        // Establecer el año actual
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+
+    <div id="cookie-banner">
+        <p>Este sitio web utiliza cookies para mejorar la experiencia del usuario. <a href="politica_cookies.html" style="color: #ff9800;">Leer más</a></p>
+        <button onclick="aceptarCookies()">Aceptar</button>
+    </div>
+
+    <script>
+        function aceptarCookies() {
+            document.getElementById('cookie-banner').style.display = 'none';
+            localStorage.setItem('cookiesAceptadas', 'true');
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('cookiesAceptadas') === 'true') {
+                document.getElementById('cookie-banner').style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

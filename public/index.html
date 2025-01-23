@@ -183,11 +183,15 @@
         });
     </script>
 
-    <footer>
-        <p>&copy; 2025 InOutTime. Todos los derechos reservados. | 
-        <a href="politica_cookies.html">Política de Cookies</a></p>
-    </footer>
+<footer>
+    <p>&copy; <span id="currentYear"></span> InOutTime. Todos los derechos reservados. | 
+    <a href="politica_cookies.html">Política de Cookies</a></p>
+</footer>
 
+<script>
+    // Establecer el año actual
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>
     <div id="cookie-banner">
         <p>Este sitio web utiliza cookies para mejorar la experiencia del usuario. <a href="politica_cookies.html" style="color: #ff9800;">Leer más</a></p>
         <button onclick="aceptarCookies()">Aceptar</button>
