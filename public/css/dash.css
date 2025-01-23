@@ -35,7 +35,7 @@ body {
 }
 /* Logo centrado */
 .logo {
-    margin: 20px; /* Espacio arriba y abajo del logo */
+    margin: 20px 0; /* Espacio arriba y abajo del logo */
     display: flex; /* Usar flexbox */
     justify-content: center; /* Centrar horizontalmente */
     width: 100%; /* Ocupar todo el ancho del contenedor */
