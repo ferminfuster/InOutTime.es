@@ -69,30 +69,27 @@
             </div>
         </div>
 
-<!-- Sección Usuarios -->
-<div id="usuarios-section" class="content-section">
-    <h2>Gestión de Usuarios</h2>
-    <button class="btn btn-primary mb-3" onclick="abrirModalNuevoUsuario()">
-        Nuevo Usuario
-    </button>
-    <div class="table-container">
-        <table class="table table-dark" id="usuariosTable">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Empresa</th>
-                    <th>Rol</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="listaUsuarios">
-                <!-- Datos de usuarios se cargarán dinámicamente -->
-            </tbody>
-        </table>
-        <div id="mobileUserList" class="mobile-user-list"></div>
-    </div>
-</div>
+        <!-- Sección Usuarios -->
+        <div id="usuarios-section" class="content-section">
+            <h2>Gestión de Usuarios</h2>
+            <button class="btn btn-primary mb-3" onclick="abrirModalNuevoUsuario()">
+                Nuevo Usuario
+            </button>
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Empresa</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="listaUsuarios">
+                    <!-- Datos de usuarios se cargarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
 
         <!-- Sección Informes -->
         <div id="informes-section" class="content-section">

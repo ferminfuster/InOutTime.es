@@ -1669,3 +1669,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+function transformTableForMobile() {
+    const table = document.getElementById('usuariosTable');
+    const mobileList = document.getElementById('mobileUserList');
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+        table.style.display = 'none';
+        mobileList.innerHTML = ''; // Limpiar lista anterior
+
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const userCard = document.createElement('div');
+            userCard.classList.add('user-card');
+
+            userCard.innerHTML = `
+                <div class="user-card-content">
+                    <h3>${cells[0].textContent}</h3>
+                    <p><strong>Email:</strong> ${cells[1].textContent}</p>
+                    <p><strong>Empresa:</strong> ${cells[2].textContent}</p>
+                    <p><strong>Rol:</strong> ${cells[3].textContent}</p>
+                    <div class="user-card-actions">
+                        ${cells[4].innerHTML}
+                    </div>
+                </div>
+            `;
+
+            mobileList.appendChild(userCard);
+        });
+
+        mobileList.style.display = 'block';
+    } else {
+        table.style.display = 'table';
+        mobileList.style.display = 'none';
+    }
+}
+
+// Ejecutar al cargar y al redimensionar
+window.addEventListener('load', transformTableForMobile);
+window.addEventListener('resize', transformTableForMobile);
