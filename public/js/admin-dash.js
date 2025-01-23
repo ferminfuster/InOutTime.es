@@ -1633,34 +1633,39 @@ document.querySelector('.btn-success').addEventListener('click', descargarListaU
 
 //////////////////////////////////////////////////////////7
 document.addEventListener('DOMContentLoaded', () => {
-    const sidebarToggle = document.querySelector('.sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
-    const sidebarLinks = document.querySelectorAll('.sidebar-menu li a');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    
+    // Función para alternar sidebar
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+    }
 
+    // Añadir event listener al botón
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', toggleSidebar);
-    } else {
-        console.error('Sidebar toggle button not found');
     }
 
-    if (sidebarLinks) {
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                // Cerrar el menú al hacer clic en un enlace
-                if (sidebar.classList.contains('active')) {
-                    sidebar.classList.remove('active');
-                }
-            });
-        });
-    }
+    // Cerrar sidebar al hacer clic fuera o en un elemento del menú
+    document.addEventListener('click', (event) => {
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnToggle = sidebarToggle.contains(event.target);
 
-    function toggleSidebar() {
-        console.log('Toggle sidebar called');
-        if (sidebar) {
-            sidebar.classList.toggle('active');
-            console.log('Sidebar classes:', sidebar.classList);
-        } else {
-            console.error('Sidebar element not found');
+        if (sidebar.classList.contains('active') && 
+            !isClickInsideSidebar && 
+            !isClickOnToggle) {
+            sidebar.classList.remove('active');
         }
-    }
+    });
+
+    // Cerrar sidebar al seleccionar una opción
+    const sidebarMenuItems = document.querySelectorAll('.sidebar-menu li');
+    sidebarMenuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // Cerrar sidebar solo en modo móvil
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
 });
