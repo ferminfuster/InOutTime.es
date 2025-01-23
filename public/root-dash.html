@@ -78,31 +78,34 @@
             </div>
         </div>
 
-        <!-- Sección Empresas -->
-        <div id="empresas-section" class="content-section">
-            <h2>Gestión de Empresas</h2>
-            <button class="btn btn-primary mb-3" onclick="abrirModalNuevaEmpresa()">
-                Nueva Empresa
-            </button>
-            <table class="table table-dark">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>CIF</th>
-                        <th>Email</th>
-                        <th>Responsable</th>
-                        <th>Contrato</th>
-                        <th>Licencia</th>
-                        <th>Fecha de Alta</th>
-                        <th>Fecha de Expiración</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="listaEmpresas">
-                    <!-- Datos de empresas se cargarán dinámicamente -->
-                </tbody>
-            </table>
-        </div>
+<!-- Sección Empresas -->
+<div id="empresas-section" class="content-section">
+    <h2>Gestión de Empresas</h2>
+    <button class="btn btn-primary mb-3" onclick="abrirModalNuevaEmpresa()">
+        Nueva Empresa
+    </button>
+    <div class="table-container">
+        <table id="empresasTable" class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>CIF</th>
+                    <th>Email</th>
+                    <th>Responsable</th>
+                    <th>Contrato</th>
+                    <th>Licencia</th>
+                    <th>Fecha de Alta</th>
+                    <th>Fecha de Expiración</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="listaEmpresas">
+                <!-- Datos de empresas se cargarán dinámicamente -->
+            </tbody>
+        </table>
+        <div id="mobileEmpresasList" class="mobile-empresas-list"></div>
+    </div>
+</div>
 
 <!-- Sección Usuarios -->
 <div id="usuarios-section" class="content-section">

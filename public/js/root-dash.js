@@ -1786,18 +1786,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 //////////////////////////////////////////////////////
-// FUNCION REDIMENSIONAR TABLA USUARIOS EN MOVILES //
+// FUNCION REDIMENSIONAR TABLA EMPRESAS EN MOVILES //
 ////////////////////////////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
-    function transformTableForMobile() {
-        console.log('Transforming table, window width:', window.innerWidth);
+    function transformEmpresasTableForMobile() {
+        console.log('Transforming empresas table, window width:', window.innerWidth);
         
-        const table = document.getElementById('usuariosTable');
-        const mobileList = document.getElementById('mobileUserList');
+        const table = document.getElementById('empresasTable');
+        const mobileList = document.getElementById('mobileEmpresasList');
 
         // Validar que los elementos existan
         if (!table || !mobileList) {
-            console.error('Table or mobile list not found');
+            console.error('Empresas Table or mobile list not found');
             return;
         }
 
@@ -1815,7 +1815,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Verificar si hay filas
             if (rows.length === 0) {
-                console.warn('No rows found in the table');
+                console.warn('No rows found in the empresas table');
                 return;
             }
 
@@ -1824,27 +1824,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cells = row.querySelectorAll('td');
                 
                 // Verificar que haya suficientes celdas
-                if (cells.length < 5) {
+                if (cells.length < 9) {
                     console.warn(`Row ${index} does not have enough cells`);
                     return;
                 }
 
-                const userCard = document.createElement('div');
-                userCard.classList.add('user-card');
+                const empresaCard = document.createElement('div');
+                empresaCard.classList.add('empresa-card');
 
-                userCard.innerHTML = `
-                    <div class="user-card-content">
+                empresaCard.innerHTML = `
+                    <div class="empresa-card-content">
                         <h3>${cells[0].textContent}</h3>
-                        <p><strong>Email:</strong> ${cells[1].textContent}</p>
-                        <p><strong>Empresa:</strong> ${cells[2].textContent}</p>
-                        <p><strong>Rol:</strong> ${cells[3].textContent}</p>
-                        <div class="user-card-actions">
-                            ${cells[4].innerHTML}
+                        <p><strong>CIF:</strong> ${cells[1].textContent}</p>
+                        <p><strong>Email:</strong> ${cells[2].textContent}</p>
+                        <p><strong>Responsable:</strong> ${cells[3].textContent}</p>
+                        <p><strong>Contrato:</strong> ${cells[4].textContent}</p>
+                        <p><strong>Licencia:</strong> ${cells[5].textContent}</p>
+                        <p><strong>Fecha de Alta:</strong> ${cells[6].textContent}</p>
+                        <p><strong>Fecha de Expiración:</strong> ${cells[7].textContent}</p>
+                        <div class="empresa-card-actions">
+                            ${cells[8].innerHTML}
                         </div>
                     </div>
                 `;
 
-                mobileList.appendChild(userCard);
+                mobileList.appendChild(empresaCard);
             });
 
             // Mostrar lista móvil
@@ -1857,25 +1861,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Función para ejecutar la transformación de forma inmediata
-    function initializeTableTransform() {
+    function initializeEmpresasTableTransform() {
         // Ejecutar transformación
-        transformTableForMobile();
+        transformEmpresasTableForMobile();
         
         // Añadir un pequeño retraso para asegurar que el contenido esté completamente cargado
-        setTimeout(transformTableForMobile, 100);
+        setTimeout(transformEmpresasTableForMobile, 100);
     }
 
     // Eventos para transformación
-    window.addEventListener('load', initializeTableTransform);
-    window.addEventListener('resize', transformTableForMobile);
+    window.addEventListener('load', initializeEmpresasTableTransform);
+    window.addEventListener('resize', transformEmpresasTableForMobile);
 
     // Observador de mutaciones para detectar cambios en la tabla
-    const table = document.getElementById('usuariosTable');
+    const table = document.getElementById('empresasTable');
     if (table) {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'childList') {
-                    transformTableForMobile();
+                    transformEmpresasTableForMobile();
                 }
             });
         });
