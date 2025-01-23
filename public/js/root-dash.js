@@ -1819,3 +1819,105 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+//////////////////////////////////////////////////////
+// FUNCION REDIMENSIONAR TABLA USUARIOS EN MOVILES //
+////////////////////////////////////////////////////
+document.addEventListener('DOMContentLoaded', () => {
+    function transformTableForMobile() {
+        console.log('Transforming table, window width:', window.innerWidth);
+        
+        const table = document.getElementById('usuariosTable');
+        const mobileList = document.getElementById('mobileUserList');
+
+        // Validar que los elementos existan
+        if (!table || !mobileList) {
+            console.error('Table or mobile list not found');
+            return;
+        }
+
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            // Ocultar tabla
+            table.style.display = 'none';
+            
+            // Limpiar lista móvil anterior
+            mobileList.innerHTML = '';
+
+            // Obtener filas de la tabla
+            const rows = table.querySelectorAll('tbody tr');
+            
+            // Verificar si hay filas
+            if (rows.length === 0) {
+                console.warn('No rows found in the table');
+                return;
+            }
+
+            // Iterar sobre las filas
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                
+                // Verificar que haya suficientes celdas
+                if (cells.length < 5) {
+                    console.warn(`Row ${index} does not have enough cells`);
+                    return;
+                }
+
+                const userCard = document.createElement('div');
+                userCard.classList.add('user-card');
+
+                userCard.innerHTML = `
+                    <div class="user-card-content">
+                        <h3>${cells[0].textContent}</h3>
+                        <p><strong>Email:</strong> ${cells[1].textContent}</p>
+                        <p><strong>Empresa:</strong> ${cells[2].textContent}</p>
+                        <p><strong>Rol:</strong> ${cells[3].textContent}</p>
+                        <div class="user-card-actions">
+                            ${cells[4].innerHTML}
+                        </div>
+                    </div>
+                `;
+
+                mobileList.appendChild(userCard);
+            });
+
+            // Mostrar lista móvil
+            mobileList.style.display = 'block';
+        } else {
+            // Mostrar tabla en modo escritorio
+            table.style.display = 'table';
+            mobileList.style.display = 'none';
+        }
+    }
+
+    // Función para ejecutar la transformación de forma inmediata
+    function initializeTableTransform() {
+        // Ejecutar transformación
+        transformTableForMobile();
+        
+        // Añadir un pequeño retraso para asegurar que el contenido esté completamente cargado
+        setTimeout(transformTableForMobile, 100);
+    }
+
+    // Eventos para transformación
+    window.addEventListener('load', initializeTableTransform);
+    window.addEventListener('resize', transformTableForMobile);
+
+    // Observador de mutaciones para detectar cambios en la tabla
+    const table = document.getElementById('usuariosTable');
+    if (table) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    transformTableForMobile();
+                }
+            });
+        });
+
+        // Configurar observador en el tbody
+        observer.observe(table.querySelector('tbody'), {
+            childList: true,
+            subtree: true
+        });
+    }
+});
