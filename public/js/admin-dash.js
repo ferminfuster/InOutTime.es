@@ -71,7 +71,6 @@ onAuthStateChanged(auth, async (user) => {
                     //Cargar Información del usuario
                     
                     document.getElementById("nombreUser").textContent = userData.nombre || "No disponible";
-                    document.getElementById("emailUser").textContent = userData.email || "No disponible";
                     document.getElementById("empresaUser").textContent = userData.empresa || "No disponible";
                     //empresaGlobal = userData.empresa ;
                     window.empresaGlobal = userData.empresa;
