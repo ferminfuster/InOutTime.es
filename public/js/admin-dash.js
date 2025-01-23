@@ -1669,7 +1669,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-
+/////////////////////////////////////////////
 function transformTableForMobile() {
     const table = document.getElementById('usuariosTable');
     const mobileList = document.getElementById('mobileUserList');
@@ -1706,6 +1706,36 @@ function transformTableForMobile() {
         mobileList.style.display = 'none';
     }
 }
+
+// Función para forzar la transformación
+function forceTransformTableForMobile() {
+    // Forzar un ancho específico para móviles
+    const tempWidth = window.innerWidth;
+    
+    // Simular redimensionamiento
+    Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        value: 767 // Forzar modo móvil
+    });
+    
+    transformTableForMobile();
+    
+    // Restaurar el ancho original
+    Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        value: tempWidth
+    });
+}
+
+// Ejecutar al cargar y al redimensionar
+window.addEventListener('load', () => {
+    transformTableForMobile();
+    
+    // Añadir un pequeño retraso para asegurar que el contenido esté cargado
+    setTimeout(forceTransformTableForMobile, 100);
+});
+
+window.addEventListener('resize', transformTableForMobile);
 
 // Ejecutar al cargar y al redimensionar
 window.addEventListener('load', transformTableForMobile);
