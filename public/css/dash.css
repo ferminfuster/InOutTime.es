@@ -29,13 +29,14 @@ body {
     transition: all 0.3s ease-in-out;
     z-index: 1000;
     overflow-y: auto;
-    display: flex; /* Usar flexbox para centrar */
-    flex-direction: column; /* Alinear en columna */
-    align-items: center; /* Centrar horizontalmente */
+    
+    
+    
 }
 /* Logo centrado */
 .logo {
     margin: 20px 0; /* Espacio arriba y abajo del logo */
+    align-items: center; /* Centrar horizontalmente */
 }
 
 .logo img {
