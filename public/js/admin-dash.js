@@ -1634,17 +1634,28 @@ document.querySelector('.btn-success').addEventListener('click', descargarListaU
 //////////////////////////////////////////////////////////7
 document.addEventListener('DOMContentLoaded', () => {
     const sidebarToggle = document.querySelector('.sidebar-toggle');
-    
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarLinks = document.querySelectorAll('.sidebar-menu li a');
+
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', toggleSidebar);
     } else {
         console.error('Sidebar toggle button not found');
     }
 
+    if (sidebarLinks) {
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // Cerrar el menú al hacer clic en un enlace
+                if (sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+    }
+
     function toggleSidebar() {
         console.log('Toggle sidebar called');
-        const sidebar = document.querySelector('.sidebar');
-        
         if (sidebar) {
             sidebar.classList.toggle('active');
             console.log('Sidebar classes:', sidebar.classList);

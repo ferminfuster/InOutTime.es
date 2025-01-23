@@ -14,48 +14,38 @@ body {
     padding: 0;
 }
 
-/* Estilos para el botón de toggle */
+/* Estilos base del sidebar */
+.sidebar {
+    height: 100vh;
+    background-color: var(--card-background);
+    width: 250px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: all 0.3s ease-in-out;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+/* Botón de toggle para móviles */
 .sidebar-toggle {
     display: none; /* Oculto por defecto */
     position: fixed;
-    top: 15px;
     left: 15px;
+    top: 15px;
     z-index: 1100;
-    background-color: var(--primary-color);
+    background: var(--primary-color);
     color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    padding: 10px 15px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.sidebar-toggle:hover {
-    background-color: var(--secondary-color);
-    transform: scale(1.1);
+    font-size: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-toggle i {
-    font-size: 20px;
-}
-
-@media (max-width: 768px) {
-    .sidebar-toggle {
-        display: flex;
-    }
-
-    .sidebar {
-        left: -250px;
-        transition: left 0.3s ease;
-    }
-
-    .sidebar.active {
-        left: 0;
-    }
+    margin: 0;
+    pointer-events: none; /* Icono no interferirá con el clic */
 }
 
 .sidebar-menu {
@@ -70,16 +60,17 @@ body {
     transition: background-color 0.3s;
     display: flex;
     align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .logo img {
     width: 80px;
     margin-bottom: 20px;
     margin-left: 40px;
-}
-
-.sidebar-menu li:hover {
-    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .content {
@@ -156,9 +147,13 @@ body {
     }
 
     /* Menú de navegación */
-    .sidebar-menu li {
-        padding: 15px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+    .sidebar-menu li,
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .logo img {
@@ -168,14 +163,9 @@ body {
 
 /* Mejoras de accesibilidad táctil */
 @media (max-width: 768px) {
-    /* Elementos interactivos más grandes */
-    .sidebar-menu li,
-    .btn {
-        min-height: 44px;
-        min-width: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .sidebar-menu li a {
+        text-decoration: none;
+        color: var(--text-color);
     }
 }
 
