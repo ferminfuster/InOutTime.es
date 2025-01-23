@@ -362,3 +362,24 @@ document.getElementById("forgot-password").addEventListener("click", async (e) =
     }
   }
 });
+
+//////////////////////
+// Mostrar password //
+/////////////////////
+document.addEventListener('DOMContentLoaded', () => {
+  const passwordInput = document.getElementById('password');
+  const togglePasswordButton = document.getElementById('toggle-password');
+
+  if (togglePasswordButton) {
+      togglePasswordButton.addEventListener('click', () => {
+          // Cambiar el tipo de input
+          if (passwordInput.type === 'password') {
+              passwordInput.type = 'text';
+              togglePasswordButton.innerHTML = '<i class="fas fa-eye-slash"></i>';
+          } else {
+              passwordInput.type = 'password';
+              togglePasswordButton.innerHTML = '<i class="fas fa-eye"></i>';
+          }
+      });
+  }
+});
