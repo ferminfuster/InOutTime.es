@@ -5,7 +5,11 @@
     --text-color: #f1f5f9;
     --card-background: #334155;
 }
-
+.h2 {
+    margin-bottom: 5px;
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
 body {
     background-color: var(--background-color);
     color: var(--text-color);
