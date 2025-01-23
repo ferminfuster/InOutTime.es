@@ -68,6 +68,11 @@ onAuthStateChanged(auth, async (user) => {
                 // Verificar si el rol del usuario es admin
                 if (userData.rol === "admin" || userData.rol === "root") {
                     content.style.display = "block";
+                    //Cargar Información del usuario
+                    
+                    document.getElementById("nombreUser").textContent = userData.nombre || "No disponible";
+                    document.getElementById("emailUser").textContent = userData.email || "No disponible";
+                    document.getElementById("empresaUser").textContent = userData.empresa || "No disponible";
                     //empresaGlobal = userData.empresa ;
                     window.empresaGlobal = userData.empresa;
 
