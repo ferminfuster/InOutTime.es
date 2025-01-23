@@ -1,0 +1,82 @@
+:root {
+    --primary-color: #0ea5e9;
+    --secondary-color: #14b8a6;
+    --background-color: #1e293b;
+    --text-color: #f1f5f9;
+    --card-background: #334155;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Arial', sans-serif;
+}
+
+.sidebar {
+    height: 100vh;
+    background-color: var(--card-background);
+    width: 250px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.sidebar-toggle {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 1001;
+    background: var(--primary-color);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    padding: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.logo img {
+    width: 80px;
+    margin-bottom: 20px;
+    margin-left: 40px; /* Añade esta línea */
+}
+.sidebar-menu li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.content-section {
+    display: none;
+    background-color: var(--card-background);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.active-section {
+    display: block;
+}
+
+.modal-custom {
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
+.table {
+    color: var(--text-color);
+}

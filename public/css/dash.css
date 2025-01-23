@@ -10,8 +10,11 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
+/* Estilos base del sidebar */
 .sidebar {
     height: 100vh;
     background-color: var(--card-background);
@@ -21,13 +24,16 @@ body {
     top: 0;
     transition: all 0.3s;
     z-index: 1000;
+    overflow-y: auto;
 }
 
+/* Botón de toggle para móviles */
 .sidebar-toggle {
+    display: none; /* Oculto por defecto */
     position: fixed;
     left: 10px;
     top: 10px;
-    z-index: 1001;
+    z-index: 1100;
     background: var(--primary-color);
     color: white;
     padding: 10px;
@@ -45,12 +51,16 @@ body {
     padding: 15px;
     cursor: pointer;
     transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
 }
+
 .logo img {
     width: 80px;
     margin-bottom: 20px;
-    margin-left: 40px; /* Añade esta línea */
+    margin-left: 40px;
 }
+
 .sidebar-menu li:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
@@ -79,4 +89,81 @@ body {
 
 .table {
     color: var(--text-color);
+}
+
+/* Estilos Responsivos */
+@media (max-width: 768px) {
+    /* Sidebar en móviles */
+    .sidebar {
+        left: -250px; /* Oculto por defecto */
+        width: 250px;
+        z-index: 1050;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar-toggle {
+        display: block; /* Mostrar en móviles */
+    }
+
+    .content {
+        margin-left: 0;
+        padding: 10px;
+    }
+
+    /* Ajustes para tablas */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    /* Ajustes para formularios */
+    .form-control {
+        font-size: 16px; /* Prevenir zoom en iOS */
+    }
+
+    /* Ajustes para columnas */
+    .col-md-4 {
+        margin-bottom: 15px;
+    }
+
+    /* Ajustes para modales */
+    .modal-dialog {
+        margin: 1.75rem auto;
+        max-width: 95%;
+    }
+
+    .modal-content {
+        width: 100%;
+    }
+
+    /* Menú de navegación */
+    .sidebar-menu li {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .logo img {
+        margin-left: 20px;
+    }
+}
+
+/* Mejoras de accesibilidad táctil */
+@media (max-width: 768px) {
+    /* Elementos interactivos más grandes */
+    .sidebar-menu li,
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Animaciones suaves */
+.sidebar,
+.content {
+    transition: all 0.3s ease-in-out;
 }

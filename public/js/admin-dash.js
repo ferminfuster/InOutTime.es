@@ -1629,3 +1629,20 @@ function descargarListaUsuarios() {
 
 // Asignar la función al botón
 document.querySelector('.btn-success').addEventListener('click', descargarListaUsuarios);
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('active');
+}
+
+// Cerrar sidebar al hacer clic fuera
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    
+    if (sidebar.classList.contains('active') && 
+        !sidebar.contains(event.target) && 
+        !sidebarToggle.contains(event.target)) {
+        sidebar.classList.remove('active');
+    }
+});
