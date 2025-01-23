@@ -352,158 +352,6 @@ window.registrarIncidencia = function() {
     registrarAccion('incidencia');
 };
 
-/*
-//////// Mostrar Registros ///////
-// Función para mostrar modal de registros
-window.mostrarMisRegistros = function() {
-    const modal = document.getElementById('modalMisRegistros');
-    modal.style.display = 'block';
-
-    // Establecer fechas por defecto
-    const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    
-    document.getElementById('fechaDesde').valueAsDate = firstDayOfMonth;
-    document.getElementById('fechaHasta').valueAsDate = today;
-
-    // Cargar registros inicialmente
-    cargarRegistros();
-}
-
-// Función para cerrar modal
-window.cerrarModalRegistros = function() {
-    const modal = document.getElementById('modalMisRegistros');
-    modal.style.display = 'none';
-}
-
-// Función para cargar registros
-async function cargarRegistros() {
-  try {
-      const user = auth.currentUser;
-      if (!user) {
-          mostrarError("Usuario no autenticado");
-          return;
-      }
-
-      // Obtener fechas
-      const fechaDesde = Timestamp.fromDate(new Date(document.getElementById('fechaDesde').value));
-      const fechaHasta = Timestamp.fromDate(new Date(document.getElementById('fechaHasta').value));
-      fechaHasta.toDate().setHours(23, 59, 59); // Establecer hora final del día
-
-      // Referencia a la colección de registros
-      const registrosRef = collection(db, "registros");
-
-      // Construir consulta con filtros
-      const q = query(
-          registrosRef, 
-          where("userId", "==", user.uid),
-          where("fecha", ">=", fechaDesde),
-          where("fecha", "<=", fechaHasta),
-          orderBy("fecha", "desc")
-      );
-
-      const querySnapshot = await getDocs(q);
-      console.log("Registros encontrados:", querySnapshot.docs.map(doc => doc.data()));
-
-      // Limpiar tabla anterior
-      const registrosBody = document.getElementById('registrosBody');
-      registrosBody.innerHTML = '';
-
-      // Almacenar registros para exportación
-      window.registrosParaExportar = [];
-
-      // Llenar tabla
-      querySnapshot.forEach((doc) => {
-          const registro = doc.data();
-          const fecha = registro.fecha.toDate();
-
-          // Formatear fecha y hora
-          const formatoFecha = new Intl.DateTimeFormat('es-ES', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric'
-          }).format(fecha);
-
-          const formatoHora = new Intl.DateTimeFormat('es-ES', {
-              hour: '2-digit',
-              minute: '2-digit'
-          }).format(fecha);
-
-          // Crear fila
-          const fila = `
-              <tr>
-                  <td>${formatoFecha}</td>
-                  <td>${registro.accion_registro.toUpperCase()}</td>
-                  <td>${registro.lugar}</td>
-                  <td>${formatoHora}</td>
-              </tr>
-          `;
-
-          registrosBody.innerHTML += fila;
-
-          // Guardar para exportación
-          window.registrosParaExportar.push({
-              fecha: formatoFecha,
-              accion: registro.accion_registro.toUpperCase(),
-              lugar: registro.lugar,
-              hora: formatoHora
-          });
-      });
-
-  } catch (error) {
-      console.error("Error al cargar registros:", error);
-      mostrarError("No se pudieron cargar los registros");
-  }
-}
-
-
-// Función para exportar PDF
-function exportarPDF() {
-    // Asegúrate de incluir las librerías jsPDF
-    if (!window.registrosParaExportar || window.registrosParaExportar.length === 0) {
-        mostrarError("No hay registros para exportar");
-        return;
-    }
-
-    // Importar jsPDF dinámicamente
-    import('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
-    .then(module => {
-        const { jsPDF } = module;
-        const doc = new jsPDF();
-
-        // Título del documento
-        doc.setFontSize(18);
-        doc.text('Mis Registros', 14, 22);
-
-        // Datos del usuario
-        const user = auth.currentUser;
-        doc.setFontSize(10);
-        doc.text(`Usuario: ${user.email}`, 14, 30);
-        doc.text(`Fecha de exportación : ${new Date().toLocaleDateString()}`, 14, 36);
-
-        // Configurar tabla
-        doc.autoTable({
-            startY: 45,
-            head: [['Fecha', 'Acción', 'Lugar', 'Hora']],
-            body: window.registrosParaExportar.map(registro => [
-                registro.fecha,
-                registro.accion,
-                registro.lugar,
-                registro.hora
-            ])
-        });
-
-        // Guardar PDF
-        doc.save(`Registros_${user.email}_${new Date().toISOString().split('T')[0]}.pdf`);
-    })
-    .catch(error => {
-        console.error("Error al cargar jsPDF:", error);
-        mostrarError("No se pudo exportar el PDF");
-    });
-}
-*/
-//// Mostrar Información del último registro
-//// Mostrar Información del último registro
 //// Mostrar Información del último registro
 async function mostrarUltimoRegistro(userId) {
   const statusUser = document.getElementById("statusUser");
@@ -1101,3 +949,81 @@ setInterval(() => {
     calcularHorasTrabajadasHoy();
   }
 }, 60000); // Actualiza cada minuto
+
+//////////////////////////////
+// Modal Incidencia //
+/////////////////////
+  // Modificar la función de registro de incidencia
+  window.registrarIncidencia = async function() {
+    // Primero validamos si puede registrar incidencia
+    const puedeRegistrar = await validarAccionRegistro('incidencia');
+    
+    if (!puedeRegistrar) {
+      mostrarNotificacionError("Solo puedes registrar incidencia después de una entrada");
+      return;
+    }
+    
+    // Abrir el modal de incidencia
+    document.getElementById('incidenciaModal').style.display = 'block';
+  };
+
+  // Manejar el envío del formulario de incidencia
+  document.getElementById('incidenciaForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    try {
+      const user = auth.currentUser;
+      const tipoIncidencia = document.getElementById('tipoIncidencia').value;
+      const descripcionIncidencia = document.getElementById('descripcionIncidencia').value;
+      const archivoIncidencia = document.getElementById('archivoIncidencia').files[0];
+
+      // Obtener datos del usuario
+      const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+      const userData = userDoc.data();
+
+      // Preparar datos de la incidencia
+      const nuevoRegistro = {
+        userId: user.uid,
+        accion_registro: 'incidencia',
+        fecha: serverTimestamp(),
+        lugar: obtenerLugarActual(),
+        email: user.email,
+        empresa: userData.empresa,
+        nombre: userData.nombre,
+        tipoIncidencia: tipoIncidencia,
+        descripcion: descripcionIncidencia
+      };
+
+      // Manejar archivo adjunto (si existe)
+      if (archivoIncidencia) {
+        const storageRef = ref(storage, `incidencias/${user.uid}/${Date.now()}_${archivoIncidencia.name}`);
+        const uploadResult = await uploadBytes(storageRef, archivoIncidencia);
+        nuevoRegistro.archivoUrl = await getDownloadURL(uploadResult.ref);
+      }
+
+      // Guardar el registro en Firestore
+      const registrosRef = collection(db, "registros");
+      const nuevoDocRef = doc(registrosRef);
+      await setDoc(nuevoDocRef, nuevoRegistro);
+
+      // Cerrar modal
+      cerrarModalIncidencia();
+
+      // Notificación de éxito
+      mostrarNotificacionExito('¡Incidencia registrada correctamente!');
+      
+      // Actualizar vista de últimos registros
+      await mostrarUltimoRegistro(user.uid);
+
+    } catch (error) {
+      console.error('Error al registrar incidencia:', error);
+      mostrarNotificacionError('Hubo un problema al registrar la incidencia. Inténtalo nuevamente.');
+    }
+  });
+
+  // Función para cerrar el modal
+  function cerrarModalIncidencia() {
+    document.getElementById('incidenciaModal').style.display = 'none';
+    // Limpiar formulario
+    document.getElementById('incidenciaForm').reset();
+  }

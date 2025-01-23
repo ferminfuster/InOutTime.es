@@ -109,7 +109,45 @@
                         </table>
                     </div>
                 </div>
-            </div>   
+            </div>
+            
+            <!-- Modal en Registrar Incidencia -->
+<div id="incidenciaModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModalIncidencia()">&times;</span>
+      <h2>Registrar Incidencia</h2>
+      <form id="incidenciaForm">
+        <div class="input-group">
+          <label for="tipoIncidencia">Tipo de Incidencia</label>
+          <select id="tipoIncidencia" required>
+            <option value="">Seleccionar tipo</option>
+            <option value="tecnica">Incidencia Técnica</option>
+            <option value="administrativa">Incidencia Administrativa</option>
+            <option value="salud">Incidencia de Salud</option>
+            <option value="otra">Otra</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="descripcionIncidencia">Descripción detallada</label>
+          <textarea 
+            id="descripcionIncidencia" 
+            rows="4" 
+            placeholder="Describe tu incidencia en detalle..."
+            required
+          ></textarea>
+        </div>
+        <div class="input-group">
+          <label for="archivoIncidencia">Adjuntar archivo (opcional)</label>
+          <input 
+            type="file" 
+            id="archivoIncidencia" 
+            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+          >
+        </div>
+        <button type="submit" class="button main-button">Enviar Incidencia</button>
+      </form>
+    </div>
+  </div>
 
     </div>
     <footer>
