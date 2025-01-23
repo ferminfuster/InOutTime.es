@@ -1631,7 +1631,9 @@ function descargarListaUsuarios() {
 document.querySelector('.btn-success').addEventListener('click', descargarListaUsuarios);
 
 
-//////////////////////////////////////////////////////////7
+////////////////////////////////////////////
+// FUNCION ESCONDER EL BOTON EL MOVILES ////
+////////////////////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.querySelector('.sidebar');
     const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -1669,74 +1671,105 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-/////////////////////////////////////////////
-function transformTableForMobile() {
-    const table = document.getElementById('usuariosTable');
-    const mobileList = document.getElementById('mobileUserList');
-    const isMobile = window.innerWidth <= 768;
+//////////////////////////////////////////////////////
+// FUNCION REDIMENSIONAR TABLA USUARIOS EN MOVILES //
+////////////////////////////////////////////////////
+document.addEventListener('DOMContentLoaded', () => {
+    function transformTableForMobile() {
+        console.log('Transforming table, window width:', window.innerWidth);
+        
+        const table = document.getElementById('usuariosTable');
+        const mobileList = document.getElementById('mobileUserList');
 
-    if (isMobile) {
-        table.style.display = 'none';
-        mobileList.innerHTML = ''; // Limpiar lista anterior
+        // Validar que los elementos existan
+        if (!table || !mobileList) {
+            console.error('Table or mobile list not found');
+            return;
+        }
 
-        const rows = table.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            const userCard = document.createElement('div');
-            userCard.classList.add('user-card');
+        const isMobile = window.innerWidth <= 768;
 
-            userCard.innerHTML = `
-                <div class="user-card-content">
-                    <h3>${cells[0].textContent}</h3>
-                    <p><strong>Email:</strong> ${cells[1].textContent}</p>
-                    <p><strong>Empresa:</strong> ${cells[2].textContent}</p>
-                    <p><strong>Rol:</strong> ${cells[3].textContent}</p>
-                    <div class="user-card-actions">
-                        ${cells[4].innerHTML}
+        if (isMobile) {
+            // Ocultar tabla
+            table.style.display = 'none';
+            
+            // Limpiar lista móvil anterior
+            mobileList.innerHTML = '';
+
+            // Obtener filas de la tabla
+            const rows = table.querySelectorAll('tbody tr');
+            
+            // Verificar si hay filas
+            if (rows.length === 0) {
+                console.warn('No rows found in the table');
+                return;
+            }
+
+            // Iterar sobre las filas
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                
+                // Verificar que haya suficientes celdas
+                if (cells.length < 5) {
+                    console.warn(`Row ${index} does not have enough cells`);
+                    return;
+                }
+
+                const userCard = document.createElement('div');
+                userCard.classList.add('user-card');
+
+                userCard.innerHTML = `
+                    <div class="user-card-content">
+                        <h3>${cells[0].textContent}</h3>
+                        <p><strong>Email:</strong> ${cells[1].textContent}</p>
+                        <p><strong>Empresa:</strong> ${cells[2].textContent}</p>
+                        <p><strong>Rol:</strong> ${cells[3].textContent}</p>
+                        <div class="user-card-actions">
+                            ${cells[4].innerHTML}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
 
-            mobileList.appendChild(userCard);
+                mobileList.appendChild(userCard);
+            });
+
+            // Mostrar lista móvil
+            mobileList.style.display = 'block';
+        } else {
+            // Mostrar tabla en modo escritorio
+            table.style.display = 'table';
+            mobileList.style.display = 'none';
+        }
+    }
+
+    // Función para ejecutar la transformación de forma inmediata
+    function initializeTableTransform() {
+        // Ejecutar transformación
+        transformTableForMobile();
+        
+        // Añadir un pequeño retraso para asegurar que el contenido esté completamente cargado
+        setTimeout(transformTableForMobile, 100);
+    }
+
+    // Eventos para transformación
+    window.addEventListener('load', initializeTableTransform);
+    window.addEventListener('resize', transformTableForMobile);
+
+    // Observador de mutaciones para detectar cambios en la tabla
+    const table = document.getElementById('usuariosTable');
+    if (table) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    transformTableForMobile();
+                }
+            });
         });
 
-        mobileList.style.display = 'block';
-    } else {
-        table.style.display = 'table';
-        mobileList.style.display = 'none';
+        // Configurar observador en el tbody
+        observer.observe(table.querySelector('tbody'), {
+            childList: true,
+            subtree: true
+        });
     }
-}
-
-// Función para forzar la transformación
-function forceTransformTableForMobile() {
-    // Forzar un ancho específico para móviles
-    const tempWidth = window.innerWidth;
-    
-    // Simular redimensionamiento
-    Object.defineProperty(window, 'innerWidth', {
-        writable: true,
-        value: 767 // Forzar modo móvil
-    });
-    
-    transformTableForMobile();
-    
-    // Restaurar el ancho original
-    Object.defineProperty(window, 'innerWidth', {
-        writable: true,
-        value: tempWidth
-    });
-}
-
-// Ejecutar al cargar y al redimensionar
-window.addEventListener('load', () => {
-    transformTableForMobile();
-    
-    // Añadir un pequeño retraso para asegurar que el contenido esté cargado
-    setTimeout(forceTransformTableForMobile, 100);
 });
-
-window.addEventListener('resize', transformTableForMobile);
-
-// Ejecutar al cargar y al redimensionar
-window.addEventListener('load', transformTableForMobile);
-window.addEventListener('resize', transformTableForMobile);
