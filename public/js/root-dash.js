@@ -718,79 +718,6 @@ window.cargarUsuarios = async function() {
     }
 }
 
-// Función para crear nuevo usuario 
-// Función para crear nuevo usuario FUNCIONA
-/*
-window.crearNuevoUsuario = async function(event) {
-    event.preventDefault();
-
-    // Obtener valores del formulario
-    const nombre = document.getElementById('nombre').value;
-    const apellidos = document.getElementById('apellidos').value;
-    const dni = document.getElementById('dni').value;
-    const email = document.getElementById('email').value;
-    const empresaId = document.getElementById('empresa').value;
-    const rol = document.getElementById('rol').value;
-
-    try {
-        // Generar una contraseña temporal segura
-        const passwordTemporal = window.generarPasswordTemporal();
-
-        // Crear usuario sin cambiar el contexto actual
-        const userCredential = await createUserWithEmailAndPassword(auth, email, passwordTemporal);
-        const user = userCredential.user;
-
-        console.log("Usuario creado en Authentication:", user.uid);
-
-        // Obtener el nombre de la empresa
-        let nombreEmpresa = 'Sin empresa';
-        if (empresaId) {
-            try {
-                const empresaDoc = await getDoc(doc(db, 'empresas', empresaId));
-                if (empresaDoc.exists()) {
-                    nombreEmpresa = empresaDoc.data().nombre_empresa;
-                }
-            } catch (empresaError) {
-                console.error("Error al obtener nombre de empresa:", empresaError);
-            }
-        }
-
-        // Guardar información adicional en Firestore
-        await setDoc(doc(db, 'usuarios', user.uid), {
-            nombre: nombre,
-            apellidos: apellidos,
-            dni: dni,
-            email: email,
-            empresa: nombreEmpresa,
-            rol: rol,
-            uid: user.uid,
-            fechaRegistro: new Date(),
-            estado: 'activo'
-        });
-
-        // Mostrar mensaje con contraseña temporal
-        alert(`Usuario creado exitosamente. 
-Contraseña temporal: ${passwordTemporal}
-Por favor, indique al usuario que cambie su contraseña al iniciar sesión por primera vez.`);
-
-        // Cerrar modal
-        const modalElement = document.getElementById('modalNuevoUsuario');
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        modal.hide();
-
-        // Limpiar formulario
-        event.target.reset();
-
-        // Recargar lista de usuarios
-        window.cargarUsuarios();
-
-    } catch (error) {
-        console.error("Error completo al crear usuario: ", error);
-        alert("No se pudo crear el usuario: " + error.message);
-    }
-};
-*/
-
 //////////////////////////////////
 // CREAR USUARIO - INICIO //
 ///////////////////////////
@@ -1081,8 +1008,8 @@ window.mostrarInformacionUsuario = async function(email) {
     }
 };
 
-///////////////////////////////////////////
-// Restablecer usuario - ROOT 
+/////////////////////////////////
+// Restablecer usuario - ROOT //
 ////////////////////////////////
 
 window.restablecerUsuario = function(email) {
@@ -1196,6 +1123,7 @@ window.modificarUsuario = async function(email) {
                         <select id="swal-rol" class="swal2-select">
                             <option value="usuario" ${usuarioData.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
                             <option value="admin" ${usuarioData.rol === 'admin' ? 'selected' : ''}>Admin</option>
+                            <option value="root" ${usuarioData.rol === 'root' ? 'selected' : ''}>Root</option>
                         </select>
                     </div>
                     <div>
