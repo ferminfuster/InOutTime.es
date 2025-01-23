@@ -66,7 +66,7 @@ onAuthStateChanged(auth, async (user) => {
                 const userData = userDoc.data();
 
                 // Verificar si el rol del usuario es admin
-                if (userData.rol === "admin") {
+                if (userData.rol === "admin" || userData.rol === "root") {
                     content.style.display = "block";
                     //empresaGlobal = userData.empresa ;
                     window.empresaGlobal = userData.empresa;
