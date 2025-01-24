@@ -353,6 +353,7 @@ window.registrarIncidencia = function() {
 };
 
 //// Mostrar Información del último registro
+/*
 async function mostrarUltimoRegistro(userId) {
   const statusUser = document.getElementById("statusUser");
 
@@ -418,6 +419,92 @@ async function mostrarUltimoRegistro(userId) {
               </div>
           </div>
       `;
+  }
+}
+*/
+async function mostrarUltimoRegistro(userId) {
+  const statusUser = document.getElementById("statusUser");
+
+  if (!statusUser) {
+      console.error("Elemento 'statusUser' no encontrado en el DOM.");
+      return;
+  }
+
+  try {
+    const registrosRef = collection(db, "registros");
+    const q = query(
+      registrosRef, 
+      where("userId", "==", userId),
+      orderBy("fecha", "desc"),
+      limit(1)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const ultimoRegistro = querySnapshot.docs[0].data();
+      const fechaRegistro = ultimoRegistro.fecha.toDate();
+      const fechaFormateada = fechaRegistro.toLocaleString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+      });
+
+      const horaFormateada = fechaRegistro.toLocaleString("es-ES", {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+      });
+
+      const configuraciones = {
+          "entrada": {
+              icono: "fas fa-sign-in-alt",
+              clase: "status-entrada",
+              texto: "Entrada"
+          },
+          "salida": {
+              icono: "fas fa-sign-out-alt",
+              clase: "status-salida",
+              texto: "Salida"
+          },
+          "incidencia": {
+              icono: "fas fa-exclamation-triangle",
+              clase: "status-incidencia",
+              texto: "Incidencia"
+          },
+          "default": {
+              icono: "fas fa-question",
+              clase: "",
+              texto: "Desconocida"
+          }
+      };
+
+      const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
+
+      statusUser.innerHTML = `
+      <div class="user-status-element ${config.clase}">
+          <span>${config.texto} el ${fechaFormateada} a las ${horaFormateada}</span>
+      </div>
+    `;
+    } else {
+      statusUser.innerHTML = `
+          <div class="user-status-container">
+              <div class="user-status-element">
+                  <span>Sin Registros</span>
+              </div>
+          </div>
+      `;
+    }
+  } catch (error) {
+    console.error("Error al obtener último registro:", error);
+    statusUser.innerHTML = `
+        <div class="user-status-container">
+            <div class="user-status-element">
+                <span>Error al cargar registro</span>
+            </div>
+        </div>
+    `;
   }
 }
 
@@ -871,7 +958,7 @@ window.descargarInformeCSV = descargarInformeCSV;
 window.enviarInformePorEmail = enviarInformePorEmail;
 window.imprimirInforme = imprimirInforme;
 
-
+/*
 window.calcularHorasTrabajadasHoy = async function() {
   console.log("Acabo de entrar en la función Horas trabajadas");
   try {
@@ -931,6 +1018,77 @@ window.calcularHorasTrabajadasHoy = async function() {
         horasTrabajadasHoy = `${horas} horas ${minutos} minutos (en curso)`;
     }
 
+    document.getElementById('horasHoy').textContent = horasTrabajadasHoy;
+  } catch (error) {
+    console.error("Error al calcular horas trabajadas hoy:", error);
+    document.getElementById('horasHoy').textContent = 'Error';
+  }
+};
+*/
+window.calcularHorasTrabajadasHoy = async function() {
+  console.log("Calculando horas trabajadas hoy");
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+        document.getElementById('horasHoy').textContent = 'N/A';
+        return;
+    }
+
+    const userId = user.uid;
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const mañana = new Date(hoy);
+    mañana.setDate(hoy.getDate() + 1);
+
+    const q = query(
+        collection(db, "registros"),
+        where("userId", "==", userId),
+        where("fecha", ">=", hoy),
+        where("fecha", "<", mañana),
+        orderBy("fecha")
+    );
+
+    const registrosSnapshot = await getDocs(q);
+    const registros = registrosSnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => a.fecha.toDate() - b.fecha.toDate());
+
+    console.log("Registros del día:", registros);
+
+    let primeraEntrada = null;
+    let ultimaSalida = null;
+
+    registros.forEach(registro => {
+        const fechaRegistro = registro.fecha.toDate();
+        
+        if (registro.accion_registro === 'entrada') {
+            if (!primeraEntrada || fechaRegistro < primeraEntrada) {
+                primeraEntrada = fechaRegistro;
+            }
+        } else if (registro.accion_registro === 'salida') {
+            if (!ultimaSalida || fechaRegistro > ultimaSalida) {
+                ultimaSalida = fechaRegistro;
+            }
+        }
+    });
+
+    let horasTrabajadasHoy = 'N/A';
+    if (primeraEntrada && ultimaSalida) {
+        const diferenciaMs = ultimaSalida - primeraEntrada;
+        const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+        const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+        horasTrabajadasHoy = `${horas} horas ${minutos} minutos`;
+    } else if (primeraEntrada && !ultimaSalida) {
+        const ahora = new Date();
+        const diferenciaMs = ahora - primeraEntrada;
+        const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+        const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+        horasTrabajadasHoy = `${horas} horas ${minutos} minutos (en curso)`;
+    }
+
+    console.log("Horas trabajadas hoy:", horasTrabajadasHoy);
     document.getElementById('horasHoy').textContent = horasTrabajadasHoy;
   } catch (error) {
     console.error("Error al calcular horas trabajadas hoy:", error);
