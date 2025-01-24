@@ -216,3 +216,19 @@ body {
 .content {
     transition: all 0.3s ease-in-out;
 }
+
+/* Registro Manual de Accion */
+.registro-manual .radio-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.registro-manual .radio-group label {
+    display: flex;
+    align-items: center;
+}
+
+.registro-manual .radio-group input[type="radio"] {
+    margin-right: 5px;
+}

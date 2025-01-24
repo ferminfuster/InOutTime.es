@@ -1777,3 +1777,120 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+///////////////////////////////////////////////////
+// Función para abrir el modal de registro manual//
+//////////////////////////////////////////////////
+function abrirModalRegistroManual() {
+    // Cargar usuarios
+    cargarUsuarios();
+    
+    // Mostrar modal
+    document.getElementById('modalRegistroManual').style.display = 'block';
+}
+
+// Cargar usuarios en el select
+async function cargarUsuarios() {
+    const selectUsuarios = document.getElementById('usuarioSeleccionado');
+    
+    try {
+        // Obtener usuarios desde Supabase
+        const { data, error } = await supabase
+            .from('users')
+            .select('id, nombre, apellidos');
+        
+        if (error) throw error;
+
+        // Limpiar select
+        selectUsuarios.innerHTML = '<option value="">Seleccionar usuario</option>';
+
+        // Añadir usuarios
+        data.forEach(usuario => {
+            const option = document.createElement('option');
+            option.value = usuario.id;
+            option.textContent = `${usuario.nombre} ${usuario.apellidos}`;
+            selectUsuarios.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error cargando usuarios:', error);
+        mostrarNotificacion('Error al cargar usuarios');
+    }
+}
+
+// Mostrar/ocultar sección de incidencia
+document.querySelectorName('input[name="tipoRegistro"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const incidenciaSection = document.getElementById('incidenciaSection');
+        incidenciaSection.style.display = this.value === 'incidencia' ? 'block' : 'none';
+    });
+});
+
+// Envío del formulario de registro manual
+document.getElementById('formRegistroManual').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const usuarioId = document.getElementById('usuarioSeleccionado').value;
+    const tipoRegistro = document.querySelector('input[name="tipoRegistro"]:checked').value;
+    const fechaRegistro = document.getElementById('fechaRegistro').value;
+    const justificacion = document.getElementById('justificacion').value;
+    
+    // Para incidencias, obtener tipo adicional
+    const tipoIncidencia = tipoRegistro === 'incidencia' 
+        ? document.getElementById('tipoIncidencia').value 
+        : null;
+
+    try {
+        let registro;
+        
+        switch(tipoRegistro) {
+            case 'entrada':
+                registro = await supabase
+                    .from('fichajes')
+                    .insert({
+                        user_id: usuarioId,
+                        tipo: 'entrada',
+                        fecha_hora: fechaRegistro,
+                        justificacion: justificacion,
+                        registrado_por: 'admin' // Identificar que fue registro manual
+                    });
+                break;
+            
+            case 'salida':
+                registro = await supabase
+                    .from('fichajes')
+                    .insert({
+                        user_id: usuarioId,
+                        tipo: 'salida',
+                        fecha_hora: fechaRegistro,
+                        justificacion: justificacion,
+                        registrado_por: 'admin'
+                    });
+                break;
+            
+            case 'incidencia':
+                registro = await supabase
+                    .from('incidencias')
+                    .insert({
+                        user_id: usuarioId,
+                        tipo: tipoIncidencia,
+                        descripcion: justificacion,
+                        fecha_hora: fechaRegistro,
+                        estado: 'pendiente',
+                        registrado_por: 'admin'
+                    });
+                break;
+        }
+
+        if (registro.error) throw registro.error;
+
+        mostrarNotificacion('Registro manual guardado correctamente');
+        cerrarModalRegistroManual();
+    } catch (error) {
+        console.error('Error en registro manual:', error);
+        mostrarNotificacion('Error al guardar el registro');
+    }
+});
+
+function cerrarModalRegistroManual() {
+    document.getElementById('modalRegistroManual').style.display = 'none';
+}
