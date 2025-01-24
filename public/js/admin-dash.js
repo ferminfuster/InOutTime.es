@@ -1782,15 +1782,34 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función para abrir el modal de registro manual//
 //////////////////////////////////////////////////
 // Función para abrir el modal de registro manual
+// Función para abrir el modal de registro manual
 async function abrirModalRegistroManual() {
     try {
         // Verificar permisos (ROOT o ADMIN)
         const userActual = auth.currentUser;
+        
+        // Verificar si hay usuario autenticado
+        if (!userActual) {
+            throw new Error('Usuario no autenticado');
+        }
+
         const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        
+        // Verificar si existe el documento del usuario
+        if (!userDoc.exists()) {
+            throw new Error('Documento de usuario no encontrado');
+        }
+
         const datosUsuarioActual = userDoc.data();
         
+        // Validar permisos
         if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
             throw new Error('No tienes permisos para realizar registros manuales');
+        }
+
+        // Verificar que la empresa global esté definida
+        if (!window.empresaGlobal) {
+            throw new Error('Empresa no definida');
         }
 
         // Abrir modal con Swal
@@ -1845,7 +1864,7 @@ async function abrirModalRegistroManual() {
                     
                     <div>
                         <label>Justificación</label>
-                        <textarea id="swal-justificacion" class="swal2-input" placeholder="Introduce una justificación para el registro manual" rows="3"></textarea>
+                        <textarea id="swal-justificacion" class="swal2-input" placeholder="Introduce una justificación para el registro manual" rows="3" required></textarea>
                     </div>
                 </div>
             `,
@@ -1861,6 +1880,17 @@ async function abrirModalRegistroManual() {
                     incidenciaSection.style.display = 
                         tipoRegistro.value === 'incidencia' ? 'block' : 'none';
                 });
+
+                // Establecer valor por defecto de fecha y hora actual
+                const fechaRegistro = document.getElementById('swal-fecha-registro');
+                const now = new Date();
+                // Formatear fecha para datetime-local
+                const formattedDate = now.getFullYear() + '-' + 
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(now.getDate()).padStart(2, '0') + 'T' + 
+                    String(now.getHours()).padStart(2, '0') + ':' + 
+                    String(now.getMinutes()).padStart(2, '0');
+                fechaRegistro.value = formattedDate;
             },
             showCancelButton: true,
             confirmButtonText: 'Guardar Registro',
@@ -1885,6 +1915,10 @@ async function abrirModalRegistroManual() {
                 }
                 if (!fechaRegistro) {
                     Swal.showValidationMessage('Debe seleccionar una fecha y hora');
+                    return false;
+                }
+                if (!justificacion) {
+                    Swal.showValidationMessage('Debe introducir una justificación');
                     return false;
                 }
                 if (tipoRegistro === 'incidencia' && !tipoIncidencia) {
@@ -1912,13 +1946,16 @@ async function abrirModalRegistroManual() {
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: error.message,
+            html: `
+                <p>No se pudo abrir el registro manual:</p>
+                <strong>${error.message}</strong>
+            `,
             confirmButtonText: 'Entendido'
         });
     }
 }
 
-// Cargar usuarios en el select
+// Función para cargar usuarios en el select
 async function cargarUsuariosEnSelect() {
     const selectUsuarios = document.getElementById('swal-usuario');
     
@@ -1929,7 +1966,11 @@ async function cargarUsuariosEnSelect() {
         const empresaUsuario = userDoc.data().empresa;
 
         const usuariosRef = collection(db, 'usuarios');
-        const q = query(usuariosRef, where('empresa', '==', empresaUsuario));
+        const q = query(
+            usuariosRef, 
+            where('empresa', '==', empresaUsuario),
+            where('estado', '==', 'activo') // Solo usuarios activos
+        );
         const querySnapshot = await getDocs(q);
 
         // Limpiar select
@@ -1944,6 +1985,11 @@ async function cargarUsuariosEnSelect() {
             selectUsuarios.appendChild(option);
         });
 
+        // Log de usuarios cargados
+        console.log(`Usuarios cargados para empresa ${empresaUsuario}:`, 
+            querySnapshot.docs.map(doc => doc.data().email)
+        );
+
     } catch (error) {
         console.error('Error al cargar usuarios:', error);
         Swal.fire({
@@ -1955,14 +2001,39 @@ async function cargarUsuariosEnSelect() {
     }
 }
 
-// Guardar registro manual
+// Función para guardar registro manual
 async function guardarRegistroManual(datos) {
     try {
+        // Log inicial de datos
+        console.log('Datos recibidos para registro manual:', datos);
+
         const userActual = auth.currentUser;
         
+        // Verificar que userActual existe
+        if (!userActual) {
+            throw new Error('Usuario no autenticado');
+        }
+
+        // Log de usuario actual
+        console.log('Usuario actual:', userActual.uid, userActual.email);
+
+        // Verificar empresa global
+        if (!window.empresaGlobal) {
+            throw new Error('Empresa no definida');
+        }
+
+        // Obtener datos del usuario seleccionado
+        const usuarioDoc = await getDoc(doc(db, 'usuarios', datos.usuario));
+        if (!usuarioDoc.exists()) {
+            throw new Error('Usuario seleccionado no encontrado');
+        }
+        const usuarioData = usuarioDoc.data();
+
         // Preparar datos para guardar
         const registroData = {
             user_id: datos.usuario,
+            email: usuarioData.email,
+            nombre: `${usuarioData.nombre} ${usuarioData.apellidos || ''}`,
             fecha: Timestamp.fromDate(new Date(datos.fechaRegistro)),
             accion_registro: datos.tipoRegistro,
             justificacion: datos.justificacion,
@@ -1970,41 +2041,85 @@ async function guardarRegistroManual(datos) {
                 uid: userActual.uid,
                 email: userActual.email
             },
-            empresa: window.empresaGlobal // Obtener de variable global
+            empresa: window.empresaGlobal,
+            created_at: serverTimestamp(),
+            tipo_registro: 'manual'
         };
 
-        // Guardar según el tipo de registro
+        // Log de datos a guardar
+        console.log('Datos de registro a guardar:', registroData);
+
+        // Determinar colección según tipo de registro
+        let coleccionTarget = 'registros';
+        
+        // Añadir detalles específicos según el tipo de registro
         if (datos.tipoRegistro === 'incidencia') {
+            coleccionTarget = 'incidencias';
             registroData.tipo_incidencia = datos.tipoIncidencia;
-            await addDoc(collection(db, 'incidencias'), registroData);
-        } else {
-            await addDoc(collection(db, 'registros'), registroData);
         }
 
-        // Notificación de éxito
+        // Log de colección target
+        console.log(`Guardando en colección: ${coleccionTarget}`);
+
+        // Intentar guardar el documento
+        const docRef = await addDoc(collection(db, coleccionTarget), registroData);
+
+        // Log de documento guardado
+        console.log(`Registro manual guardado con ID: ${docRef.id}`);
+
+        // Notificación de éxito detallada
         await Swal.fire({
             icon: 'success',
             title: 'Registro Guardado',
-            text: 'El registro manual se ha guardado correctamente',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000
-        });
-
-        // Opcional: Recargar lista de usuarios o contadores
-        await contarFichajesHoy();
-
-    } catch (error) {
-        console.error('Error al guardar registro manual:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message,
+            html: `
+                <p>Registro manual guardado correctamente:</p>
+                <ul>
+                    <li><strong>Usuario:</strong> ${usuarioData.nombre} ${usuarioData.apellidos || ''}</li>
+                    <li><strong>Tipo:</strong> ${datos.tipoRegistro}</li>
+                    <li><strong>Fecha:</strong> ${new Date(datos.fechaRegistro).toLocaleString()}</li>
+                    <li><strong>ID Registro:</strong> ${docRef.id}</li>
+                </ul>
+            `,
             confirmButtonText: 'Entendido'
         });
+
+        // Opcional: Recargar contadores o lista
+        try {
+            if (typeof contarFichajesHoy === 'function') {
+                await contarFichajesHoy();
+            }
+        } catch (reloadError) {
+            console.warn('Error al recargar contadores:', reloadError);
+        }
+
+        return docRef;
+
+    } catch (error) {
+        // Log de error detallado
+        console.error('Error COMPLETO al guardar registro manual:', {
+            message: error.message,
+            code: error.code,
+            stack: error.stack,
+            fullError: error
+        });
+
+        // Notificación de error detallada
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error al Guardar Registro',
+            html: `
+                <p>No se pudo guardar el registro:</p>
+                <strong>${error.message}</strong>
+                <p>Detalles del error:</p>
+                <pre>${JSON.stringify(error, null, 2)}</pre>
+            `,
+            confirmButtonText: 'Entendido'
+        });
+
+        // Re-lanzar el error para manejo adicional si es necesario
+        throw error;
     }
 }
 
-// Añadir al menú lateral
+// Añadir al objeto window para acceso global
 window.abrirModalRegistroManual = abrirModalRegistroManual;
