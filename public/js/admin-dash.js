@@ -1781,3 +1781,230 @@ document.addEventListener('DOMContentLoaded', () => {
 ///////////////////////////////////////////////////
 // Función para abrir el modal de registro manual//
 //////////////////////////////////////////////////
+// Función para abrir el modal de registro manual
+async function abrirModalRegistroManual() {
+    try {
+        // Verificar permisos (ROOT o ADMIN)
+        const userActual = auth.currentUser;
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const datosUsuarioActual = userDoc.data();
+        
+        if (datosUsuarioActual.rol !== 'root' && datosUsuarioActual.rol !== 'admin') {
+            throw new Error('No tienes permisos para realizar registros manuales');
+        }
+
+        // Abrir modal con Swal
+        const { value: formValues } = await Swal.fire({
+            title: 'Registro Manual',
+            html: `
+                <style>
+                    .swal-form {
+                        display: grid;
+                        grid-template-columns: 1fr;
+                        gap: 15px;
+                        text-align: left;
+                    }
+                    .swal2-input, .swal2-select {
+                        width: 100%;
+                        box-sizing: border-box;
+                    }
+                </style>
+                <div class="swal-form">
+                    <div>
+                        <label>Seleccionar Usuario</label>
+                        <select id="swal-usuario" class="swal2-select" required>
+                            <option value="">Seleccionar usuario</option>
+                            <!-- Se llenará dinámicamente -->
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>Tipo de Registro</label>
+                        <select id="swal-tipo-registro" class="swal2-select" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="entrada">Entrada</option>
+                            <option value="salida">Salida</option>
+                            <option value="incidencia">Incidencia</option>
+                        </select>
+                    </div>
+                    
+                    <div id="swal-incidencia-section" style="display:none;">
+                        <label>Tipo de Incidencia</label>
+                        <select id="swal-tipo-incidencia" class="swal2-select">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="tecnica">Incidencia Técnica</option>
+                            <option value="administrativa">Incidencia Administrativa</option>
+                            <option value="otra">Otra</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>Fecha y Hora</label>
+                        <input type="datetime-local" id="swal-fecha-registro" class="swal2-input" required>
+                    </div>
+                    
+                    <div>
+                        <label>Justificación</label>
+                        <textarea id="swal-justificacion" class="swal2-input" placeholder="Introduce una justificación para el registro manual" rows="3"></textarea>
+                    </div>
+                </div>
+            `,
+            didOpen: () => {
+                // Cargar usuarios
+                cargarUsuariosEnSelect();
+
+                // Mostrar/ocultar sección de incidencia
+                const tipoRegistro = document.getElementById('swal-tipo-registro');
+                const incidenciaSection = document.getElementById('swal-incidencia-section');
+                
+                tipoRegistro.addEventListener('change', () => {
+                    incidenciaSection.style.display = 
+                        tipoRegistro.value === 'incidencia' ? 'block' : 'none';
+                });
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Guardar Registro',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const usuario = document.getElementById('swal-usuario').value;
+                const tipoRegistro = document.getElementById('swal-tipo-registro').value;
+                const fechaRegistro = document.getElementById('swal-fecha-registro').value;
+                const justificacion = document.getElementById('swal-justificacion').value;
+                const tipoIncidencia = tipoRegistro === 'incidencia' 
+                    ? document.getElementById('swal-tipo-incidencia').value 
+                    : null;
+
+                // Validaciones
+                if (!usuario) {
+                    Swal.showValidationMessage('Debe seleccionar un usuario');
+                    return false;
+                }
+                if (!tipoRegistro) {
+                    Swal.showValidationMessage('Debe seleccionar un tipo de registro');
+                    return false;
+                }
+                if (!fechaRegistro) {
+                    Swal.showValidationMessage('Debe seleccionar una fecha y hora');
+                    return false;
+                }
+                if (tipoRegistro === 'incidencia' && !tipoIncidencia) {
+                    Swal.showValidationMessage('Debe seleccionar un tipo de incidencia');
+                    return false;
+                }
+
+                return {
+                    usuario,
+                    tipoRegistro,
+                    fechaRegistro,
+                    justificacion,
+                    tipoIncidencia
+                };
+            }
+        });
+
+        // Si se proporcionaron valores
+        if (formValues) {
+            await guardarRegistroManual(formValues);
+        }
+
+    } catch (error) {
+        console.error('Error en registro manual:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message,
+            confirmButtonText: 'Entendido'
+        });
+    }
+}
+
+// Cargar usuarios en el select
+async function cargarUsuariosEnSelect() {
+    const selectUsuarios = document.getElementById('swal-usuario');
+    
+    try {
+        // Obtener usuarios de la misma empresa
+        const userActual = auth.currentUser;
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const empresaUsuario = userDoc.data().empresa;
+
+        const usuariosRef = collection(db, 'usuarios');
+        const q = query(usuariosRef, where('empresa', '==', empresaUsuario));
+        const querySnapshot = await getDocs(q);
+
+        // Limpiar select
+        selectUsuarios.innerHTML = '<option value="">Seleccionar usuario</option>';
+
+        // Añadir usuarios
+        querySnapshot.forEach((doc) => {
+            const usuario = doc.data();
+            const option = document.createElement('option');
+            option.value = doc.id;
+            option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
+            selectUsuarios.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los usuarios',
+            confirmButtonText: 'Entendido'
+        });
+    }
+}
+
+// Guardar registro manual
+async function guardarRegistroManual(datos) {
+    try {
+        const userActual = auth.currentUser;
+        
+        // Preparar datos para guardar
+        const registroData = {
+            user_id: datos.usuario,
+            fecha: Timestamp.fromDate(new Date(datos.fechaRegistro)),
+            accion_registro: datos.tipoRegistro,
+            justificacion: datos.justificacion,
+            registrado_por: {
+                uid: userActual.uid,
+                email: userActual.email
+            },
+            empresa: window.empresaGlobal // Obtener de variable global
+        };
+
+        // Guardar según el tipo de registro
+        if (datos.tipoRegistro === 'incidencia') {
+            registroData.tipo_incidencia = datos.tipoIncidencia;
+            await addDoc(collection(db, 'incidencias'), registroData);
+        } else {
+            await addDoc(collection(db, 'registros'), registroData);
+        }
+
+        // Notificación de éxito
+        await Swal.fire({
+            icon: 'success',
+            title: 'Registro Guardado',
+            text: 'El registro manual se ha guardado correctamente',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        // Opcional: Recargar lista de usuarios o contadores
+        await contarFichajesHoy();
+
+    } catch (error) {
+        console.error('Error al guardar registro manual:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message,
+            confirmButtonText: 'Entendido'
+        });
+    }
+}
+
+// Añadir al menú lateral
+window.abrirModalRegistroManual = abrirModalRegistroManual;
