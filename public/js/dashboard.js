@@ -431,6 +431,8 @@ async function mostrarUltimoRegistro(userId) {
   }
 
   try {
+    console.log("Buscando último registro para usuario:", userId);
+
     const registrosRef = collection(db, "registros");
     const q = query(
       registrosRef, 
@@ -441,9 +443,24 @@ async function mostrarUltimoRegistro(userId) {
 
     const querySnapshot = await getDocs(q);
 
+    console.log("Número de documentos encontrados:", querySnapshot.size);
+
     if (!querySnapshot.empty) {
       const ultimoRegistro = querySnapshot.docs[0].data();
+      
+      // Depuración detallada del registro
+      console.log("Último registro completo:", ultimoRegistro);
+
+      // Verificar si fecha existe y es un Timestamp válido
+      if (!ultimoRegistro.fecha || typeof ultimoRegistro.fecha.toDate !== 'function') {
+        console.error("Formato de fecha inválido:", ultimoRegistro.fecha);
+        throw new Error("Formato de fecha inválido");
+      }
+
       const fechaRegistro = ultimoRegistro.fecha.toDate();
+      
+      console.log("Fecha de registro:", fechaRegistro);
+
       const fechaFormateada = fechaRegistro.toLocaleString("es-ES", {
           year: "numeric",
           month: "long",
@@ -480,7 +497,11 @@ async function mostrarUltimoRegistro(userId) {
           }
       };
 
-      const config = configuraciones[ultimoRegistro.accion_registro.toLowerCase()] || configuraciones.default;
+      // Verificar si accion_registro existe
+      const accionRegistro = ultimoRegistro.accion_registro || 'default';
+      console.log("Acción de registro:", accionRegistro);
+
+      const config = configuraciones[accionRegistro.toLowerCase()] || configuraciones.default;
 
       statusUser.innerHTML = `
       <div class="user-status-element ${config.clase}">
@@ -488,6 +509,7 @@ async function mostrarUltimoRegistro(userId) {
       </div>
     `;
     } else {
+      console.log("No se encontraron registros para el usuario");
       statusUser.innerHTML = `
           <div class="user-status-container">
               <div class="user-status-element">
@@ -497,17 +519,58 @@ async function mostrarUltimoRegistro(userId) {
       `;
     }
   } catch (error) {
-    console.error("Error al obtener último registro:", error);
+    console.error("Error COMPLETO al obtener último registro:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      userId: userId
+    });
+
     statusUser.innerHTML = `
         <div class="user-status-container">
             <div class="user-status-element">
-                <span>Error al cargar registro</span>
+                <span>Error al cargar registro: ${error.message}</span>
             </div>
         </div>
     `;
   }
 }
 
+// Función de depuración adicional
+async function depurarRegistrosUsuario(userId) {
+  try {
+    console.log("Iniciando depuración de registros para usuario:", userId);
+
+    const registrosRef = collection(db, "registros");
+    const q = query(
+      registrosRef, 
+      where("userId", "==", userId),
+      orderBy("fecha", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    console.log("Total de registros encontrados:", querySnapshot.size);
+
+    querySnapshot.docs.forEach((doc, index) => {
+      const registro = doc.data();
+      console.log(`Registro ${index + 1}:`, {
+        id: doc.id,
+        fecha: registro.fecha ? registro.fecha.toDate() : 'Fecha inválida',
+        accion_registro: registro.accion_registro,
+        email: registro.email,
+        lugar: registro.lugar
+      });
+    });
+
+  } catch (error) {
+    console.error("Error en depuración de registros:", error);
+  }
+}
+
+// Llamar a la función de depuración cuando sea necesario
+// Por ejemplo, en el onAuthStateChanged o al cargar el dashboard
+window.depurarRegistrosUsuario = depurarRegistrosUsuario;
 //// Descargar csv
 // Función para descargar registros como CSV
 /*
