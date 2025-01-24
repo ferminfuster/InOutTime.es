@@ -953,25 +953,26 @@ setInterval(() => {
 //////////////////////////////
 // Modal Incidencia //
 /////////////////////
-  // Modificar la función de registro de incidencia
-  window.registrarIncidencia = async function() {
-    // Primero validamos si puede registrar incidencia
-    const puedeRegistrar = await validarAccionRegistro('incidencia');
-    
-    if (!puedeRegistrar) {
+// Función para abrir el modal de incidencia
+window.registrarIncidencia = async function() {
+  // Primero validamos si puede registrar incidencia
+  const puedeRegistrar = await validarAccionRegistro('incidencia');
+  
+  if (!puedeRegistrar) {
       mostrarNotificacionError("Solo puedes registrar incidencia después de una entrada");
       return;
-    }
-    
-    // Abrir el modal de incidencia
-    document.getElementById('incidenciaModal').style.display = 'block';
-  };
+  }
+  
+  // Abrir el modal de incidencia
+  const incidenciaModal = document.getElementById('incidenciaModal');
+  incidenciaModal.style.display = 'block';
+};
 
-  // Manejar el envío del formulario de incidencia
-  document.getElementById('incidenciaForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    
-    try {
+// Manejar el envío del formulario de incidencia
+document.getElementById('incidenciaForm').addEventListener('submit', async function(event) {
+  event.preventDefault();
+  
+  try {
       const user = auth.currentUser;
       const tipoIncidencia = document.getElementById('tipoIncidencia').value;
       const descripcionIncidencia = document.getElementById('descripcionIncidencia').value;
@@ -983,22 +984,22 @@ setInterval(() => {
 
       // Preparar datos de la incidencia
       const nuevoRegistro = {
-        userId: user.uid,
-        accion_registro: 'incidencia',
-        fecha: serverTimestamp(),
-        lugar: obtenerLugarActual(),
-        email: user.email,
-        empresa: userData.empresa,
-        nombre: userData.nombre,
-        tipoIncidencia: tipoIncidencia,
-        descripcion: descripcionIncidencia
+          userId: user.uid,
+          accion_registro: 'incidencia',
+          fecha: serverTimestamp(),
+          lugar: obtenerLugarActual(),
+          email: user.email,
+          empresa: userData.empresa,
+          nombre: userData.nombre,
+          tipoIncidencia: tipoIncidencia,
+          descripcion: descripcionIncidencia
       };
 
       // Manejar archivo adjunto (si existe)
       if (archivoIncidencia) {
-        const storageRef = ref(storage, `incidencias/${user.uid}/${Date.now()}_${archivoIncidencia.name}`);
-        const uploadResult = await uploadBytes(storageRef, archivoIncidencia);
-        nuevoRegistro.archivoUrl = await getDownloadURL(uploadResult.ref);
+          const storageRef = ref(storage, `incidencias/${user.uid}/${Date.now()}_${archivoIncidencia.name}`);
+          const uploadResult = await uploadBytes(storageRef, archivoIncidencia);
+          nuevoRegistro.archivoUrl = await getDownloadURL(uploadResult.ref);
       }
 
       // Guardar el registro en Firestore
@@ -1015,15 +1016,25 @@ setInterval(() => {
       // Actualizar vista de últimos registros
       await mostrarUltimoRegistro(user.uid);
 
-    } catch (error) {
+  } catch (error) {
       console.error('Error al registrar incidencia:', error);
       mostrarNotificacionError('Hubo un problema al registrar la incidencia. Inténtalo nuevamente.');
-    }
-  });
-
-  // Función para cerrar el modal
-  function cerrarModalIncidencia() {
-    document.getElementById('incidenciaModal').style.display = 'none';
-    // Limpiar formulario
-    document.getElementById('incidenciaForm').reset();
   }
+});
+
+// Función para cerrar el modal
+function cerrarModalIncidencia() {
+  const incidenciaModal = document.getElementById('incidenciaModal');
+  incidenciaModal.style.display = 'none';
+  
+  // Limpiar formulario
+  document.getElementById('incidenciaForm').reset();
+}
+
+// Añadir un event listener para cerrar el modal si se hace clic fuera de él
+window.addEventListener('click', function(event) {
+  const incidenciaModal = document.getElementById('incidenciaModal');
+  if (event.target === incidenciaModal) {
+      cerrarModalIncidencia();
+  }
+});
