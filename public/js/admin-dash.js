@@ -1960,42 +1960,104 @@ async function cargarUsuariosEnSelect() {
     const selectUsuarios = document.getElementById('swal-usuario');
     
     try {
-        // Obtener usuarios de la misma empresa
-        const userActual = auth.currentUser;
-        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
-        const empresaUsuario = userDoc.data().empresa;
+        // Log inicial
+        console.log('Iniciando carga de usuarios');
 
+        // Obtener usuario actual
+        const userActual = auth.currentUser;
+        if (!userActual) {
+            throw new Error('Usuario no autenticado');
+        }
+
+        // Log de usuario actual
+        console.log('Usuario actual:', userActual.uid, userActual.email);
+
+        // Obtener documento del usuario actual
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        
+        // Verificar existencia del documento
+        if (!userDoc.exists()) {
+            throw new Error('Documento de usuario no encontrado');
+        }
+
+        // Obtener empresa del usuario
+        const empresaUsuario = userDoc.data().empresa;
+        
+        // Log de empresa
+        console.log('Empresa del usuario:', empresaUsuario);
+
+        // Verificar que la empresa exista
+        if (!empresaUsuario) {
+            throw new Error('Empresa no definida para el usuario');
+        }
+
+        // Consulta de usuarios
         const usuariosRef = collection(db, 'usuarios');
         const q = query(
             usuariosRef, 
-            where('empresa', '==', empresaUsuario),
-            where('estado', '==', 'activo') // Solo usuarios activos
+            where('empresa', '==', empresaUsuario)
+            // Eliminar filtro de estado para mostrar todos los usuarios
         );
+
+        // Obtener snapshot de usuarios
         const querySnapshot = await getDocs(q);
+
+        // Log de usuarios encontrados
+        console.log(`Usuarios encontrados para ${empresaUsuario}:`, 
+            querySnapshot.docs.length
+        );
 
         // Limpiar select
         selectUsuarios.innerHTML = '<option value="">Seleccionar usuario</option>';
 
-        // Añadir usuarios
-        querySnapshot.forEach((doc) => {
-            const usuario = doc.data();
+        // Añadir usuarios ordenados alfabéticamente
+        const usuarios = querySnapshot.docs
+            .map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            .sort((a, b) => 
+                `${a.nombre} ${a.apellidos}`.localeCompare(`${b.nombre} ${b.apellidos}`)
+            );
+
+        // Añadir usuarios al select
+        usuarios.forEach((usuario) => {
             const option = document.createElement('option');
-            option.value = doc.id;
+            option.value = usuario.id;
             option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
+            
+            // Opcional: Deshabilitar usuarios inactivos
+            if (usuario.estado !== 'activo') {
+                option.disabled = true;
+                option.textContent += ' [Inactivo]';
+            }
+            
             selectUsuarios.appendChild(option);
         });
 
-        // Log de usuarios cargados
-        console.log(`Usuarios cargados para empresa ${empresaUsuario}:`, 
-            querySnapshot.docs.map(doc => doc.data().email)
+        // Log final
+        console.log('Usuarios cargados en el select:', 
+            Array.from(selectUsuarios.options)
+                .map(option => option.textContent)
         );
 
     } catch (error) {
-        console.error('Error al cargar usuarios:', error);
+        // Log de error detallado
+        console.error('Error COMPLETO al cargar usuarios:', {
+            message: error.message,
+            code: error.code,
+            stack: error.stack,
+            fullError: error
+        });
+
+        // Notificación de error
         Swal.fire({
             icon: 'error',
-            title: 'Error',
-            text: 'No se pudieron cargar los usuarios',
+            title: 'Error al Cargar Usuarios',
+            html: `
+                <p>No se pudieron cargar los usuarios:</p>
+                <strong>${error.message}</strong>
+            `,
             confirmButtonText: 'Entendido'
         });
     }
