@@ -2249,15 +2249,27 @@ async function cargarRegistrosPorUsuario() {
     listaRegistros.innerHTML = '';
     totalRegistros.textContent = '0';
 
-    if (!usuarioId) return;
+    if (!usuarioId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Por favor, selecciona un usuario.'
+        });
+        return;
+    }
 
     try {
         const registrosRef = collection(db, 'registros');
+        
+        // Obtener la fecha de hace 30 días
+        const fechaLimite = new Date();
+        fechaLimite.setDate(fechaLimite.getDate() - 30); // Restar 30 días
+
         const q = query(
             registrosRef,
             where('user_id', '==', usuarioId),
-            orderBy('fecha', 'desc'),
-            limit(50)
+            where('fecha', '>=', fechaLimite), // Filtrar registros desde hace 30 días
+            orderBy('fecha', 'desc')
         );
 
         const querySnapshot = await getDocs(q);
@@ -2266,46 +2278,58 @@ async function cargarRegistrosPorUsuario() {
         if (querySnapshot.empty) {
             listaRegistros.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center">No hay registros para este usuario</td>
+                    <td colspan="6" class="text-center">No hay registros para este usuario en el último mes</td>
                 </tr>
             `;
             return;
         }
 
+        // Agrupar registros por día
+        const registrosPorDia = {};
         querySnapshot.forEach((doc) => {
             const registro = doc.data();
             const fecha = registro.fecha.toDate();
+            const fechaKey = fecha.toISOString().split('T')[0]; // Formato YYYY-MM-DD
 
-            const fila = `
-                <tr data-id="${doc.id}">
-                    <td>${fecha.toLocaleString('es-ES')}</td>
-                    <td>${registro.nombre || 'N/A'}</td>
-                    <td>${registro.email || 'N/A'}</td>
-                    <td>${registro.accion_registro || 'N/A'}</td>
-                    <td>${calcularHorasTrabajadas(registro) || 'N/A'}</td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-info" onclick="agregarComentario('${doc.id}')">
-                                <i class="fas fa-comment"></i>
-                            </button>
-                            <button class="btn btn-sm btn-warning" onclick="editarRegistro('${doc.id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${doc.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            listaRegistros.insertAdjacentHTML('beforeend', fila);
+            if (!registrosPorDia[fechaKey]) {
+                registrosPorDia[fechaKey] = [];
+            }
+            registrosPorDia[fechaKey].push({
+                id: doc.id,
+                nombre: registro.nombre || 'N/A',
+                fechaInicio: registro.fechaInicio ? registro.fechaInicio.toDate().toLocaleString('es-ES') : 'N/A',
+                fechaFin: registro.fechaFin ? registro.fechaFin.toDate().toLocaleString('es-ES') : 'N/A',
+                horasTrabajadas: calcularHorasTrabajadas(registro) || 'N/A',
+                comentarios: registro.comentarios || 'N/A'
+            });
+        });
+
+        // Mostrar los días en orden descendente
+        const diasKeys = Object.keys(registrosPorDia).sort((a, b) => new Date(b) - new Date(a));
+        diasKeys.forEach(dia => {
+            const registros = registrosPorDia[dia];
+            const filaDia = `<tr><td colspan="6" class="text-center"><strong>${dia}</strong></td></tr>`;
+            listaRegistros.insertAdjacentHTML('beforeend', filaDia);
+
+            registros.forEach(registro => {
+                const filaRegistro = `
+                    <tr data-id="${registro.id}">
+                        <td>${registro.nombre}</td>
+                        <td>${registro.fechaInicio}</td>
+                        <td>${registro.fechaFin}</td>
+                        <td>${registro.horasTrabajadas}</td>
+                        <td>${registro.comentarios}</td>
+                    </tr>
+                `;
+                listaRegistros.insertAdjacentHTML('beforeend', filaRegistro);
+            });
         });
     } catch (error) {
         console.error('Error al cargar registros:', error);
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudieron cargar los registros'
+            text: 'No se pudieron cargar los registros. Intenta nuevamente más tarde.'
         });
     }
 }
