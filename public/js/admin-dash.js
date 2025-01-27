@@ -2691,7 +2691,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
             return;
         }*/
 
-        const userData = userDoc.data();
+       // const userData = userDoc.data();
 
         // Crear nuevo registro
         const nuevoRegistro = {
