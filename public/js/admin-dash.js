@@ -1783,6 +1783,7 @@ document.addEventListener('DOMContentLoaded', () => {
 //////////////////////////////////////////////////
 // Función para abrir el modal de registro manual
 // Función para abrir el modal de registro manual
+/*
 async function abrirModalRegistroManual() {
     try {
         // Verificar permisos (ROOT o ADMIN)
@@ -2185,3 +2186,266 @@ async function guardarRegistroManual(datos) {
 
 // Añadir al objeto window para acceso global
 window.abrirModalRegistroManual = abrirModalRegistroManual;
+*/
+// Cargar usuarios en el combo de selección
+async function cargarUsuariosEnCombo() {
+    try {
+        const selectUsuarios = document.getElementById('selectUsuario');
+        selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
+
+        const userActual = auth.currentUser;
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const empresaUsuario = userDoc.data().empresa;
+
+        const usuariosRef = collection(db, 'usuarios');
+        const q = query(
+            usuariosRef, 
+            where('empresa', '==', empresaUsuario),
+            orderBy('nombre')
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+            const usuario = doc.data();
+            const option = document.createElement('option');
+            option.value = doc.id;
+            option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
+            selectUsuarios.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los usuarios'
+        });
+    }
+}
+
+// Cargar registros por usuario seleccionado
+async function cargarRegistrosPorUsuario() {
+    const usuarioId = document.getElementById('selectUsuario').value;
+    const listaRegistros = document.getElementById('listaRegistros').getElementsByTagName('tbody')[0];
+    const totalRegistros = document.getElementById('totalRegistros');
+
+    // Limpiar tabla
+    listaRegistros.innerHTML = '';
+    totalRegistros.textContent = '0';
+
+    if (!usuarioId) return;
+
+    try {
+        const registrosRef = collection(db, 'registros');
+        const q = query(
+            registrosRef,
+            where('user_id', '==', usuarioId),
+            orderBy('fecha', 'desc'),
+            limit(50)
+        );
+
+        const querySnapshot = await getDocs(q);
+        totalRegistros.textContent = querySnapshot.size;
+
+        if (querySnapshot.empty) {
+            listaRegistros.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center">No hay registros para este usuario</td>
+                </tr>
+            `;
+            return;
+        }
+
+        querySnapshot.forEach((doc) => {
+            const registro = doc.data();
+            const fecha = registro.fecha.toDate();
+
+            const fila = `
+                <tr data-id="${doc.id}">
+                    <td>${fecha.toLocaleString('es-ES')}</td>
+                    <td>${registro.nombre || 'N/A'}</td>
+                    <td>${registro.email || 'N/A'}</td>
+                    <td>${registro.accion_registro || 'N/A'}</td>
+                    <td>${calcularHorasTrabajadas(registro) || 'N/A'}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-info" onclick="agregarComentario('${doc.id}')">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editarRegistro('${doc.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${doc.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            listaRegistros.insertAdjacentHTML('beforeend', fila);
+        });
+    } catch (error) {
+        console.error('Error al cargar registros:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los registros'
+        });
+    }
+}
+
+// Calcular horas trabajadas
+function calcularHorasTrabajadas(registro) {
+    // Implementar lógica de cálculo de horas
+    return 'Pendiente';
+}
+
+// Agregar comentario a un registro
+async function agregarComentario(registroId) {
+    const { value: comentario } = await Swal.fire({
+        title: 'Añadir Comentario',
+        input: 'textarea',
+        inputPlaceholder: 'Escribe un comentario...',
+        showCancelButton: true
+    });
+
+    if (comentario) {
+        try {
+            await updateDoc(doc(db, 'registros', registroId), {
+                comentario,
+                comentario_fecha: serverTimestamp()
+            });
+
+            Swal.fire('Comentario añadido', '', 'success');
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo añadir el comentario', 'error');
+        }
+    }
+}
+
+// Editar registro
+async function editarRegistro(registroId) {
+    // Implementar lógica de edición
+}
+
+// Eliminar registro
+async function eliminarRegistro(registroId) {
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esta acción",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, eliminar'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            // Eliminar el registro de Firestore
+            await deleteDoc(doc(db, 'registros', registroId));
+            
+            // Mostrar notificación de éxito
+            Swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success');
+            
+            // Recargar los registros después de la eliminación
+            cargarRegistrosPorUsuario();
+        } catch (error) {
+            console.error('Error al eliminar registro:', error);
+            Swal.fire('Error', 'No se pudo eliminar el registro', 'error');
+        }
+    }
+}
+
+// Función para abrir el modal de registro manual
+async function abrirModalRegistroManual() {
+    try {
+        const { value: formValues } = await Swal.fire({
+            title: 'Registro Manual',
+            html: `
+                <div class="swal-form">
+                    <label>Seleccionar Usuario:</label>
+                    <select id="swal-usuario" class="swal2-select" required>
+                        <option value="">Seleccione un usuario</option>
+                        <!-- Se llenará dinámicamente -->
+                    </select>
+                    <label>Tipo de Registro:</label>
+                    <select id="swal-tipo-registro" class="swal2-select" required>
+                        <option value="">Seleccionar tipo</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="salida">Salida</option>
+                        <option value="incidencia">Incidencia</option>
+                    </select>
+                    <label>Fecha y Hora:</label>
+                    <input type="datetime-local" id="swal-fecha-registro" class="swal2-input" required>
+                    <label>Justificación:</label>
+                    <textarea id="swal-justificacion" class="swal2-input" placeholder="Introduce una justificación" rows="3" required></textarea>
+                </div>
+            `,
+            focusConfirm: false,
+            preConfirm: () => {
+                return {
+                    usuario: document.getElementById('swal-usuario').value,
+                    tipoRegistro: document.getElementById('swal-tipo-registro').value,
+                    fechaRegistro: document.getElementById('swal-fecha-registro').value,
+                    justificacion: document.getElementById('swal-justificacion').value
+                };
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Guardar Registro',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (formValues) {
+            await guardarRegistroManual(formValues);
+        }
+    } catch (error) {
+        console.error('Error en registro manual:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message
+        });
+    }
+}
+
+// Función para guardar el registro manual
+async function guardarRegistroManual(datos) {
+    try {
+        const registroData = {
+            user_id: datos.usuario,
+            fecha: Timestamp.fromDate(new Date(datos.fechaRegistro)),
+            accion_registro: datos.tipoRegistro,
+            justificacion: datos.justificacion,
+            registrado_por: {
+                uid: auth.currentUser .uid,
+                email: auth.currentUser .email
+            },
+            empresa: window.empresaGlobal,
+            created_at: serverTimestamp()
+        };
+
+        await addDoc(collection(db, 'registros'), registroData);
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro Guardado',
+            text: 'El registro manual se ha guardado correctamente.'
+        });
+
+        // Recargar los registros después de guardar
+        cargarRegistrosPorUsuario();
+    } catch (error) {
+        console.error('Error al guardar registro manual:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo guardar el registro manual.'
+        });
+    }
+}
+
+// Llamar a la función para cargar usuarios en el combo al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    cargarUsuariosEnCombo(); // Cargar usuarios en el combo
+});
