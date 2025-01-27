@@ -2189,7 +2189,6 @@ async function guardarRegistroManual(datos) {
 window.abrirModalRegistroManual = abrirModalRegistroManual;
 */
 // Cargar usuarios en el combo de selección
-// Cargar usuarios en el combo de selección
 async function cargarUsuariosEnCombo(userId) {
     const selectUsuarios = document.getElementById('selectUsuario');
     selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
@@ -2202,6 +2201,9 @@ async function cargarUsuariosEnCombo(userId) {
         }
 
         const empresaUsuario = userDoc.data().empresa;
+        if (!empresaUsuario || typeof empresaUsuario !== 'string') {
+            throw new Error('El campo "empresa" no está definido o no es válido.');
+        }
 
         // Consultar usuarios de la misma empresa
         const usuariosRef = collection(db, 'usuarios');
@@ -2237,6 +2239,7 @@ async function cargarUsuariosEnCombo(userId) {
         });
     }
 }
+
 
 // Cargar registros por usuario seleccionado
 async function cargarRegistrosPorUsuario() {
