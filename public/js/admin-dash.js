@@ -2623,7 +2623,8 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
       });
   
       // Opcional: Actualizar la tabla en pantalla sin recargar
-      agregarRegistroATabla(nuevoRegistro, docRef.id);
+      //agregarRegistroATabla(nuevoRegistro, docRef.id);
+      await cargarUsuariosEnCombo();
   
       // Actualizar el contador de registros
       const totalRegistros = document.getElementById('totalRegistros');
