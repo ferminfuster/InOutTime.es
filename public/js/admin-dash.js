@@ -2193,18 +2193,18 @@ async function cargarUsuariosEnCombo() {
     const selectUsuarios = document.getElementById('selectUsuario');
     selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
 
-/*    const userActual = auth.currentUser ;
-    if (!userActual) {
-        console.error('No hay usuario autenticado');
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo cargar los usuarios porque no hay un usuario autenticado.'
-        });
-        return; // Salir de la función si no hay usuario
-    }*/
-
     try {
+        const userActual = auth.currentUser ; // Obtener el usuario actual aquí
+        if (!userActual) {
+            console.error('No hay usuario autenticado');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo cargar los usuarios porque no hay un usuario autenticado.'
+            });
+            return; // Salir de la función si no hay usuario
+        }
+
         const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
         const empresaUsuario = userDoc.data().empresa;
 
