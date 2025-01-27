@@ -2239,7 +2239,14 @@ async function cargarUsuariosEnCombo() {
     }
 }
 
-// Cargar registros por usuario seleccionado
+// Obtener el primer y último día del mes en curso
+function obtenerRangoMesActual() {
+    const fechaActual = new Date();
+    const primerDia = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+    const ultimoDia = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+    return { primerDia, ultimoDia };
+}
+
 async function cargarRegistrosPorUsuario() {
     const usuarioId = document.getElementById('selectUsuario').value;
     const listaRegistros = document.getElementById('listaRegistros').getElementsByTagName('tbody')[0];
@@ -2249,27 +2256,17 @@ async function cargarRegistrosPorUsuario() {
     listaRegistros.innerHTML = '';
     totalRegistros.textContent = '0';
 
-    if (!usuarioId) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: 'Por favor, selecciona un usuario.'
-        });
-        return;
-    }
+    if (!usuarioId) return;
 
     try {
+        const { primerDia, ultimoDia } = obtenerRangoMesActual();
         const registrosRef = collection(db, 'registros');
-        
-        // Obtener la fecha de hace 30 días
-        const fechaLimite = new Date();
-        fechaLimite.setDate(fechaLimite.getDate() - 30); // Restar 30 días
-
         const q = query(
             registrosRef,
             where('user_id', '==', usuarioId),
-            where('fecha', '>=', fechaLimite), // Filtrar registros desde hace 30 días
-            orderBy('fecha', 'desc')
+            where('fecha', '>=', primerDia),
+            where('fecha', '<=', ultimoDia),
+            orderBy('fecha', 'asc')
         );
 
         const querySnapshot = await getDocs(q);
@@ -2278,68 +2275,70 @@ async function cargarRegistrosPorUsuario() {
         if (querySnapshot.empty) {
             listaRegistros.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center">No hay registros para este usuario en el último mes</td>
+                    <td colspan="6" class="text-center">No hay registros para este usuario este mes</td>
                 </tr>
             `;
             return;
         }
 
-        // Agrupar registros por día
-        const registrosPorDia = {};
         querySnapshot.forEach((doc) => {
             const registro = doc.data();
             const fecha = registro.fecha.toDate();
-            const fechaKey = fecha.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+            const horaInicio = registro.hora_inicio?.toDate(); // Verificar si existe
+            const horaFin = registro.hora_fin?.toDate(); // Verificar si existe
 
-            if (!registrosPorDia[fechaKey]) {
-                registrosPorDia[fechaKey] = [];
-            }
-            registrosPorDia[fechaKey].push({
-                id: doc.id,
-                nombre: registro.nombre || 'N/A',
-                fechaInicio: registro.fechaInicio ? registro.fechaInicio.toDate().toLocaleString('es-ES') : 'N/A',
-                fechaFin: registro.fechaFin ? registro.fechaFin.toDate().toLocaleString('es-ES') : 'N/A',
-                horasTrabajadas: calcularHorasTrabajadas(registro) || 'N/A',
-                comentarios: registro.comentarios || 'N/A'
-            });
-        });
+            // Calcular horas trabajadas
+            const horasTrabajadas = horaInicio && horaFin
+                ? ((horaFin - horaInicio) / (1000 * 60 * 60)).toFixed(2)
+                : 'N/A';
 
-        // Mostrar los días en orden descendente
-        const diasKeys = Object.keys(registrosPorDia).sort((a, b) => new Date(b) - new Date(a));
-        diasKeys.forEach(dia => {
-            const registros = registrosPorDia[dia];
-            const filaDia = `<tr><td colspan="6" class="text-center"><strong>${dia}</strong></td></tr>`;
-            listaRegistros.insertAdjacentHTML('beforeend', filaDia);
-
-            registros.forEach(registro => {
-                const filaRegistro = `
-                    <tr data-id="${registro.id}">
-                        <td>${registro.nombre}</td>
-                        <td>${registro.fechaInicio}</td>
-                        <td>${registro.fechaFin}</td>
-                        <td>${registro.horasTrabajadas}</td>
-                        <td>${registro.comentarios}</td>
-                    </tr>
-                `;
-                listaRegistros.insertAdjacentHTML('beforeend', filaRegistro);
-            });
+            const fila = `
+                <tr data-id="${doc.id}">
+                    <td>${fecha.toLocaleString('es-ES')}</td>
+                    <td>${horaInicio ? horaInicio.toLocaleTimeString('es-ES') : 'N/A'}</td>
+                    <td>${horaFin ? horaFin.toLocaleTimeString('es-ES') : 'N/A'}</td>
+                    <td>${horasTrabajadas}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-info" onclick="agregarComentario('${doc.id}')">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editarRegistro('${doc.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${doc.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            listaRegistros.insertAdjacentHTML('beforeend', fila);
         });
     } catch (error) {
         console.error('Error al cargar registros:', error);
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudieron cargar los registros. Intenta nuevamente más tarde.'
+            text: 'No se pudieron cargar los registros'
         });
     }
 }
 
+
 window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
 // Calcular horas trabajadas
 function calcularHorasTrabajadas(registro) {
-    // Implementar lógica de cálculo de horas
-    return 'Pendiente';
+    const horaInicio = registro.hora_inicio?.toDate();
+    const horaFin = registro.hora_fin?.toDate();
+
+    if (horaInicio && horaFin) {
+        const diferencia = (horaFin - horaInicio) / (1000 * 60 * 60); // Diferencia en horas
+        return diferencia.toFixed(2); // Retornar con 2 decimales
+    }
+    return 'N/A';
 }
+
 
 // Agregar comentario a un registro
 async function agregarComentario(registroId) {
