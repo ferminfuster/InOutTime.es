@@ -2519,6 +2519,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /////////////////////////////////
 // AGREGAR REGISTRO MANUAL//
 ////////////////////////////
+window.mostrarFormularioRegistroManual = mostrarFormularioRegistroManual;
 async function mostrarFormularioRegistroManual() {
     const { value: formValues } = await Swal.fire({
         title: 'Agregar Registro Manual',
