@@ -2195,10 +2195,10 @@ async function cargarUsuariosEnCombo() {
 
     try {
         // Obtener el usuario actual
-        const userActual = auth.currentUser ;
-        if (!userActual) {
-            throw new Error('No hay usuario autenticado');
-        }
+      //  const userActual = auth.currentUser ;
+      //  if (!userActual) {
+        //    throw new Error('No hay usuario autenticado');
+       // }
 
         // Obtener los datos del usuario actual desde Firestore
         const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
