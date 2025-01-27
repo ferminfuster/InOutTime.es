@@ -2297,7 +2297,6 @@ async function cargarRegistrosPorUsuario() {
                         <td>${hora}</td> <!-- Mostrar la hora de cada acción -->
                         <td>${registro.accion_registro || 'N/A'}</td>
                         <td>${registro.comentario || 'Sin Comentarios'}</td>
-                        <td>${hora}</td> <!-- Mostrar la hora de cada acción -->
                         <td>${index === 0 ? horasTrabajadas : ''}</td> <!-- Mostrar las horas trabajadas solo en la primera fila -->
                         <td>
                             <div class="btn-group">
