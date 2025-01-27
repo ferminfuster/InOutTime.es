@@ -2263,7 +2263,7 @@ async function cargarRegistrosPorUsuario() {
         const q = query(
             registrosRef,
             where('userId', '==', usuarioId), // Asegúrate de que este campo coincida con tus datos
-            orderBy('fecha', 'asc'), // Ordenamos por fecha de forma ascendente para facilitar el cálculo
+            orderBy('fecha', 'desc'), // Orden descendente por fecha
             limit(100) // Aumentamos el límite si es necesario
         );
 
@@ -2289,12 +2289,15 @@ async function cargarRegistrosPorUsuario() {
 
             registros.forEach((registro, index) => {
                 const fecha = registro.fecha?.toDate();
+                const hora = fecha ? fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A'; // Formato de hora
                 const fila = `
                     <tr data-id="${registro.id}">
                         <td>${index === 0 ? dia : ''}</td> <!-- Mostrar el día solo en la primera fila -->
                         <td>${registro.email || 'N/A'}</td>
+                        <td>${hora}</td> <!-- Mostrar la hora de cada acción -->
                         <td>${registro.accion_registro || 'N/A'}</td>
                         <td>${registro.comentario || 'Sin Comentarios'}</td>
+                        <td>${hora}</td> <!-- Mostrar la hora de cada acción -->
                         <td>${index === 0 ? horasTrabajadas : ''}</td> <!-- Mostrar las horas trabajadas solo en la primera fila -->
                         <td>
                             <div class="btn-group">
@@ -2323,6 +2326,7 @@ async function cargarRegistrosPorUsuario() {
         });
     }
 }
+
 
 
 // Función para agrupar registros por día
