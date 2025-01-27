@@ -2324,6 +2324,7 @@ async function cargarRegistrosPorUsuario() {
     }
 }
 
+
 // Función para agrupar registros por día
 function agruparRegistrosPorDia(querySnapshot) {
     const registrosPorDia = {};
@@ -2361,9 +2362,60 @@ function calcularHorasTrabajadas(registros) {
 }
 
 
-
 window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
 
+/////////////////////
+// Función para eliminar un registro
+async function eliminarRegistro(docId) {
+    // Confirmar acción con el usuario
+    const confirmacion = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción eliminará el registro de forma permanente.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+    });
+
+    if (!confirmacion.isConfirmed) {
+        return; // Si el usuario cancela, no se elimina nada
+    }
+
+    try {
+        // Referencia al documento a eliminar
+        const registroRef = doc(db, 'registros', docId);
+
+        // Eliminar el registro de Firestore
+        await deleteDoc(registroRef);
+
+        // Actualizar la tabla visualmente eliminando la fila correspondiente
+        const fila = document.querySelector(`tr[data-id="${docId}"]`);
+        if (fila) {
+            fila.remove();
+        }
+
+        // Actualizar el contador total de registros
+        const totalRegistros = document.getElementById('totalRegistros');
+        if (totalRegistros) {
+            totalRegistros.textContent = parseInt(totalRegistros.textContent) - 1;
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro eliminado',
+            text: 'El registro se eliminó correctamente.',
+        });
+    } catch (error) {
+        console.error('Error al eliminar registro:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo eliminar el registro. Intenta nuevamente.',
+        });
+    }
+}
 
 
 // Agregar comentario a un registro
