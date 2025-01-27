@@ -2189,47 +2189,60 @@ async function guardarRegistroManual(datos) {
 window.abrirModalRegistroManual = abrirModalRegistroManual;
 */
 // Cargar usuarios en el combo de selección
-// Cargar usuarios en el combo de selección
 async function cargarUsuariosEnCombo() {
     const selectUsuarios = document.getElementById('selectUsuario');
-    selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
+    selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>'; // Limpiar opciones anteriores
 
     try {
-        console.log("Cargando usuarios para el combo...");
-
-        if (!window.empresaGlobal) {
-            throw new Error("Empresa no definida en el contexto global");
+        // Obtener el usuario actual
+        const userActual = auth.currentUser ;
+        if (!userActual) {
+            throw new Error('No hay usuario autenticado');
         }
 
+        // Obtener los datos del usuario actual desde Firestore
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        if (!userDoc.exists()) {
+            throw new Error('Documento de usuario no encontrado');
+        }
+
+        const empresaUsuario = userDoc.data().empresa;
+
+        // Consultar usuarios de la misma empresa
         const usuariosRef = collection(db, 'usuarios');
-        const q = query(usuariosRef, where('empresa', '==', window.empresaGlobal));
+        const q = query(usuariosRef, where('empresa', '==', empresaUsuario));
+
         const querySnapshot = await getDocs(q);
 
-        console.log(`Usuarios encontrados en ${window.empresaGlobal}: ${querySnapshot.size}`);
-
+        // Verificar si hay usuarios
         if (querySnapshot.empty) {
-            console.warn("No hay usuarios disponibles para la empresa");
+            console.warn('No se encontraron usuarios para la empresa:', empresaUsuario);
             selectUsuarios.innerHTML += '<option value="">No hay usuarios disponibles</option>';
             return;
         }
 
+        // Llenar el select con los usuarios
         querySnapshot.forEach((doc) => {
             const usuario = doc.data();
-            if (usuario && usuario.nombre && usuario.email) { // Verificar que los datos sean válidos
+            if (usuario && usuario.nombre && usuario.email) { // Verificar que los campos existan
                 const option = document.createElement('option');
                 option.value = doc.id;
                 option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
                 selectUsuarios.appendChild(option);
             } else {
-                console.warn("Usuario con datos incompletos:", usuario);
+                console.warn('Usuario sin datos válidos:', usuario);
             }
         });
+
+        // Actualizar el contador de usuarios si es necesario
+        document.getElementById('totalUsuarios').textContent = querySnapshot.size;
+
     } catch (error) {
-        console.error('Error al cargar usuarios en el combo:', error);
+        console.error('Error al cargar usuarios:', error);
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: `No se pudieron cargar los usuarios: ${error.message}`
+            text: 'No se pudieron cargar los usuarios'
         });
     }
 }
