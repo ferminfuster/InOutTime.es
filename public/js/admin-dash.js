@@ -2190,7 +2190,6 @@ window.abrirModalRegistroManual = abrirModalRegistroManual;
 */
 // Cargar usuarios en el combo de selección
 // Cargar usuarios en el combo de selección
-// Cargar usuarios en el combo de selección
 async function cargarUsuariosEnCombo(userId) {
     const selectUsuarios = document.getElementById('selectUsuario');
     selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
@@ -2210,13 +2209,24 @@ async function cargarUsuariosEnCombo(userId) {
 
         const querySnapshot = await getDocs(q);
 
+        // Verificar si hay usuarios
+        if (querySnapshot.empty) {
+            console.warn('No se encontraron usuarios para la empresa:', empresaUsuario);
+            selectUsuarios.innerHTML += '<option value="">No hay usuarios disponibles</option>';
+            return;
+        }
+
         // Llenar el select con los usuarios
         querySnapshot.forEach((doc) => {
             const usuario = doc.data();
-            const option = document.createElement('option');
-            option.value = doc.id;
-            option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
-            selectUsuarios.appendChild(option);
+            if (usuario && usuario.nombre && usuario.email) { // Verificar que los campos existan
+                const option = document.createElement('option');
+                option.value = doc.id;
+                option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
+                selectUsuarios.appendChild(option);
+            } else {
+                console.warn('Usuario sin datos válidos:', usuario);
+            }
         });
     } catch (error) {
         console.error('Error al cargar usuarios:', error);
