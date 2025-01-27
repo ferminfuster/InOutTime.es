@@ -2526,9 +2526,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarUsuariosEnCombo(); // Cargar usuarios en el combo
 });
 */
-/////////////////////////////////
-// AGREGAR REGISTRO MANUAL//
-////////////////////////////
+// Mostrar formulario para agregar registro manual
 window.mostrarFormularioRegistroManual = mostrarFormularioRegistroManual;
 async function mostrarFormularioRegistroManual() {
     const { value: formValues } = await Swal.fire({
@@ -2544,7 +2542,7 @@ async function mostrarFormularioRegistroManual() {
             </div>
             <div class="form-group">
                 <label for="registroFecha">Fecha y Hora:</label>
-                <input type="datetime-local" id="registroFecha" class="swal2-input form-control">
+                <input type="datetime-local" id="registroFecha" class="swal2-input form-control" required>
             </div>
             <div class="form-group">
                 <label for="registroComentarios">Comentarios:</label>
@@ -2579,11 +2577,11 @@ async function mostrarFormularioRegistroManual() {
         await agregarRegistroManual(email, formValues);
     }
 }
-///// FIN MODAL ////
-////// INICIO AGREGAR ////
+
+// Función para agregar registro manual
 async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
     try {
-        // Obtener el usuario desde su email (si lo tienes en Firestore)
+        // Obtener el usuario desde su email
         const userDoc = await getDoc(doc(db, "usuarios", usuarioEmail));
         
         if (!userDoc.exists()) {
@@ -2600,7 +2598,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         // Crear nuevo registro
         const nuevoRegistro = {
             userId: userDoc.id,  // Usa el ID del documento en Firestore
-            accion_registro: accion,
+			accion_registro: accion,
             fecha: new Date(fecha).toISOString(),  // Convierte la fecha correctamente
             lugar: 'Oficina Principal',  // Lugar fijo por ahora, puedes modificarlo si es necesario
             email: userData.email,
@@ -2620,10 +2618,13 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         });
 
         // Opcional: Actualizar la tabla en pantalla sin recargar
-        //agregarRegistroATabla(nuevoRegistro, docRef.id);
+        // agregarRegistroATabla(nuevoRegistro, docRef.id);
+        
         // Actualizar el contador de registros
         const totalRegistros = document.getElementById('totalRegistros');
-        totalRegistros.textContent = parseInt(totalRegistros.textContent) + 1;
+        if (totalRegistros) {
+            totalRegistros.textContent = parseInt(totalRegistros.textContent) + 1;
+        }
 
     } catch (error) {
         console.error('Error al agregar registro:', error);
