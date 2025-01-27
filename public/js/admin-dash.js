@@ -2680,7 +2680,7 @@ async function mostrarFormularioRegistroManual() {
 async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
     try {
         // Obtener el usuario desde su email
-        const userDoc = await getDoc(doc(db, "usuarios", usuarioEmail));
+      /*  const userDoc = await getDoc(doc(db, "usuarios", usuarioEmail));
         
         if (!userDoc.exists()) {
             Swal.fire({
@@ -2689,7 +2689,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
                 text: 'No se pudo encontrar el usuario con el email proporcionado.',
             });
             return;
-        }
+        }*/
 
         const userData = userDoc.data();
 
