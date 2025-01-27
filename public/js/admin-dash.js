@@ -2351,11 +2351,16 @@ function calcularHorasTrabajadas(registros) {
     let horasTrabajadas = 0;
     let horaEntrada = null;
 
+    // Ordenar registros por fecha ascendente
+    registros.sort((a, b) => a.fecha?.toDate() - b.fecha?.toDate());
+
     registros.forEach((registro) => {
+        const fechaRegistro = registro.fecha?.toDate();
+
         if (registro.accion_registro === 'entrada') {
-            horaEntrada = registro.fecha?.toDate();
+            horaEntrada = fechaRegistro;
         } else if (registro.accion_registro === 'salida' && horaEntrada) {
-            const horaSalida = registro.fecha?.toDate();
+            const horaSalida = fechaRegistro;
             horasTrabajadas += (horaSalida - horaEntrada) / (1000 * 60 * 60); // Diferencia en horas
             horaEntrada = null; // Reiniciar para la siguiente entrada
         }
@@ -2363,6 +2368,7 @@ function calcularHorasTrabajadas(registros) {
 
     return horasTrabajadas > 0 ? horasTrabajadas.toFixed(2) + ' hrs' : 'N/A';
 }
+
 
 
 window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
