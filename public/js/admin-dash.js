@@ -2308,6 +2308,8 @@ async function cargarRegistrosPorUsuario() {
         });
     }
 }
+
+window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
 // Calcular horas trabajadas
 function calcularHorasTrabajadas(registro) {
     // Implementar lógica de cálculo de horas
