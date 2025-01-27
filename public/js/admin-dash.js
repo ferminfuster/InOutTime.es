@@ -2531,6 +2531,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ////////////////////////////
 window.mostrarFormularioRegistroManual = mostrarFormularioRegistroManual;
 async function mostrarFormularioRegistroManual() {
+    await cargarUsuariosEnCombo(); 
     const { value: formValues } = await Swal.fire({
         title: 'Agregar Registro Manual',
         html: `
