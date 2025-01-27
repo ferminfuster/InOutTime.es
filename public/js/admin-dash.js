@@ -2598,7 +2598,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         // Crear nuevo registro
         const nuevoRegistro = {
             userId: userDoc.id,  // Usa el ID del documento en Firestore
-			accion_registro: accion,
+            accion_registro: accion,
             fecha: new Date(fecha).toISOString(),  // Convierte la fecha correctamente
             lugar: 'Oficina Principal',  // Lugar fijo por ahora, puedes modificarlo si es necesario
             email: userData.email,
@@ -2617,9 +2617,6 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
             text: 'El registro se agregó correctamente.',
         });
 
-        // Opcional: Actualizar la tabla en pantalla sin recargar
-        // agregarRegistroATabla(nuevoRegistro, docRef.id);
-        
         // Actualizar el contador de registros
         const totalRegistros = document.getElementById('totalRegistros');
         if (totalRegistros) {
@@ -2635,8 +2632,6 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         });
     }
 }
-
-
 
 /* Función para agregar el registro a la tabla
 function agregarRegistroATabla(registro, docId) {
