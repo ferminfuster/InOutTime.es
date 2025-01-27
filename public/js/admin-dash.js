@@ -2189,65 +2189,54 @@ async function guardarRegistroManual(datos) {
 window.abrirModalRegistroManual = abrirModalRegistroManual;
 */
 // Cargar usuarios en el combo de selección
+// Cargar usuarios en el combo de selección
 async function cargarUsuariosEnCombo() {
     const selectUsuarios = document.getElementById('selectUsuario');
-    selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>'; // Limpiar opciones anteriores
+    selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
 
     try {
-        // Obtener el usuario actual
-      //  const userActual = auth.currentUser ;
-      //  if (!userActual) {
-        //    throw new Error('No hay usuario autenticado');
-       // }
+        console.log("Iniciando carga de usuarios en el combo");
 
-        // Obtener los datos del usuario actual desde Firestore
-        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
-        if (!userDoc.exists()) {
-            throw new Error('Documento de usuario no encontrado');
+        // Verificar si la empresa global está definida
+        if (!window.empresaGlobal) {
+            throw new Error("Empresa no definida");
         }
-
-        const empresaUsuario = userDoc.data().empresa;
 
         // Consultar usuarios de la misma empresa
         const usuariosRef = collection(db, 'usuarios');
-        const q = query(usuariosRef, where('empresa', '==', empresaUsuario));
-
+        const q = query(usuariosRef, where('empresa', '==', window.empresaGlobal));
         const querySnapshot = await getDocs(q);
 
-        // Verificar si hay usuarios
+        console.log(`Número de usuarios encontrados en ${window.empresaGlobal}: ${querySnapshot.size}`);
+
+        // Verificar si no hay usuarios
         if (querySnapshot.empty) {
-            console.warn('No se encontraron usuarios para la empresa:', empresaUsuario);
-            selectUsuarios.innerHTML += '<option value="">No hay usuarios disponibles</option>';
+            console.log("No hay usuarios registrados en la empresa");
             return;
         }
 
         // Llenar el select con los usuarios
         querySnapshot.forEach((doc) => {
             const usuario = doc.data();
-            if (usuario && usuario.nombre && usuario.email) { // Verificar que los campos existan
-                const option = document.createElement('option');
-                option.value = doc.id;
-                option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
-                selectUsuarios.appendChild(option);
-            } else {
-                console.warn('Usuario sin datos válidos:', usuario);
-            }
+            const option = document.createElement('option');
+            option.value = doc.id; // Usar el ID del documento como valor
+            option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
+            selectUsuarios.appendChild(option);
         });
 
-        // Actualizar el contador de usuarios si es necesario
-        document.getElementById('totalUsuarios').textContent = querySnapshot.size;
-
+        console.log("Usuarios cargados en el combo correctamente");
     } catch (error) {
-        console.error('Error al cargar usuarios:', error);
+        console.error("Error al cargar usuarios en el combo:", error);
+
+        // Mostrar mensaje de error en la interfaz
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudieron cargar los usuarios'
+            text: 'No se pudieron cargar los usuarios en el combo',
+            confirmButtonText: 'Entendido'
         });
     }
 }
-
-
 
 // Cargar registros por usuario seleccionado
 async function cargarRegistrosPorUsuario() {
