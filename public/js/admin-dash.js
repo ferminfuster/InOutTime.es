@@ -2292,10 +2292,9 @@ async function cargarRegistrosPorUsuario() {
                 const fila = `
                     <tr data-id="${registro.id}">
                         <td>${index === 0 ? dia : ''}</td> <!-- Mostrar el día solo en la primera fila -->
-                        <td>${registro.nombre || 'N/A'}</td>
                         <td>${registro.email || 'N/A'}</td>
                         <td>${registro.accion_registro || 'N/A'}</td>
-                        <td>${registro.lugar || 'N/A'}</td>
+                        <td>${registro.comentario || 'Comentario'}</td>
                         <td>${index === 0 ? horasTrabajadas : ''}</td> <!-- Mostrar las horas trabajadas solo en la primera fila -->
                         <td>
                             <div class="btn-group">
