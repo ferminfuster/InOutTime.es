@@ -77,7 +77,7 @@ onAuthStateChanged(auth, async (user) => {
 
                     // Llamar a la función cargarUsuarios
                     await cargarUsuarios();
-                    await cargarUsuariosEnCombo()
+                    
                     
                     // Usar una notificación más moderna
                     Swal.fire({
@@ -89,6 +89,7 @@ onAuthStateChanged(auth, async (user) => {
                         showConfirmButton: false,
                         timer: 3000
                     });
+                    await cargarUsuariosEnCombo()
                 } else {
                     // Redirigir si no es admin
                     handleUnauthorizedAccess();
