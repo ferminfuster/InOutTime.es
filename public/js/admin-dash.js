@@ -2192,7 +2192,7 @@ window.abrirModalRegistroManual = abrirModalRegistroManual;
 // Cargar usuarios en el combo de selección
 async function cargarUsuariosEnCombo() {
     const selectUsuarios = document.getElementById('selectUsuario');
-    selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>'; // Limpiar opciones anteriores
+    selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
 
     try {
         console.log("Iniciando carga de usuarios en el combo");
@@ -2229,54 +2229,14 @@ async function cargarUsuariosEnCombo() {
         console.error("Error al cargar usuarios en el combo:", error);
 
         // Mostrar mensaje de error en la interfaz
-        async function cargarUsuariosEnCombo() {
-    const selectUsuarios = document.getElementById('selectUsuario');
-    selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>'; // Limpiar opciones anteriores
-
-    try {
-        console.log("Iniciando carga de usuarios en el combo");
-
-        // Verificar si la empresa global está definida
-        if (!window.empresaGlobal) {
-            throw new Error("Empresa no definida");
-        }
-
-        // Consultar usuarios de la misma empresa
-        const usuariosRef = collection(db, 'usuarios');
-        const q = query(usuariosRef, where('empresa', '==', window.empresaGlobal));
-        const querySnapshot = await getDocs(q);
-
-        console.log(`Número de usuarios encontrados en ${window.empresaGlobal}: ${querySnapshot.size}`);
-
-        // Verificar si no hay usuarios
-        if (querySnapshot.empty) {
-            console.log("No hay usuarios registrados en la empresa");
-            return;
-        }
-
-        // Llenar el select con los usuarios
-        querySnapshot.forEach((doc) => {
-            const usuario = doc.data();
-            const option = document.createElement('option');
-            option.value = doc.id; // Usar el ID del documento como valor
-            option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
-            selectUsuarios.appendChild(option);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los usuarios en el combo',
+            confirmButtonText: 'Entendido'
         });
-
-        console.log("Usuarios cargados en el combo correctamente");
-    } catch (error) {
-        console.error("Error al cargar usuarios en el combo:", error);
-
-        // Mostrar mensaje de error en la interfaz
-                // Mostrar mensaje de error en la interfaz
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'No se pudieron cargar los usuarios en el combo',
-                    confirmButtonText: 'Entendido'
-                });
-            }
-        }
+    }
+}
 
 // Cargar registros por usuario seleccionado
 async function cargarRegistrosPorUsuario() {
@@ -2498,8 +2458,9 @@ async function guardarRegistroManual(datos) {
         });
     }
 }
-
+/*
 // Llamar a la función para cargar usuarios en el combo al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     cargarUsuariosEnCombo(); // Cargar usuarios en el combo
 });
+*/
