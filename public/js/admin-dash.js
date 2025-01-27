@@ -2531,7 +2531,6 @@ document.addEventListener('DOMContentLoaded', () => {
 ////////////////////////////
 window.mostrarFormularioRegistroManual = mostrarFormularioRegistroManual;
 async function mostrarFormularioRegistroManual() {
-    await cargarUsuariosEnCombo(); 
     const { value: formValues } = await Swal.fire({
         title: 'Agregar Registro Manual',
         html: `
@@ -2552,10 +2551,8 @@ async function mostrarFormularioRegistroManual() {
                 <input type="text" id="registroComentarios" class="swal2-input form-control" placeholder="Opcional">
             </div>
             <div class="form-group">
-                <label for="selectUsuario">Seleccionar Usuario:</label>
-                <select id="selectUsuario" class="swal2-input form-control">
-                    <option value="">Cargando...</option>
-                </select>
+                <label for="registroEmail">Email del Usuario:</label>
+                <input type="email" id="registroEmail" class="swal2-input form-control" placeholder="Ingrese el email del usuario" required>
             </div>
         `,
         focusConfirm: false,
@@ -2566,29 +2563,20 @@ async function mostrarFormularioRegistroManual() {
             const accion = document.getElementById('registroAccion').value;
             const fecha = document.getElementById('registroFecha').value;
             const comentarios = document.getElementById('registroComentarios').value;
+            const email = document.getElementById('registroEmail').value;
 
-            if (!accion || !fecha) {
+            if (!accion || !fecha || !email) {
                 Swal.showValidationMessage('Por favor, completa todos los campos obligatorios.');
                 return;
             }
 
-            return { accion, fecha, comentarios };
+            return { accion, fecha, comentarios, email };
         },
     });
 
     if (formValues) {
-        const usuarioSeleccionado = document.getElementById('selectUsuario').value;
-
-        if (!usuarioSeleccionado) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Por favor selecciona un usuario antes de agregar un registro.',
-            });
-            return;
-        }
-
-        agregarRegistroManual(usuarioSeleccionado, formValues);
+        const { email } = formValues;
+        await agregarRegistroManual(email, formValues);
     }
 }
 ///// FIN MODAL ////
@@ -2633,7 +2621,6 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
 
         // Opcional: Actualizar la tabla en pantalla sin recargar
         //agregarRegistroATabla(nuevoRegistro, docRef.id);
-        await cargarUsuariosEnCombo
         // Actualizar el contador de registros
         const totalRegistros = document.getElementById('totalRegistros');
         totalRegistros.textContent = parseInt(totalRegistros.textContent) + 1;
@@ -2647,6 +2634,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         });
     }
 }
+
 
 
 /* Función para agregar el registro a la tabla
