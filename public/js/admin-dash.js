@@ -2262,9 +2262,9 @@ async function cargarRegistrosPorUsuario() {
         const registrosRef = collection(db, 'registros');
         const q = query(
             registrosRef,
-            where('userId', '==', usuarioId), // Campo correcto según tus datos
-            orderBy('fecha', 'desc'),
-            limit(50)
+            where('userId', '==', usuarioId), // Asegúrate de que este campo coincida con tus datos
+            orderBy('fecha', 'asc'), // Ordenamos por fecha de forma ascendente para facilitar el cálculo
+            limit(100) // Aumentamos el límite si es necesario
         );
 
         const querySnapshot = await getDocs(q);
@@ -2279,33 +2279,41 @@ async function cargarRegistrosPorUsuario() {
             return;
         }
 
-        querySnapshot.forEach((doc) => {
-            const registro = doc.data();
-            const fecha = registro.fecha?.toDate();
+        // Procesar registros y agrupar por días
+        const registrosPorDia = agruparRegistrosPorDia(querySnapshot);
 
-            const fila = `
-                <tr data-id="${doc.id}">
-                    <td>${fecha?.toLocaleString('es-ES') || 'N/A'}</td>
-                    <td>${registro.nombre || 'N/A'}</td>
-                    <td>${registro.email || 'N/A'}</td>
-                    <td>${registro.accion_registro || 'N/A'}</td>
-                    <td>${registro.lugar || 'N/A'}</td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-info" onclick="agregarComentario('${doc.id}')">
-                                <i class="fas fa-comment"></i>
-                            </button>
-                            <button class="btn btn-sm btn-warning" onclick="editarRegistro('${doc.id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${doc.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            listaRegistros.insertAdjacentHTML('beforeend', fila);
+        // Renderizar tabla
+        Object.keys(registrosPorDia).forEach((dia) => {
+            const registros = registrosPorDia[dia];
+            const horasTrabajadas = calcularHorasTrabajadas(registros);
+
+            registros.forEach((registro, index) => {
+                const fecha = registro.fecha?.toDate();
+                const fila = `
+                    <tr data-id="${registro.id}">
+                        <td>${index === 0 ? dia : ''}</td> <!-- Mostrar el día solo en la primera fila -->
+                        <td>${registro.nombre || 'N/A'}</td>
+                        <td>${registro.email || 'N/A'}</td>
+                        <td>${registro.accion_registro || 'N/A'}</td>
+                        <td>${registro.lugar || 'N/A'}</td>
+                        <td>${index === 0 ? horasTrabajadas : ''}</td> <!-- Mostrar las horas trabajadas solo en la primera fila -->
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
+                                    <i class="fas fa-comment"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="editarRegistro('${registro.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${registro.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                listaRegistros.insertAdjacentHTML('beforeend', fila);
+            });
         });
     } catch (error) {
         console.error('Error al cargar registros:', error);
@@ -2317,26 +2325,46 @@ async function cargarRegistrosPorUsuario() {
     }
 }
 
+// Función para agrupar registros por día
+function agruparRegistrosPorDia(querySnapshot) {
+    const registrosPorDia = {};
 
+    querySnapshot.forEach((doc) => {
+        const registro = { ...doc.data(), id: doc.id };
+        const fecha = registro.fecha?.toDate();
+        const dia = fecha?.toLocaleDateString('es-ES');
 
-window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
-// Calcular horas trabajadas
-function calcularHorasTrabajadas(acciones) {
+        if (!registrosPorDia[dia]) {
+            registrosPorDia[dia] = [];
+        }
+        registrosPorDia[dia].push(registro);
+    });
+
+    return registrosPorDia;
+}
+
+// Función para calcular horas trabajadas a partir de registros de un día
+function calcularHorasTrabajadas(registros) {
     let horasTrabajadas = 0;
     let horaEntrada = null;
 
-    acciones.forEach((accion) => {
-        if (accion.accion_registro === 'entrada') {
-            horaEntrada = accion.fecha?.toDate();
-        } else if (accion.accion_registro === 'salida' && horaEntrada) {
-            const horaSalida = accion.fecha?.toDate();
+    registros.forEach((registro) => {
+        if (registro.accion_registro === 'entrada') {
+            horaEntrada = registro.fecha?.toDate();
+        } else if (registro.accion_registro === 'salida' && horaEntrada) {
+            const horaSalida = registro.fecha?.toDate();
             horasTrabajadas += (horaSalida - horaEntrada) / (1000 * 60 * 60); // Diferencia en horas
-            horaEntrada = null; // Reinicia para el siguiente cálculo
+            horaEntrada = null; // Reiniciar para la siguiente entrada
         }
     });
 
-    return horasTrabajadas.toFixed(2); // Retorna las horas trabajadas con 2 decimales
+    return horasTrabajadas > 0 ? horasTrabajadas.toFixed(2) + ' hrs' : 'N/A';
 }
+
+
+
+window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
+
 
 
 // Agregar comentario a un registro
