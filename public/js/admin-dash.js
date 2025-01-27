@@ -2602,13 +2602,13 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
   
       // Crear nuevo registro
       const nuevoRegistro = {
+        userId: user.uid,
         accion_registro: accion,
-        email: usuarioEmail,
-        empresa: userData.empresa || 'InOutTime',  // Usar la empresa del usuario si está disponible
-        fecha: new Date(fecha).toISOString(), // Convertir la fecha a formato ISO
-        lugar: 'Oficina Principal', // Puedes actualizar esto si el lugar es dinámico
-        nombre: userData.nombre || 'Nombre del Usuario', // Usar el nombre del usuario si está disponible
-        userId: userData.userId || 'IdUsuario', // Usar el ID del usuario si está disponible
+        fecha: serverTimestamp(),
+        lugar: obtenerLugarActual(),
+        email: user.email,
+        empresa: userData.empresa,
+        nombre: userData.nombre,
         comentarios: comentarios || '', // Incluir comentarios si se pasan
       };
   
