@@ -77,7 +77,7 @@ onAuthStateChanged(auth, async (user) => {
 
                     // Llamar a la función cargarUsuarios
                     await cargarUsuarios();
-                    
+                    await cargarUsuariosEnCombo()
                     
                     // Usar una notificación más moderna
                     Swal.fire({
@@ -89,7 +89,6 @@ onAuthStateChanged(auth, async (user) => {
                         showConfirmButton: false,
                         timer: 3000
                     });
-                    await cargarUsuariosEnCombo()
                 } else {
                     // Redirigir si no es admin
                     handleUnauthorizedAccess();
@@ -2194,7 +2193,7 @@ async function cargarUsuariosEnCombo() {
     const selectUsuarios = document.getElementById('selectUsuario');
     selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
 
-    const userActual = auth.currentUser ;
+/*    const userActual = auth.currentUser ;
     if (!userActual) {
         console.error('No hay usuario autenticado');
         Swal.fire({
@@ -2203,7 +2202,7 @@ async function cargarUsuariosEnCombo() {
             text: 'No se pudo cargar los usuarios porque no hay un usuario autenticado.'
         });
         return; // Salir de la función si no hay usuario
-    }
+    }*/
 
     try {
         const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
@@ -2301,7 +2300,6 @@ async function cargarRegistrosPorUsuario() {
         });
     }
 }
-
 // Calcular horas trabajadas
 function calcularHorasTrabajadas(registro) {
     // Implementar lógica de cálculo de horas
