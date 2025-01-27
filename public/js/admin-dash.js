@@ -2679,19 +2679,26 @@ async function mostrarFormularioRegistroManual() {
 // Función para agregar registro manual
 async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
     try {
-        // Obtener el usuario desde su email
-      /*  const userDoc = await getDoc(doc(db, "usuarios", usuarioEmail));
-        
-        if (!userDoc.exists()) {
+        // Obtener referencia a la colección de usuarios
+        const usuariosRef = collection(db, "usuarios");
+
+        // Crear una consulta para buscar el documento que tenga el campo "email" igual al email proporcionado
+        const q = query(usuariosRef, where("email", "==", usuarioEmail));
+        const querySnapshot = await getDocs(q);
+
+        // Verificar si se encontró algún documento
+        if (querySnapshot.empty) {
             Swal.fire({
                 icon: 'error',
                 title: 'Usuario no encontrado',
                 text: 'No se pudo encontrar el usuario con el email proporcionado.',
             });
             return;
-        }*/
+        }
 
-       // const userData = userDoc.data();
+        // Tomar el primer documento encontrado (asumimos que el email es único en la base de datos)
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
 
         // Crear nuevo registro
         const nuevoRegistro = {
@@ -2730,6 +2737,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         });
     }
 }
+
 
 /* Función para agregar el registro a la tabla
 function agregarRegistroATabla(registro, docId) {
