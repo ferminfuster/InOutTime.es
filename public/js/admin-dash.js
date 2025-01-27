@@ -2704,7 +2704,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         const nuevoRegistro = {
             userId: userDoc.id,  // Usa el ID del documento en Firestore
             accion_registro: accion,
-            fecha: new Date(fecha).toISOString(),  // Convierte la fecha correctamente
+            fecha: serverTimestamp(),  // Convierte la fecha correctamente
             lugar: 'Oficina Principal',  // Lugar fijo por ahora, puedes modificarlo si es necesario
             email: userData.email,
             empresa: userData.empresa,
