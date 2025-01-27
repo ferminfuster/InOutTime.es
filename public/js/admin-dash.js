@@ -77,6 +77,7 @@ onAuthStateChanged(auth, async (user) => {
 
                     // Llamar a la función cargarUsuarios
                     await cargarUsuarios();
+                    await cargarUsuariosEnCombo()
                     
                     // Usar una notificación más moderna
                     Swal.fire({
@@ -2224,76 +2225,46 @@ async function cargarUsuariosEnCombo() {
 }
 
 // Cargar registros por usuario seleccionado
-async function cargarRegistrosPorUsuario() {
-    const usuarioId = document.getElementById('selectUsuario').value;
-    const listaRegistros = document.getElementById('listaRegistros').getElementsByTagName('tbody')[0];
-    const totalRegistros = document.getElementById('totalRegistros');
+async function cargarUsuariosEnCombo() {
+    const selectUsuarios = document.getElementById('selectUsuario');
+    selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
 
-    // Limpiar tabla
-    listaRegistros.innerHTML = '';
-    totalRegistros.textContent = '0';
-
-    if (!usuarioId) return;
-
-    try {
-        const registrosRef = collection(db, 'registros');
-        const q = query(
-            registrosRef,
-            where('user_id', '==', usuarioId),
-            orderBy('fecha', 'desc'),
-            limit(50)
-        );
-
-        const querySnapshot = await getDocs(q);
-        totalRegistros.textContent = querySnapshot.size;
-
-        if (querySnapshot.empty) {
-            listaRegistros.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center">No hay registros para este usuario</td>
-                </tr>
-            `;
-            return;
-        }
-
-        querySnapshot.forEach((doc) => {
-            const registro = doc.data();
-            const fecha = registro.fecha.toDate();
-
-            const fila = `
-                <tr data-id="${doc.id}">
-                    <td>${fecha.toLocaleString('es-ES')}</td>
-                    <td>${registro.nombre || 'N/A'}</td>
-                    <td>${registro.email || 'N/A'}</td>
-                    <td>${registro.accion_registro || 'N/A'}</td>
-                    <td>${calcularHorasTrabajadas(registro) || 'N/A'}</td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-info" onclick="agregarComentario('${doc.id}')">
-                                <i class="fas fa-comment"></i>
-                            </button>
-                            <button class="btn btn-sm btn-warning" onclick="editarRegistro('${doc.id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${doc.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            listaRegistros.insertAdjacentHTML('beforeend', fila);
-        });
-    } catch (error) {
-        console.error('Error al cargar registros:', error);
+    const userActual = auth.currentUser ;
+    if (!userActual) {
+        console.error('No hay usuario autenticado');
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudieron cargar los registros'
+            text: 'No se pudo cargar los usuarios porque no hay un usuario autenticado.'
+        });
+        return; // Salir de la función si no hay usuario
+    }
+
+    try {
+        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const empresaUsuario = userDoc.data().empresa;
+
+        const usuariosRef = collection(db, 'usuarios');
+        const q = query(usuariosRef, where('empresa', '==', empresaUsuario));
+
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+            const usuario = doc.data();
+            const option = document.createElement('option');
+            option.value = doc.id;
+            option.textContent = `${usuario.nombre} ${usuario.apellidos || ''} (${usuario.email})`;
+            selectUsuarios.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los usuarios'
         });
     }
 }
-
 // Calcular horas trabajadas
 function calcularHorasTrabajadas(registro) {
     // Implementar lógica de cálculo de horas
