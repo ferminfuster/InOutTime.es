@@ -2534,16 +2534,22 @@ async function mostrarFormularioRegistroManual() {
     const { value: formValues } = await Swal.fire({
         title: 'Agregar Registro Manual',
         html: `
-            <label for="registroAccion">Acción:</label>
-            <select id="registroAccion" class="swal2-input">
-                <option value="entrada">Entrada</option>
-                <option value="salida">Salida</option>
-                <option value="incidencia">Incidencia</option>
-            </select>
-            <label for="registroFecha">Fecha y Hora:</label>
-            <input type="datetime-local" id="registroFecha" class="swal2-input">
-            <label for="registroComentarios">Comentarios:</label>
-            <input type="text" id="registroComentarios" class="swal2-input" placeholder="Opcional">
+            <div class="form-group">
+                <label for="registroAccion">Acción:</label>
+                <select id="registroAccion" class="swal2-input form-control">
+                    <option value="entrada">Entrada</option>
+                    <option value="salida">Salida</option>
+                    <option value="incidencia">Incidencia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="registroFecha">Fecha y Hora:</label>
+                <input type="datetime-local" id="registroFecha" class="swal2-input form-control">
+            </div>
+            <div class="form-group">
+                <label for="registroComentarios">Comentarios:</label>
+                <input type="text" id="registroComentarios" class="swal2-input form-control" placeholder="Opcional">
+            </div>
         `,
         focusConfirm: false,
         showCancelButton: true,
@@ -2578,6 +2584,7 @@ async function mostrarFormularioRegistroManual() {
         agregarRegistroManual(usuarioSeleccionado, formValues);
     }
 }
+
 async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
     try {
         const nuevoRegistro = {
