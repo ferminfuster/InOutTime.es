@@ -1779,7 +1779,105 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+///////////////////////////////////////////////////
+// REDIMENSIONAR TABLA RESGISTROS
+////////////////////////////////////
+document.addEventListener('DOMContentLoaded', () => {
+    function transformRegistrosForMobile() {
+        console.log('Transforming registros, window width:', window.innerWidth);
+        
+        const table = document.getElementById('listaRegistros');
+        const mobileList = document.getElementById('mobileRegistrosList');
 
+        // Validar que los elementos existan
+        if (!table || !mobileList) {
+            console.error('Table or mobile list not found');
+            return;
+        }
+
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            // Ocultar tabla
+            table.style.display = 'none';
+            
+            // Limpiar lista móvil anterior
+            mobileList.innerHTML = '';
+
+            // Obtener filas de la tabla
+            const rows = table.querySelectorAll('tbody tr');
+            
+            // Verificar si hay filas
+            if (rows.length === 0) {
+                console.warn('No rows found in the table');
+                return;
+            }
+
+            // Iterar sobre las filas
+            rows.forEach((row) => {
+                const cells = row.querySelectorAll('td');
+
+                // Crear un contenedor para cada registro
+                const registroCard = document.createElement('div');
+                registroCard.classList.add('registro-card');
+
+                registroCard.innerHTML = `
+                    <div class="registro-card-content">
+                        <h3>${cells[0].textContent}</h3>
+                        <p><strong>Email:</strong> ${cells[1].textContent}</p>
+                        <p><strong>Hora:</strong> ${cells[2].textContent}</p>
+                        <p><strong>Acción:</strong> ${cells[3].textContent}</p>
+                        <p><strong>Comentarios:</strong> ${cells[4].textContent || 'Sin Comentarios'}</p>
+                        <p><strong>Horas:</strong> ${cells[5].textContent || 'N/A'}</p>
+                        <div class="registro-card-actions">
+                            ${cells[6].innerHTML}
+                        </div>
+                    </div>
+                `;
+
+                mobileList.appendChild(registroCard);
+            });
+
+            // Mostrar lista móvil
+            mobileList.style.display = 'block';
+        } else {
+            // Mostrar tabla en modo escritorio
+            table.style.display = 'table';
+            mobileList.style.display = 'none';
+        }
+    }
+
+    //    // Función para ejecutar la transformación de forma inmediata
+    function initializeRegistrosTransform() {
+        // Ejecutar transformación
+        transformRegistrosForMobile();
+        
+        // Añadir un pequeño retraso para asegurar que el contenido esté completamente cargado
+        setTimeout(transformRegistrosForMobile, 100);
+    }
+
+    // Eventos para transformación
+    window.addEventListener('load', initializeRegistrosTransform);
+    window.addEventListener('resize', transformRegistrosForMobile);
+
+    // Observador de mutaciones para detectar cambios en la tabla
+    const registrosTable = document.getElementById('listaRegistros');
+    if (registrosTable) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    transformRegistrosForMobile();
+                }
+            });
+        });
+
+        // Configurar observador en el tbody
+        observer.observe(registrosTable.querySelector('tbody'), {
+            childList: true,
+            subtree: true
+        });
+    }
+});
 ///////////////////////////////////////////////////
 // Función para abrir el modal de registro manual//
 //////////////////////////////////////////////////
