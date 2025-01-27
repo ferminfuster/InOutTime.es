@@ -2584,7 +2584,6 @@ async function mostrarFormularioRegistroManual() {
         agregarRegistroManual(usuarioSeleccionado, formValues);
     }
 }
-
 async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
     try {
         const nuevoRegistro = {
@@ -2609,33 +2608,12 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         });
 
         // Opcional: Actualizar la tabla en pantalla sin recargar
-        const tabla = document.getElementById('listaRegistros').querySelector('tbody');
-        tabla.innerHTML += `
-            <tr data-id="${docRef.id}">
-                <td>${new Date(nuevoRegistro.fecha).toLocaleString('es-ES')}</td>
-                <td>${nuevoRegistro.email}</td>
-                <td>${nuevoRegistro.accion_registro}</td>
-                <td>${nuevoRegistro.comentarios || 'N/A'}</td>
-                <td>N/A</td>
-                <td>
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-info" onclick="agregarComentario('${docRef.id}')">
-                            <i class="fas fa-comment"></i>
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="editarRegistro('${docRef.id}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${docRef.id}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
+        agregarRegistroATabla(nuevoRegistro, docRef.id);
 
         // Actualizar el contador de registros
         const totalRegistros = document.getElementById('totalRegistros');
         totalRegistros.textContent = parseInt(totalRegistros.textContent) + 1;
+
     } catch (error) {
         console.error('Error al agregar registro:', error);
         Swal.fire({
@@ -2644,4 +2622,32 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
             text: 'No se pudo agregar el registro. Intenta nuevamente.',
         });
     }
+}
+
+// Función para agregar el registro a la tabla
+function agregarRegistroATabla(registro, docId) {
+    const tabla = document.getElementById('listaRegistros').querySelector('tbody');
+    const fila = `
+        <tr data-id="${docId}">
+            <td>${new Date(registro.fecha).toLocaleString('es-ES')}</td>
+            <td>${registro.email}</td>
+            <td>${registro.accion_registro}</td>
+            <td>${registro.comentarios || 'N/A'}</td>
+            <td>N/A</td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-info" onclick="agregarComentario('${docId}')">
+                        <i class="fas fa-comment"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning" onclick="editarRegistro('${docId}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${docId}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+    tabla.insertAdjacentHTML('beforeend', fila);
 }
