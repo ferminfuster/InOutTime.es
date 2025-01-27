@@ -2294,7 +2294,7 @@ async function cargarRegistrosPorUsuario() {
                         <td>${index === 0 ? dia : ''}</td> <!-- Mostrar el día solo en la primera fila -->
                         <td>${registro.email || 'N/A'}</td>
                         <td>${registro.accion_registro || 'N/A'}</td>
-                        <td>${registro.comentario || 'Comentario'}</td>
+                        <td>${registro.comentario || 'Sin Comentarios'}</td>
                         <td>${index === 0 ? horasTrabajadas : ''}</td> <!-- Mostrar las horas trabajadas solo en la primera fila -->
                         <td>
                             <div class="btn-group">
@@ -2364,59 +2364,6 @@ function calcularHorasTrabajadas(registros) {
 
 window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
 
-/////////////////////
-// Función para eliminar un registro
-/*async function eliminarRegistro(docId) {
-    // Confirmar acción con el usuario
-    const confirmacion = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: 'Esta acción eliminará el registro de forma permanente.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-    });
-
-    if (!confirmacion.isConfirmed) {
-        return; // Si el usuario cancela, no se elimina nada
-    }
-
-    try {
-        // Referencia al documento a eliminar
-        const registroRef = doc(db, 'registros', docId);
-
-        // Eliminar el registro de Firestore
-        await deleteDoc(registroRef);
-
-        // Actualizar la tabla visualmente eliminando la fila correspondiente
-        const fila = document.querySelector(`tr[data-id="${docId}"]`);
-        if (fila) {
-            fila.remove();
-        }
-
-        // Actualizar el contador total de registros
-        const totalRegistros = document.getElementById('totalRegistros');
-        if (totalRegistros) {
-            totalRegistros.textContent = parseInt(totalRegistros.textContent) - 1;
-        }
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Registro eliminado',
-            text: 'El registro se eliminó correctamente.',
-        });
-    } catch (error) {
-        console.error('Error al eliminar registro:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo eliminar el registro. Intenta nuevamente.',
-        });
-    }
-}
-*/
 
 // Agregar comentario a un registro
 async function agregarComentario(registroId) {
