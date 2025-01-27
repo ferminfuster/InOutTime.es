@@ -77,7 +77,7 @@ onAuthStateChanged(auth, async (user) => {
 
                     // Llamar a la función cargarUsuarios
                     await cargarUsuarios();
-                    await cargarUsuariosEnCombo()
+                    await cargarUsuariosEnCombo(user)
                     
                     // Usar una notificación más moderna
                     Swal.fire({
@@ -2190,14 +2190,13 @@ window.abrirModalRegistroManual = abrirModalRegistroManual;
 */
 // Cargar usuarios en el combo de selección
 // Cargar usuarios en el combo de selección
-async function cargarUsuariosEnCombo() {
+async function cargarUsuariosEnCombo(user) {
     const selectUsuarios = document.getElementById('selectUsuario');
     selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
 
     try {
-        // Obtener el usuario actual
-        const userActual = auth.currentUser;
-        if (!userActual) {
+        // Verificar si el usuario está autenticado
+        if (!user) {
             console.error('No hay usuario autenticado');
             Swal.fire({
                 icon: 'error',
@@ -2208,7 +2207,7 @@ async function cargarUsuariosEnCombo() {
         }
 
         // Obtener los datos del usuario actual desde Firestore
-        const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        const userDoc = await getDoc(doc(db, 'usuarios', user.uid));
         if (!userDoc.exists()) {
             throw new Error('Documento de usuario no encontrado');
         }
