@@ -2259,14 +2259,12 @@ async function cargarRegistrosPorUsuario() {
     if (!usuarioId) return;
 
     try {
-        const { primerDia, ultimoDia } = obtenerRangoMesActual();
         const registrosRef = collection(db, 'registros');
         const q = query(
             registrosRef,
-            where('user_id', '==', usuarioId),
-            where('fecha', '>=', primerDia),
-            where('fecha', '<=', ultimoDia),
-            orderBy('fecha', 'asc')
+            where('userId', '==', usuarioId), // Campo correcto según tus datos
+            orderBy('fecha', 'desc'),
+            limit(50)
         );
 
         const querySnapshot = await getDocs(q);
@@ -2275,7 +2273,7 @@ async function cargarRegistrosPorUsuario() {
         if (querySnapshot.empty) {
             listaRegistros.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center">No hay registros para este usuario este mes</td>
+                    <td colspan="6" class="text-center">No hay registros para este usuario</td>
                 </tr>
             `;
             return;
@@ -2283,21 +2281,15 @@ async function cargarRegistrosPorUsuario() {
 
         querySnapshot.forEach((doc) => {
             const registro = doc.data();
-            const fecha = registro.fecha.toDate();
-            const horaInicio = registro.hora_inicio?.toDate(); // Verificar si existe
-            const horaFin = registro.hora_fin?.toDate(); // Verificar si existe
-
-            // Calcular horas trabajadas
-            const horasTrabajadas = horaInicio && horaFin
-                ? ((horaFin - horaInicio) / (1000 * 60 * 60)).toFixed(2)
-                : 'N/A';
+            const fecha = registro.fecha?.toDate();
 
             const fila = `
                 <tr data-id="${doc.id}">
-                    <td>${fecha.toLocaleString('es-ES')}</td>
-                    <td>${horaInicio ? horaInicio.toLocaleTimeString('es-ES') : 'N/A'}</td>
-                    <td>${horaFin ? horaFin.toLocaleTimeString('es-ES') : 'N/A'}</td>
-                    <td>${horasTrabajadas}</td>
+                    <td>${fecha?.toLocaleString('es-ES') || 'N/A'}</td>
+                    <td>${registro.nombre || 'N/A'}</td>
+                    <td>${registro.email || 'N/A'}</td>
+                    <td>${registro.accion_registro || 'N/A'}</td>
+                    <td>${registro.lugar || 'N/A'}</td>
                     <td>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-info" onclick="agregarComentario('${doc.id}')">
@@ -2326,17 +2318,24 @@ async function cargarRegistrosPorUsuario() {
 }
 
 
+
 window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
 // Calcular horas trabajadas
-function calcularHorasTrabajadas(registro) {
-    const horaInicio = registro.hora_inicio?.toDate();
-    const horaFin = registro.hora_fin?.toDate();
+function calcularHorasTrabajadas(acciones) {
+    let horasTrabajadas = 0;
+    let horaEntrada = null;
 
-    if (horaInicio && horaFin) {
-        const diferencia = (horaFin - horaInicio) / (1000 * 60 * 60); // Diferencia en horas
-        return diferencia.toFixed(2); // Retornar con 2 decimales
-    }
-    return 'N/A';
+    acciones.forEach((accion) => {
+        if (accion.accion_registro === 'entrada') {
+            horaEntrada = accion.fecha?.toDate();
+        } else if (accion.accion_registro === 'salida' && horaEntrada) {
+            const horaSalida = accion.fecha?.toDate();
+            horasTrabajadas += (horaSalida - horaEntrada) / (1000 * 60 * 60); // Diferencia en horas
+            horaEntrada = null; // Reinicia para el siguiente cálculo
+        }
+    });
+
+    return horasTrabajadas.toFixed(2); // Retorna las horas trabajadas con 2 decimales
 }
 
 
