@@ -2189,12 +2189,14 @@ async function guardarRegistroManual(datos) {
 window.abrirModalRegistroManual = abrirModalRegistroManual;
 */
 // Cargar usuarios en el combo de selección
+// Cargar usuarios en el combo de selección
 async function cargarUsuariosEnCombo() {
     const selectUsuarios = document.getElementById('selectUsuario');
     selectUsuarios.innerHTML = '<option value="">Seleccione un usuario</option>';
 
     try {
-        const userActual = auth.currentUser ; // Obtener el usuario actual aquí
+        // Obtener el usuario actual
+        const userActual = auth.currentUser;
         if (!userActual) {
             console.error('No hay usuario autenticado');
             Swal.fire({
@@ -2205,14 +2207,21 @@ async function cargarUsuariosEnCombo() {
             return; // Salir de la función si no hay usuario
         }
 
+        // Obtener los datos del usuario actual desde Firestore
         const userDoc = await getDoc(doc(db, 'usuarios', userActual.uid));
+        if (!userDoc.exists()) {
+            throw new Error('Documento de usuario no encontrado');
+        }
+
         const empresaUsuario = userDoc.data().empresa;
 
+        // Consultar usuarios de la misma empresa
         const usuariosRef = collection(db, 'usuarios');
         const q = query(usuariosRef, where('empresa', '==', empresaUsuario));
 
         const querySnapshot = await getDocs(q);
 
+        // Llenar el select con los usuarios
         querySnapshot.forEach((doc) => {
             const usuario = doc.data();
             const option = document.createElement('option');
