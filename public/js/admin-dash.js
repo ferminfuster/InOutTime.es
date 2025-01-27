@@ -2586,43 +2586,59 @@ async function mostrarFormularioRegistroManual() {
 }
 async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
     try {
-        const nuevoRegistro = {
-            accion_registro: accion,
-            email: usuarioEmail,
-            empresa: 'InOutTime',
-            fecha: new Date(fecha).toISOString(),
-            lugar: 'Oficina Principal',
-            nombre: 'Nombre del Usuario', // Reemplaza con el nombre del usuario si está disponible
-            userId: 'IdUsuario', // Reemplaza con el ID real del usuario si lo tienes
-            comentarios: comentarios || '',
-        };
-
-        // Añadir el registro a Firestore
-        const docRef = await addDoc(collection(db, 'registros'), nuevoRegistro);
-
-        // Mostrar éxito
+      // Obtener el usuario desde su email (si lo tienes en Firestore)
+      const userDoc = await getDoc(doc(db, "usuarios", usuarioEmail));
+      
+      if (!userDoc.exists()) {
         Swal.fire({
-            icon: 'success',
-            title: 'Registro agregado',
-            text: 'El registro se agregó correctamente.',
+          icon: 'error',
+          title: 'Usuario no encontrado',
+          text: 'No se pudo encontrar el usuario con el email proporcionado.',
         });
-
-        // Opcional: Actualizar la tabla en pantalla sin recargar
-        agregarRegistroATabla(nuevoRegistro, docRef.id);
-
-        // Actualizar el contador de registros
-        const totalRegistros = document.getElementById('totalRegistros');
-        totalRegistros.textContent = parseInt(totalRegistros.textContent) + 1;
-
+        return;
+      }
+  
+      const userData = userDoc.data();
+  
+      // Crear nuevo registro
+      const nuevoRegistro = {
+        accion_registro: accion,
+        email: usuarioEmail,
+        empresa: userData.empresa || 'InOutTime',  // Usar la empresa del usuario si está disponible
+        fecha: new Date(fecha).toISOString(), // Convertir la fecha a formato ISO
+        lugar: 'Oficina Principal', // Puedes actualizar esto si el lugar es dinámico
+        nombre: userData.nombre || 'Nombre del Usuario', // Usar el nombre del usuario si está disponible
+        userId: userData.userId || 'IdUsuario', // Usar el ID del usuario si está disponible
+        comentarios: comentarios || '', // Incluir comentarios si se pasan
+      };
+  
+      // Añadir el registro a Firestore
+      const docRef = await addDoc(collection(db, 'registros'), nuevoRegistro);
+  
+      // Notificación de éxito
+      Swal.fire({
+        icon: 'success',
+        title: 'Registro agregado',
+        text: 'El registro se agregó correctamente.',
+      });
+  
+      // Opcional: Actualizar la tabla en pantalla sin recargar
+      agregarRegistroATabla(nuevoRegistro, docRef.id);
+  
+      // Actualizar el contador de registros
+      const totalRegistros = document.getElementById('totalRegistros');
+      totalRegistros.textContent = parseInt(totalRegistros.textContent) + 1;
+  
     } catch (error) {
-        console.error('Error al agregar registro:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo agregar el registro. Intenta nuevamente.',
-        });
+      console.error('Error al agregar registro:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo agregar el registro. Intenta nuevamente.',
+      });
     }
-}
+  }
+  
 
 // Función para agregar el registro a la tabla
 function agregarRegistroATabla(registro, docId) {
