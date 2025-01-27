@@ -2388,6 +2388,7 @@ async function agregarComentario(registroId) {
     }
 }
 
+window.agregarComentario = agregarComentario;
 // Editar registro
 async function editarRegistro(registroId) {
     // Implementar lógica de edición
