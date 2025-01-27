@@ -2516,3 +2516,114 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarUsuariosEnCombo(); // Cargar usuarios en el combo
 });
 */
+/////////////////////////////////
+// AGREGAR REGISTRO MANUAL//
+////////////////////////////
+async function mostrarFormularioRegistroManual() {
+    const { value: formValues } = await Swal.fire({
+        title: 'Agregar Registro Manual',
+        html: `
+            <label for="registroAccion">Acción:</label>
+            <select id="registroAccion" class="swal2-input">
+                <option value="entrada">Entrada</option>
+                <option value="salida">Salida</option>
+                <option value="incidencia">Incidencia</option>
+            </select>
+            <label for="registroFecha">Fecha y Hora:</label>
+            <input type="datetime-local" id="registroFecha" class="swal2-input">
+            <label for="registroComentarios">Comentarios:</label>
+            <input type="text" id="registroComentarios" class="swal2-input" placeholder="Opcional">
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Agregar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            const accion = document.getElementById('registroAccion').value;
+            const fecha = document.getElementById('registroFecha').value;
+            const comentarios = document.getElementById('registroComentarios').value;
+
+            if (!accion || !fecha) {
+                Swal.showValidationMessage('Por favor, completa todos los campos obligatorios.');
+                return;
+            }
+
+            return { accion, fecha, comentarios };
+        },
+    });
+
+    if (formValues) {
+        const usuarioSeleccionado = document.getElementById('selectUsuario').value;
+
+        if (!usuarioSeleccionado) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor selecciona un usuario antes de agregar un registro.',
+            });
+            return;
+        }
+
+        agregarRegistroManual(usuarioSeleccionado, formValues);
+    }
+}
+async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
+    try {
+        const nuevoRegistro = {
+            accion_registro: accion,
+            email: usuarioEmail,
+            empresa: 'InOutTime',
+            fecha: new Date(fecha).toISOString(),
+            lugar: 'Oficina Principal',
+            nombre: 'Nombre del Usuario', // Reemplaza con el nombre del usuario si está disponible
+            userId: 'IdUsuario', // Reemplaza con el ID real del usuario si lo tienes
+            comentarios: comentarios || '',
+        };
+
+        // Añadir el registro a Firestore
+        const docRef = await addDoc(collection(db, 'registros'), nuevoRegistro);
+
+        // Mostrar éxito
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro agregado',
+            text: 'El registro se agregó correctamente.',
+        });
+
+        // Opcional: Actualizar la tabla en pantalla sin recargar
+        const tabla = document.getElementById('listaRegistros').querySelector('tbody');
+        tabla.innerHTML += `
+            <tr data-id="${docRef.id}">
+                <td>${new Date(nuevoRegistro.fecha).toLocaleString('es-ES')}</td>
+                <td>${nuevoRegistro.email}</td>
+                <td>${nuevoRegistro.accion_registro}</td>
+                <td>${nuevoRegistro.comentarios || 'N/A'}</td>
+                <td>N/A</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-info" onclick="agregarComentario('${docRef.id}')">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editarRegistro('${docRef.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${docRef.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        // Actualizar el contador de registros
+        const totalRegistros = document.getElementById('totalRegistros');
+        totalRegistros.textContent = parseInt(totalRegistros.textContent) + 1;
+    } catch (error) {
+        console.error('Error al agregar registro:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo agregar el registro. Intenta nuevamente.',
+        });
+    }
+}
