@@ -2366,7 +2366,7 @@ window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
 
 /////////////////////
 // Función para eliminar un registro
-async function eliminarRegistro(docId) {
+/*async function eliminarRegistro(docId) {
     // Confirmar acción con el usuario
     const confirmacion = await Swal.fire({
         title: '¿Estás seguro?',
@@ -2416,7 +2416,7 @@ async function eliminarRegistro(docId) {
         });
     }
 }
-
+*/
 
 // Agregar comentario a un registro
 async function agregarComentario(registroId) {
@@ -2475,6 +2475,7 @@ async function eliminarRegistro(registroId) {
     }
 }
 
+window.eliminarRegistro = eliminarRegistro;
 // Función para abrir el modal de registro manual
 async function abrirModalRegistroManual() {
     try {
