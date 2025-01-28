@@ -2767,3 +2767,30 @@ function agregarRegistroATabla(registro, docId) {
     tabla.insertAdjacentHTML('beforeend', fila);
 }
 */
+
+function descargarRegistros() {
+    const listaRegistros = document.getElementById('listaRegistros').outerHTML;
+    const blob = new Blob([listaRegistros], { type: 'application/vnd.ms-excel' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'registros_usuario.xls'; // Nombre del archivo
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function imprimirRegistros() {
+    const listaRegistros = document.getElementById('listaRegistros').outerHTML;
+    const ventanaImpresion = window.open('', '', 'height=600,width=800');
+    ventanaImpresion.document.write('<html><head><title>Imprimir Registros</title>');
+    ventanaImpresion.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">'); // Si usas Font Awesome
+    ventanaImpresion.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 8px; text-align: left; } th { background-color: #f2f2f2; }</style>');
+    ventanaImpresion.document.write('</head><body>');
+    ventanaImpresion.document.write('<h1>Registros del Usuario</h1>');
+    ventanaImpresion.document.write(listaRegistros);
+    ventanaImpresion.document.write('</body></html>');
+    ventanaImpresion.document.close();
+    ventanaImpresion.print();
+}
