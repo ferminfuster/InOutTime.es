@@ -2490,7 +2490,7 @@ async function agregarComentario(registroId) {
             // Mostrar notificación
             Swal.fire('Comentario añadido', '', 'success');
             
-            // Cargar de nuevo la pagina
+            // Cargar de nuevo la pagina de registro
             cargarRegistrosPorUsuario();
         } catch (error) {
             Swal.fire('Error', 'No se pudo añadir el comentario', 'error');
@@ -2621,14 +2621,12 @@ async function guardarRegistroManual(datos) {
         });
     }
 }
-/*
-// Llamar a la función para cargar usuarios en el combo al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    cargarUsuariosEnCombo(); // Cargar usuarios en el combo
-});
-*/
-// Mostrar formulario para agregar registro manual
+/////////////////////////////////////////////////////
+// Mostrar formulario para agregar registro manual //
+/////////////////////////////////////////////////////
+
 window.mostrarFormularioRegistroManual = mostrarFormularioRegistroManual;
+
 async function mostrarFormularioRegistroManual() {
     const { value: formValues } = await Swal.fire({
         title: 'Agregar Registro Manual',
@@ -2707,8 +2705,6 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         const nuevoRegistro = {
             userId: userDoc.id,  // Usa el ID del documento en Firestore
             accion_registro: accion,
-            //fecha: serverTimestamp(),  // Convierte la fecha correctamente
-            //fecha: Timestamp.fromDate(new Date(datos.fechaRegistro)),
             fecha: Timestamp.fromDate(new Date(fecha)),  //
             lugar: 'Oficina Principal',  // Lugar fijo por ahora, puedes modificarlo si es necesario
             email: userData.email,
@@ -2726,6 +2722,8 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
             title: 'Registro agregado',
             text: 'El registro se agregó correctamente.',
         });
+        // Cargar de nuevo la pagina de registro
+        cargarRegistrosPorUsuario();
 
         // Actualizar el contador de registros
         const totalRegistros = document.getElementById('totalRegistros');
@@ -2744,34 +2742,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
 }
 
 
-/* Función para agregar el registro a la tabla
-function agregarRegistroATabla(registro, docId) {
-    const tabla = document.getElementById('listaRegistros').querySelector('tbody');
-    const fila = `
-        <tr data-id="${docId}">
-            <td>${new Date(registro.fecha).toLocaleString('es-ES')}</td>
-            <td>${registro.email}</td>
-            <td>${registro.accion_registro}</td>
-            <td>${registro.comentarios || 'N/A'}</td>
-            <td>N/A</td>
-            <td>
-                <div class="btn-group">
-                    <button class="btn btn-sm btn-info" onclick="agregarComentario('${docId}')">
-                        <i class="fas fa-comment"></i>
-                    </button>
-                    <button class="btn btn-sm btn-warning" onclick="editarRegistro('${docId}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${docId}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `;
-    tabla.insertAdjacentHTML('beforeend', fila);
-}
-*/
+
 
 function descargarRegistros() {
     const listaRegistros = document.getElementById('listaRegistros').outerHTML;
@@ -2802,73 +2773,3 @@ function imprimirRegistros() {
 window.imprimirRegistros = imprimirRegistros;
 window.descargarRegistros = descargarRegistros;
 
-//////////////////////////////////
-// ACTUALIZAR TABLA DE REGISTRO //
-//////////////////////////////////
-
-async function actualizarTablaRegistros() {
-    const usuarioId = document.getElementById('selectUsuario').value; // Asegúrate de que este ID esté disponible
-    const listaRegistros = document.getElementById('listaRegistros').getElementsByTagName('tbody')[0];
-
-    // Limpiar tabla
-    listaRegistros.innerHTML = '';
-
-    if (!usuarioId) return;
-
-    try {
-        const registrosRef = collection(db, 'registros');
-        const q = query(
-            registrosRef,
-            where('userId', '==', usuarioId), // Asegúrate de que este campo coincida con tus datos
-            orderBy('fecha', 'desc'), // Orden descendente por fecha
-            limit(100) // Aumentamos el límite si es necesario
-        );
-
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            listaRegistros.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center">No hay registros para este usuario</td>
-                </tr>
-            `;
-            return;
-        }
-
-        // Procesar registros y renderizar tabla
-        querySnapshot.forEach((registro) => {
-            const data = registro.data();
-            const fecha = data.fecha?.toDate();
-            const hora = fecha ? fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A';
-            const fila = `
-                <tr data-id="${registro.id}">
-                    <td>${data.email || 'N/A'}</td>
-                    <td>${hora}</td>
-                    <td>${data.accion_registro || 'N/A'}</td>
-                    <td>${data.comentario || 'Sin Comentarios'}</td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
-                                <i class="fas fa-comment"></i>
-                            </button>
-                            <button class="btn btn-sm btn-warning" onclick="editarRegistro('${registro.id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${registro.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            listaRegistros.insertAdjacentHTML('beforeend', fila);
-        });
-    } catch (error) {
-        console.error('Error al cargar registros:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudieron cargar los registros'
-        });
-    }
-}
