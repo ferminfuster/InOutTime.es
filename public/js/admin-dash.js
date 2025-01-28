@@ -2794,3 +2794,5 @@ function imprimirRegistros() {
     ventanaImpresion.document.close();
     ventanaImpresion.print();
 }
+window.imprimirRegistros = imprimirRegistros;
+window.descargarRegistros = descargarRegistros;
