@@ -2037,22 +2037,30 @@ async function cargarRegistrosPorUsuario() {
         );
 
         const querySnapshot = await getDocs(q);
-        totalRegistros.textContent = querySnapshot.size;
+        
+        // Filtrar registros por mes si se ha seleccionado un mes
+        let registrosFiltrados = querySnapshot.docs;
+        if (mesSeleccionado !== "") {
+            registrosFiltrados = querySnapshot.docs.filter(doc => {
+                const fecha = doc.data().fecha?.toDate();
+                return fecha && fecha.getMonth() == mesSeleccionado; // Filtrar por mes
+            });
+        }
 
-        if (querySnapshot.empty) {
+        // Actualizar total de registros
+        totalRegistros.textContent = registrosFiltrados.length;
+
+        if (registrosFiltrados.length === 0) {
             listaRegistros.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center">No hay registros para este usuario</td>
+                    <td colspan="7" class="text-center">No hay registros para este usuario</td>
                 </tr>
             `;
             return;
         }
 
-        // Filtrar registros por mes
-        const registrosFiltrados = querySnapshot.docs.filter(doc => {
-            const fecha = doc.data().fecha?.toDate();
-            return fecha && fecha.getMonth() == mesSeleccionado; // Filtrar por mes
-        });
+        // Depuración: Verificar registros filtrados
+        console.log("Registros filtrados:", registrosFiltrados);
 
         // Procesar registros y agrupar por días
         const registrosPorDia = agruparRegistrosPorDia(registrosFiltrados);
@@ -2063,16 +2071,19 @@ async function cargarRegistrosPorUsuario() {
             const horasTrabajadas = calcularHorasTrabajadas(registros);
 
             registros.forEach((registro, index) => {
+                // Depuración: Verificar cada registro
+                console.log("Registro individual:", registro);
+
                 const fecha = registro.fecha?.toDate();
                 const hora = fecha ? fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A'; // Formato de hora
                 const fila = `
                     <tr data-id="${registro.id}">
-                        <td>${index === 0 ? dia : ''}</td> <!-- Mostrar el día solo en la primera fila -->
+                        <td>${index === 0 ? dia : ''}</td>
                         <td>${registro.email || 'N/A'}</td>
-                        <td>${hora}</td> <!-- Mostrar la hora de                        
-						<td>${registro.accion_registro || 'N/A'}</td>
+                        <td>${hora}</td>
+                        <td>${registro.accion_registro || 'N/A'}</td>
                         <td>${registro.comentario || 'Sin Comentarios'}</td>
-                        <td>${index === 0 ? horasTrabajadas : ''}</td> <!-- Mostrar las horas trabajadas solo en la primera fila -->
+                        <td>${index === 0 ? horasTrabajadas : ''}</td>
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
@@ -2100,8 +2111,6 @@ async function cargarRegistrosPorUsuario() {
         });
     }
 }
-
-
 
 // Función para agrupar registros por día
 function agruparRegistrosPorDia(querySnapshot) {
