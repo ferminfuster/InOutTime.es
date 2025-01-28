@@ -591,6 +591,96 @@ async function obtenerDetallesFichajesHoy() {
     }
 }
 
+async function revisarFichajesPendientes() {
+    try {
+        if (!window.empresaGlobal) {
+            throw new Error("Empresa no definida");
+        }
+
+        // Obtener la fecha de ayer al final del día
+        const ayer = new Date();
+        ayer.setDate(ayer.getDate() - 1);
+        ayer.setHours(0, 0, 0, 0); // Inicio del día
+        const inicioAyer = Timestamp.fromDate(ayer);
+
+        // Obtener la fecha de hoy al inicio del día
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0); // Inicio del día
+        const finAyer = Timestamp.fromDate(hoy); // Fin del día anterior
+
+        // Referencia a la colección de registros
+        const registrosRef = collection(db, 'registros');
+
+        // Consulta para obtener registros del día anterior
+        const q = query(
+            registrosRef,
+            where('empresa', '==', window.empresaGlobal),
+            where('fecha', '>=', inicioAyer),
+            where('fecha', '<', finAyer),
+            orderBy('fecha', 'asc') // Ordenar por fecha
+        );
+
+        // Obtener snapshot
+        const querySnapshot = await getDocs(q);
+
+        // Crear un objeto para almacenar los usuarios a revisar
+        const usuariosARevisar = {};
+
+        // Procesar los registros
+        querySnapshot.forEach((doc) => {
+            const registro = doc.data();
+            const email = registro.email; // Suponiendo que el campo email existe
+            const accion = registro.accion_registro;
+
+            // Si el registro es de entrada, lo marcamos
+            if (accion === 'entrada') {
+                usuariosARevisar[email] = 'a revisar'; // Marcar como "a revisar"
+            } else if (accion === 'salida') {
+                // Si hay un registro de salida, eliminamos al usuario de la lista
+                delete usuariosARevisar[email];
+            }
+        });
+
+        // Mostrar los usuarios a revisar
+        console.log('Usuarios a revisar:', usuariosARevisar);
+
+        // Actualizar el contador en el HTML o mostrar en la interfaz
+        const contadorPendientes = document.getElementById('fichajesPendientes');
+        contadorPendientes.textContent = Object.keys(usuariosARevisar).length;
+
+        // Opcional: Mostrar detalles de los usuarios a revisar
+        if (Object.keys(usuariosARevisar).length > 0) {
+            Swal.fire({
+                title: 'Usuarios a Revisar',
+                text: `Los siguientes usuarios no han cerrado su día: ${Object.keys(usuariosARevisar).join(', ')}`,
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
+        }
+
+        return usuariosARevisar; // Retornar la lista de usuarios a revisar
+
+    } catch (error) {
+        console.error("Error al revisar fichajes pendientes:", error);
+        
+        // Mostrar 0 en caso de error
+        const contadorPendientes = document.getElementById('fichajesPendientes');
+        contadorPendientes.textContent = '0';
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo revisar los fichajes pendientes',
+            confirmButtonText: 'Entendido'
+        });
+
+        return {};
+    }
+}
+
+// En la función revisarFichajesPendientes
+const contadorPendientes = document.getElementById('fichajesPendientes');
+contadorPendientes.textContent = Object.keys(usuariosARevisar).length;
 
 // Llamar a la función de actualización cuando sea necesario
 //window.addEventListener('load', actualizarContadores);
