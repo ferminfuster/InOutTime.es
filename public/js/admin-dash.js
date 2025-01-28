@@ -2188,9 +2188,80 @@ async function agregarComentario(registroId) {
 window.agregarComentario = agregarComentario;
 // Editar registro
 async function editarRegistro(registroId) {
-    // Implementar lógica de edición
-}
+    // Obtener el registro actual de Firestore
+    const registroRef = doc(db, 'registros', registroId);
+    const registroSnapshot = await getDoc(registroRef);
 
+    if (!registroSnapshot.exists()) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El registro no existe.',
+        });
+        return;
+    }
+
+    const registroData = registroSnapshot.data();
+
+    // Mostrar el formulario de edición
+    const { value: formValues } = await Swal.fire({
+        title: 'Editar Registro',
+        html: `
+            <div class="form-group">
+                <label for="editarAccion">Acción:</label>
+                <select id="editarAccion" class="swal2-input form-control">
+                    <option value="entrada" ${registroData.accion_registro === 'entrada' ? 'selected' : ''}>Entrada</option>
+                    <option value="salida" ${registroData.accion_registro === 'salida' ? 'selected' : ''}>Salida</option>
+                    <option value="incidencia" ${registroData.accion_registro === 'incidencia' ? 'selected' : ''}>Incidencia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editarFecha">Fecha y Hora:</label>
+                <input type="datetime-local" id="editarFecha" class="swal2-input form-control" value="${registroData.fecha.toDate().toISOString().slice(0, 16)}" required>
+            </div>
+            <div class="form-group">
+                <label for="editarComentarios">Comentarios:</label>
+                <input type="text" id="editarComentarios" class="swal2-input form-control" placeholder="Opcional" value="${registroData.comentario || ''}">
+            </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Guardar Cambios',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            const accion = document.getElementById('editarAccion').value;
+            const fecha = document.getElementById('editarFecha').value;
+            const comentarios = document.getElementById('editarComentarios').value;
+
+            if (!accion || !fecha) {
+                Swal.showValidationMessage('Por favor, completa todos los campos obligatorios.');
+                return;
+            }
+
+            return { accion, fecha, comentarios };
+        },
+    });
+
+    if (formValues) {
+        // Actualizar el registro en Firestore
+        try {
+            await updateDoc(registroRef, {
+                accion_registro: formValues.accion,
+                fecha: Timestamp.fromDate(new Date(formValues.fecha)), // Convertir la fecha a Timestamp
+                comentario: formValues.comentarios || '', // Incluir comentarios si se pasan
+                comentario_fecha: serverTimestamp() // Actualizar la fecha del comentario
+            });
+
+            Swal.fire('Registro actualizado', '', 'success');
+
+            // Actualizar la tabla después de editar
+            await cargarRegistrosPorUsuario(); // Llama a la función para recargar los registros
+        } catch (error) {
+            console.error('Error al actualizar el registro:', error);
+            Swal.fire('Error', 'No se pudo actualizar el registro. Intenta nuevamente.', 'error');
+        }
+    }
+}
 // Eliminar registro
 async function eliminarRegistro(registroId) {
     const result = await Swal.fire({
