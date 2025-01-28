@@ -166,6 +166,8 @@ async function cargarUsuarios() {
 
         // LLamar a la función contarFichajesHoy
         contarFichajesHoy();
+        fichajesPendientes();
+
 
         if (querySnapshot.empty) {
             listaUsuarios.innerHTML = `
