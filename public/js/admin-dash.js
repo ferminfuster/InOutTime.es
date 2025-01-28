@@ -681,8 +681,8 @@ async function revisarFichajesPendientes() {
 }
 
 // En la función revisarFichajesPendientes
-const contadorPendientes = document.getElementById('fichajesPendientes');
-contadorPendientes.textContent = Object.keys(usuariosARevisar).length;
+//const contadorPendientes = document.getElementById('fichajesPendientes');
+//contadorPendientes.textContent = Object.keys(usuariosARevisar).length;
 
 // Llamar a la función de actualización cuando sea necesario
 //window.addEventListener('load', actualizarContadores);
