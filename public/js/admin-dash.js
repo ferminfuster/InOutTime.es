@@ -2186,6 +2186,7 @@ async function agregarComentario(registroId) {
 }
 
 window.agregarComentario = agregarComentario;
+window.editarRegistro = editarRegistro;
 // Editar registro
 async function editarRegistro(registroId) {
     // Obtener el registro actual de Firestore
