@@ -2657,27 +2657,27 @@ async function mostrarFormularioRegistroManual() {
         cancelButtonText: 'Cancelar',
         preConfirm: () => {
             const accion = document.getElementById('registroAccion').value;
-            const fecha = document.getElementById('registroFecha').value;
+            const fechas = document.getElementById('registroFecha').value;
             const comentarios = document.getElementById('registroComentarios').value;
             const email = document.getElementById('registroEmail').value;
 
-            if (!accion || !fecha || !email) {
+            if (!accion || !fechas || !email) {
                 Swal.showValidationMessage('Por favor, completa todos los campos obligatorios.');
                 return;
             }
 
-            return { accion, fecha, comentarios, email };
+            return { accion, fechas, comentarios, email };
         },
     });
 
     if (formValues) {
         const { email } = formValues;
-        await agregarRegistroManual(email, formValues);
+        await agregarRegistroManual(email, fechas, formValues);
     }
 }
 
 // Función para agregar registro manual
-async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
+async function agregarRegistroManual(usuarioEmail, { accion, fechas, comentarios }) {
     try {
         // Obtener referencia a la colección de usuarios
         const usuariosRef = collection(db, "usuarios");
@@ -2705,7 +2705,8 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
             userId: userDoc.id,  // Usa el ID del documento en Firestore
             accion_registro: accion,
             //fecha: serverTimestamp(),  // Convierte la fecha correctamente
-            fecha: Timestamp.fromDate(new Date(datos.fechaRegistro)),
+            //fecha: Timestamp.fromDate(new Date(datos.fechaRegistro)),
+            fecha: fechas,
             lugar: 'Oficina Principal',  // Lugar fijo por ahora, puedes modificarlo si es necesario
             email: userData.email,
             empresa: userData.empresa,
