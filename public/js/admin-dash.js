@@ -514,19 +514,21 @@ async function contarFichajesHoy() {
 
         // Actualizar contador en el HTML
         const contadorFichajes = document.getElementById('fichajeshoy');
-        contadorFichajes.textContent = querySnapshot.size;
-
-        console.log(`Usuarios fichados hoy en ${window.empresaGlobal}: ${querySnapshot.size}`);
-
-        // Si quieres más detalle, puedes hacer un mapeo de usuarios
+        
+        // Usar un Set para contar solo una entrada por usuario
         const usuariosFichados = new Set();
         querySnapshot.forEach((doc) => {
-            usuariosFichados.add(doc.data().email);
+            const email = doc.data().email; // Suponiendo que el campo email existe
+            usuariosFichados.add(email); // Agregar el email al Set
         });
 
+        // Actualizar el contador con el tamaño del Set
+        contadorFichajes.textContent = usuariosFichados.size;
+
+        console.log(`Usuarios fichados hoy en ${window.empresaGlobal}: ${usuariosFichados.size}`);
         console.log('Usuarios fichados:', Array.from(usuariosFichados));
 
-        return querySnapshot.size;
+        return usuariosFichados.size;
 
     } catch (error) {
         console.error("Error al contar fichajes de hoy:", error);
