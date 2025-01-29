@@ -1868,7 +1868,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-///////////////////////////////////////////////////
+////////////////////////////////////
 // REDIMENSIONAR TABLA RESGISTROS
 ////////////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
@@ -1935,6 +1935,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileList.style.display = 'none';
         }
     }
+    
 
     //    // Función para ejecutar la transformación de forma inmediata
     function initializeRegistrosTransform() {
@@ -1951,6 +1952,104 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Observador de mutaciones para detectar cambios en la tabla
     const registrosTable = document.getElementById('listaRegistros');
+    if (registrosTable) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    transformRegistrosForMobile();
+                }
+            });
+        });
+
+        // Configurar observador en el tbody
+        observer.observe(registrosTable.querySelector('tbody'), {
+            childList: true,
+            subtree: true
+        });
+    }
+});
+
+
+/////////////////////////////////////////////
+// REDIMENSIONAR TABLA INFORMES ASISTENCIA //
+////////////////////////////////////////////
+document.addEventListener('DOMContentLoaded', () => {
+    function transformRegistrosForMobile() {
+        console.log('Transforming registros, window width:', window.innerWidth);
+        
+        const table = document.getElementById('listaTodosAsistencia');
+        const mobileList = document.getElementById('mobilelistaTodosAsistencia');
+
+        // Validar que los elementos existan
+        if (!table || !mobileList) {
+            console.error('Table or mobile list not found');
+            return;
+        }
+
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            // Ocultar tabla
+            table.style.display = 'none';
+            
+            // Limpiar lista móvil anterior
+            mobileList.innerHTML = '';
+
+            // Obtener filas de la tabla
+            const rows = table.querySelectorAll('tbody tr');
+            
+            // Verificar si hay filas
+            if (rows.length === 0) {
+                console.warn('No rows found in the table');
+                return;
+            }
+
+            // Iterar sobre las filas
+            rows.forEach((row) => {
+                const cells = row.querySelectorAll('td');
+
+                // Crear un contenedor para cada registro
+                const registroCard = document.createElement('div');
+                registroCard.classList.add('registro-card');
+
+                registroCard.innerHTML = `
+                    <div class="registro-card-content">
+                        <h3>${cells[0].textContent}</h3>
+                        <p><strong>Mes:</strong> ${cells[1].textContent}</p>
+                        <p><strong>Email:</strong> ${cells[2].textContent}</p>
+                        <p><strong>Dias:</strong> ${cells[3].textContent}</p>
+                        <p><strong>Horas:</strong> ${cells[4].textContent || 'Sin Horas'}</p>
+                    </div>
+                `;
+
+                mobileList.appendChild(registroCard);
+            });
+
+            // Mostrar lista móvil
+            mobileList.style.display = 'block';
+        } else {
+            // Mostrar tabla en modo escritorio
+            table.style.display = 'table';
+            mobileList.style.display = 'none';
+        }
+    }
+    
+
+    //    // Función para ejecutar la transformación de forma inmediata
+    function initializeRegistrosTransform() {
+        // Ejecutar transformación
+        transformRegistrosForMobile();
+        
+        // Añadir un pequeño retraso para asegurar que el contenido esté completamente cargado
+        setTimeout(transformRegistrosForMobile, 100);
+    }
+
+    // Eventos para transformación
+    window.addEventListener('load', initializeRegistrosTransform);
+    window.addEventListener('resize', transformRegistrosForMobile);
+
+    // Observador de mutaciones para detectar cambios en la tabla
+    const registrosTable = document.getElementById('listaTodosAsistencia');
     if (registrosTable) {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -2026,85 +2125,7 @@ function obtenerRangoMesActual() {
     const ultimoDia = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
     return { primerDia, ultimoDia };
 }
-/* FUNCIONA
-async function cargarRegistrosPorUsuario() {
-    const usuarioId = document.getElementById('selectUsuario').value;
-    const listaRegistros = document.getElementById('listaRegistros').getElementsByTagName('tbody')[0];
-    const totalRegistros = document.getElementById('totalRegistros');
-
-    // Limpiar tabla
-    listaRegistros.innerHTML = '';
-    totalRegistros.textContent = '0';
-
-    if (!usuarioId) return;
-
-    try {
-        const registrosRef = collection(db, 'registros');
-        const q = query(
-            registrosRef,
-            where('userId', '==', usuarioId), // Asegúrate de que este campo coincida con tus datos
-            orderBy('fecha', 'desc'), // Orden descendente por fecha
-            limit(100) // Aumentamos el límite si es necesario
-        );
-
-        const querySnapshot = await getDocs(q);
-        totalRegistros.textContent = querySnapshot.size;
-
-        if (querySnapshot.empty) {
-            listaRegistros.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center">No hay registros para este usuario</td>
-                </tr>
-            `;
-            return;
-        }
-
-        // Procesar registros y agrupar por días
-        const registrosPorDia = agruparRegistrosPorDia(querySnapshot);
-
-        // Renderizar tabla
-        Object.keys(registrosPorDia).forEach((dia) => {
-            const registros = registrosPorDia[dia];
-            const horasTrabajadas = calcularHorasTrabajadas(registros);
-
-            registros.forEach((registro, index) => {
-                const fecha = registro.fecha?.toDate();
-                const hora = fecha ? fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A'; // Formato de hora
-                const fila = `
-                    <tr data-id="${registro.id}">
-                        <td>${index === 0 ? dia : ''}</td> <!-- Mostrar el día solo en la primera fila -->
-                        <td>${registro.email || 'N/A'}</td>
-                        <td>${hora}</td> <!-- Mostrar la hora de cada acción -->
-                        <td>${registro.accion_registro || 'N/A'}</td>
-                        <td>${registro.comentario || 'Sin Comentarios'}</td>
-                        <td>${index === 0 ? horasTrabajadas : ''}</td> <!-- Mostrar las horas trabajadas solo en la primera fila -->
-                        <td>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
-                                    <i class="fas fa-comment"></i>
-                                </button>
-                                <button class="btn btn-sm btn-warning" onclick="editarRegistro('${registro.id}')">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${registro.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                listaRegistros.insertAdjacentHTML('beforeend', fila);
-            });
-        });
-    } catch (error) {
-        console.error('Error al cargar registros:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudieron cargar los registros'
-        });
-    }
-}*/
+// Cargar contenido por usuario
 async function cargarRegistrosPorUsuario() {
     const usuarioId = document.getElementById('selectUsuario').value;
     const mesSeleccionado = document.getElementById('selectMes').value;
