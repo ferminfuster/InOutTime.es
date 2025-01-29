@@ -164,8 +164,9 @@ async function cargarUsuarios() {
         // Actualizar contador de usuarios
         document.getElementById('totalUsuarios').textContent = querySnapshot.size;
 
-        // LLamar a la función contarUsuariosTrabajando
+        // LLamar a la función contarUsuariosTrabajando y contarUsuariosRevisar
         contarUsuariosTrabajando();
+        contarUsuariosRevisar();
         //fichajesPendientes();
 
 
