@@ -2793,7 +2793,7 @@ async function cargarResumenAsistencia() {
             console.log("No hay empleados registrados en la empresa");
             listaAsistencia.innerHTML = `
                 <tr>
-                    <td colspan="3" class="text-center">No hay empleados registrados en la empresa</td>
+                    <td colspan="4" class="text-center">No hay empleados registrados en la empresa</td>
                 </tr>
             `;
             return;
@@ -2817,29 +2817,20 @@ async function cargarResumenAsistencia() {
 
             const registrosSnapshot = await getDocs(qRegistros);
 
-            // Calcular total de horas
+            // Calcular total de horas y días trabajados
             let totalHoras = 0;
-            const registrosPorDia = {};
+            const diasTrabajados = new Set(); // Usar un Set para contar días únicos
 
             registrosSnapshot.docs.forEach(registroDoc => {
                 const registro = registroDoc.data();
                 const fecha = registro.fecha.toDate();
-                const diaKey = fecha.toLocaleDateString();
-
-                if (!registrosPorDia[diaKey]) {
-                    registrosPorDia[diaKey] = [];
-                }
-                registrosPorDia[diaKey].push(registro);
-            });
-
-            // Calcular horas por día
-            Object.values(registrosPorDia).forEach(registrosDia => {
-                const horasDia = calcularHorasTrabajadas(registrosDia);
-                totalHoras += parseFloat(horasDia);
+                diasTrabajados.add(fecha.toLocaleDateString()); // Agregar el día al Set
+                totalHoras += calcularHorasTrabajadas([registro]); // Sumar horas trabajadas
             });
 
             return {
                 email: usuario.email,
+                diasTrabajados: diasTrabajados.size, // Número de días únicos
                 totalHoras: totalHoras.toFixed(2) // Formatear a dos decimales
             };
         });
@@ -2853,6 +2844,7 @@ async function cargarResumenAsistencia() {
                 <tr>
                     <td>${mesSeleccionado !== "" ? new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' }) : 'Todos los meses'}</td>
                     <td>${item.email}</td>
+                    <td>${item.diasTrabajados}</td>
                     <td>${item.totalHoras} hrs</td>
                 </tr>
             `;
