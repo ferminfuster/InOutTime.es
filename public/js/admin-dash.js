@@ -2623,8 +2623,11 @@ function imprimirRegistros() {
 }
 window.imprimirRegistros = imprimirRegistros;
 window.descargarRegistros = descargarRegistros;
+////////////////////////
+/// SECCION INFORMES ///
+////////////////////////
 window.cargarRegistrosTotales = cargarRegistrosTotales;
-
+// Cargar Registros de todos los usuarios.
 async function cargarRegistrosTotales() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const listaRegistros = document.getElementById('listaTodosRegistros').getElementsByTagName('tbody')[0];
@@ -2635,43 +2638,73 @@ async function cargarRegistrosTotales() {
     totalRegistros.textContent = '0';
 
     try {
-        const registrosRef = collection(db, 'registros');
-        const q = query(
-            registrosRef,
-            orderBy('fecha', 'desc') // Orden descendente por fecha
-        );
+        // Obtener el ID de la empresa del usuario actual
+        const empresaId = await obtenerEmpresaId();
+        if (!empresaId) {
+            console.error('No se pudo obtener el ID de la empresa');
+            return;
+        }
 
-        const querySnapshot = await getDocs(q);
-        
-        // Filtrar registros por mes si se ha seleccionado un mes
-        let registrosFiltrados = querySnapshot.docs;
+        // Consultar todos los usuarios de la misma empresa
+        const usuariosRef = collection(db, 'usuarios');
+        const qUsuarios = query(usuariosRef, where('empresa', '==', empresaId));
+        const usuariosSnapshot = await getDocs(qUsuarios);
 
-        if (mesSeleccionado !== "") {
-            registrosFiltrados = querySnapshot.docs.filter(doc => {
-                const fecha = doc.data().fecha;
-                if (fecha && typeof fecha.toDate === 'function') {
-                    return fecha.toDate().getMonth() == mesSeleccionado; // Filtrar por mes
-                } else {
-                    console.warn('El campo fecha no está definido o no es un Timestamp:', doc.data());
-                    return false; // Excluir este registro si no es válido
-                }
-            });
+        // Verificar si hay empleados
+        if (usuariosSnapshot.empty) {
+            console.log("No hay empleados registrados en la empresa");
+            listaRegistros.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center">No hay empleados registrados en la empresa</td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Crear un array para almacenar los registros de todos los empleados
+        const todosLosRegistros = [];
+
+        // Cargar registros de cada empleado
+        for (const usuarioDoc of usuariosSnapshot.docs) {
+            const usuarioId = usuarioDoc.id;
+
+            // Consultar registros de este usuario
+            const registrosRef = collection(db, 'registros');
+            const qRegistros = query(
+                registrosRef,
+                where('userId', '==', usuarioId),
+                orderBy('fecha', 'desc') // Orden descendente por fecha
+            );
+
+            const registrosSnapshot = await getDocs(qRegistros);
+
+            // Filtrar registros por mes si se ha seleccionado un mes
+            let registrosFiltrados = registrosSnapshot.docs;
+            if (mesSeleccionado !== "") {
+                registrosFiltrados = registrosSnapshot.docs.filter(doc => {
+                    const fecha = doc.data().fecha?.toDate();
+                    return fecha && fecha.getMonth() == mesSeleccionado; // Filtrar por mes
+                });
+            }
+
+            // Agregar los registros filtrados al array
+            todosLosRegistros.push(...registrosFiltrados);
         }
 
         // Actualizar total de registros
-        totalRegistros.textContent = registrosFiltrados.length;
+        totalRegistros.textContent = todosLosRegistros.length;
 
-        if (registrosFiltrados.length === 0) {
+        if (todosLosRegistros.length === 0) {
             listaRegistros.innerHTML = `
                 <tr>
-                    <td colspan="7" class="text-center">No hay registros para este mes</td>
+                    <td colspan="7" class="text-center">No hay registros para los empleados en este mes</td>
                 </tr>
             `;
             return;
         }
 
         // Procesar registros y agrupar por días
-        const registrosPorDia = agruparRegistrosPorDia(registrosFiltrados);
+        const registrosPorDia = agruparRegistrosPorDia(todosLosRegistros);
 
         // Renderizar tabla
         Object.keys(registrosPorDia).forEach((dia) => {
@@ -2714,5 +2747,27 @@ async function cargarRegistrosTotales() {
             title: 'Error',
             text: 'No se pudieron cargar los registros'
         });
+    }
+}
+
+// Función para obtener el ID de la empresa del usuario actual
+async function obtenerEmpresaId() {
+    try {
+        const user = auth.currentUser ; // Asegúrate de que 'auth' esté correctamente inicializado
+        if (!user) {
+            console.error('No hay usuario autenticado');
+            return null;
+        }
+
+        const userDoc = await getDoc(doc(db, 'usuarios', user.uid)); // Asegúrate de que 'usuarios' sea la colección correcta
+        if (userDoc.exists()) {
+            return userDoc.data().empresa; // Asegúrate de que este campo coincida con tu estructura de datos
+        } else {
+            console.error('No se encontró el documento del usuario');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error al obtener el ID de la empresa:', error);
+        return null;
     }
 }
