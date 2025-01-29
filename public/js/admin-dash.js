@@ -487,7 +487,7 @@ window.crearNuevoUsuario = async function (event) {
 
 
 /////////////////////////////////////
-// Añadir fichajes en Dashboard
+// Añadir Usuarios online en Dashboard
 /////////////////////////////////////
 async function contarUsuariosTrabajando() {
         try {
@@ -552,7 +552,79 @@ async function contarUsuariosTrabajando() {
             return 0;
         }
     }
-    
+
+///////////////////////////////
+// Añadir Usuarios a Revisar //
+///////////////////////////////
+async function contarUsuariosRevisar() {
+    try {
+        if (!window.empresaGlobal) {
+            throw new Error("Empresa no definida");
+        }
+
+        // Obtener la fecha de ayer al inicio y fin del día
+        const ayer = new Date();
+        ayer.setDate(ayer.getDate() - 1); // Restar un día
+        ayer.setHours(0, 0, 0, 0);
+
+        const finAyer = new Date(ayer);
+        finAyer.setHours(23, 59, 59, 999); // Fin del día anterior
+
+        // Referencia a la colección de registros
+        const registrosRef = collection(db, 'registros');
+
+        // Consulta para obtener todos los fichajes (entrada/salida) del día anterior
+        const q = query(
+            registrosRef,
+            where('empresa', '==', window.empresaGlobal),
+            where('fecha', '>=', Timestamp.fromDate(ayer)),
+            where('fecha', '<=', Timestamp.fromDate(finAyer))
+        );
+
+        // Obtener snapshot
+        const querySnapshot = await getDocs(q);
+
+        // Objeto para almacenar el último registro de cada usuario en el día anterior
+        const registrosPorUsuario = new Map();
+
+        querySnapshot.forEach((doc) => {
+            const { email, accion_registro, fecha } = doc.data();
+
+            // Guardar solo el registro más reciente del usuario
+            if (!registrosPorUsuario.has(email) || registrosPorUsuario.get(email).fecha.toMillis() < fecha.toMillis()) {
+                registrosPorUsuario.set(email, { accion_registro, fecha });
+            }
+        });
+
+        // Contar usuarios cuyo último registro del día anterior fue "entrada"
+        const usuariosRevisar = Array.from(registrosPorUsuario.values())
+            .filter(registro => registro.accion_registro === 'entrada')
+            .length;
+
+        // Actualizar el contador en el HTML
+        document.getElementById('usuariosRevisar').textContent = usuariosRevisar;
+
+        console.log(`Usuarios a revisar en ${window.empresaGlobal}: ${usuariosRevisar}`);
+        return usuariosRevisar;
+
+    } catch (error) {
+        console.error("Error al contar usuarios a revisar:", error);
+        
+        // Mostrar 0 en caso de error
+        document.getElementById('usuariosRevisar').textContent = '0';
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo contar los usuarios a revisar',
+            confirmButtonText: 'Entendido'
+        });
+
+        return 0;
+    }
+}
+
+
 // Función para obtener más detalles de los fichajes de hoy
 async function obtenerDetallesFichajesHoy() {
     try {
