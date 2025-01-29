@@ -50,47 +50,51 @@
         </ul>
     </div>
 
-    <!-- Contenido Principal -->
-    <div class="content" id="content">
-        <!-- Dashboard -->
-        <div id="dashboard-section" class="content-section active-section">
-            <h1>Panel de Control</h1>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card bg-primary text-white mb-3">
-                        <div class="card-body">
-                            <h5>Total Usuarios</h5>
-                            <h2 id="totalUsuarios">0</h2>
-                        </div>
+ <!-- Contenido Principal -->
+<div class="content" id="content">
+    <!-- Dashboard -->
+    <div id="dashboard-section" class="content-section active-section">
+        <h1>Panel de Control</h1>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-3x"></i>
+                        <h5>Total Usuarios</h5>
+                        <h2 id="totalUsuarios">0</h2>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card bg-succes text-white mb-3">
-                        <div class="card-body">
-                            <h5>Usuarios Trabajando</h5>
-                            <h2 id="fichajeshoy">0</h2>
-                        </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-check fa-3x"></i>
+                        <h5>Usuarios Trabajando</h5>
+                        <h2 id="fichajeshoy">0</h2>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card bg-warning text-white mb-3">
-                        <div class="card-body">
-                            <h5>Usuarios No trabajando</h5>
-                            <h2 id="fichajesPendientes">0</h2>
-                        </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-times fa-3x"></i>
+                        <h5>Usuarios No Trabajando</h5>
+                        <h2 id="fichajesPendientes">0</h2>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card bg-danger text-white mb-3">
-                        <div class="card-body">
-                            <h5>Usuarios a Revisar</h5>
-                            <h2 id="fichajesPendientes">0</h2>
-                        </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-exclamation-triangle fa-3x"></i>
+                        <h5>Usuarios a Revisar</h5>
+                        <h2 id="usuariosRevisar">0</h2>
                     </div>
                 </div>
             </div>
         </div>
-
+    </div>
+</div>
 <!-- Sección Registros -->
 <div id="registros-section" class="content-section">
     <h2>Registros del Mes</h2>
