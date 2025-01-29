@@ -597,16 +597,34 @@ async function contarUsuariosRevisar() {
             }
         });
 
-        // Contar usuarios cuyo último registro del día anterior fue "entrada"
-        const usuariosRevisar = Array.from(registrosPorUsuario.values())
-            .filter(registro => registro.accion_registro === 'entrada')
-            .length;
+        // Filtrar usuarios cuyo último registro del día anterior fue "entrada"
+        const usuariosRevisar = Array.from(registrosPorUsuario.entries())
+            .filter(([_, registro]) => registro.accion_registro === 'entrada')
+            .map(([email]) => email); // Obtener solo los emails
 
         // Actualizar el contador en el HTML
-        document.getElementById('usuariosRevisar').textContent = usuariosRevisar;
+        const contadorElement = document.getElementById('usuariosRevisar');
+        contadorElement.textContent = usuariosRevisar.length;
 
-        console.log(`Usuarios a revisar en ${window.empresaGlobal}: ${usuariosRevisar}`);
-        return usuariosRevisar;
+        // Hacer la tarjeta clickeable solo si hay usuarios a revisar
+        const cardElement = contadorElement.closest('.card');
+        if (usuariosRevisar.length > 0) {
+            cardElement.style.cursor = 'pointer'; // Cambiar cursor
+            cardElement.onclick = () => {
+                Swal.fire({
+                    title: 'Usuarios a Revisar',
+                    icon: 'warning',
+                    html: `<ul style="text-align:left">${usuariosRevisar.map(user => `<li>${user}</li>`).join('')}</ul>`,
+                    confirmButtonText: 'Entendido'
+                });
+            };
+        } else {
+            cardElement.style.cursor = 'default'; // Restaurar cursor
+            cardElement.onclick = null; // Eliminar evento de clic
+        }
+
+        console.log(`Usuarios a revisar en ${window.empresaGlobal}: ${usuariosRevisar.length}`);
+        return usuariosRevisar.length;
 
     } catch (error) {
         console.error("Error al contar usuarios a revisar:", error);
@@ -624,6 +642,7 @@ async function contarUsuariosRevisar() {
         return 0;
     }
 }
+
 
 
 // Función para obtener más detalles de los fichajes de hoy
