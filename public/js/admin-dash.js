@@ -2624,6 +2624,7 @@ function imprimirRegistros() {
 window.imprimirRegistros = imprimirRegistros;
 window.descargarRegistros = descargarRegistros;
 window.cargarRegistrosTotales = cargarRegistrosTotales;
+
 async function cargarRegistrosTotales() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const listaRegistros = document.getElementById('listaTodosRegistros').getElementsByTagName('tbody')[0];
@@ -2647,8 +2648,13 @@ async function cargarRegistrosTotales() {
 
         if (mesSeleccionado !== "") {
             registrosFiltrados = querySnapshot.docs.filter(doc => {
-                const fecha = doc.data().fecha?.toDate();
-                return fecha && fecha.getMonth() == mesSeleccionado; // Filtrar por mes
+                const fecha = doc.data().fecha;
+                if (fecha && typeof fecha.toDate === 'function') {
+                    return fecha.toDate().getMonth() == mesSeleccionado; // Filtrar por mes
+                } else {
+                    console.warn('El campo fecha no está definido o no es un Timestamp:', doc.data());
+                    return false; // Excluir este registro si no es válido
+                }
             });
         }
 
