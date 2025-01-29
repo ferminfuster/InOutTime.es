@@ -115,11 +115,6 @@
             </select>
         </div>
     </div>
-    <div class="acciones">
-        <button class="btn btn-primary  mb-3"" onclick="descargarRegistros()">Descargar</button>
-        <button class="btn btn-primary  mb-3"" onclick="imprimirRegistros()">Imprimir</button>
-        <button class="btn btn-success mb-3"" onclick="mostrarFormularioRegistroManual()">Registro Manual </button>
-    </div>
     <div class="table-responsive">
         <table class="table table-striped" id="listaRegistros">
             <thead>
@@ -180,20 +175,73 @@
         <div id="mobileUserList" class="mobile-user-list"></div>
     </div>
 </div>
-
         <!-- Sección Informes -->
         <div id="informes-section" class="content-section">
-            <h2>Informes</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <button class="btn btn-success w-100 mb-3">Informe de Usuarios</button>
-                </div>
-                <div class="col-md-4">
-                    <button class="btn btn-warning w-100 mb-3">Informe de Fichajes</button>
+            <h2>Registros por Meses</h2>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="selectMestotal">Seleccionar Mes:</label>
+                    <select id="selectMestotal" class="form-control" onchange="cargarRegistrosTotales()">
+                        <option value="">Seleccione un mes</option>
+                        <option value="0">Enero</option>
+                        <option value="1">Febrero</option>
+                        <option value="2">Marzo</option>
+                        <option value="3">Abril</option>
+                        <option value="4">Mayo</option>
+                        <option value="5">Junio</option>
+                        <option value="6">Julio</option>
+                        <option value="7">Agosto</option>
+                        <option value="8">Septiembre</option>
+                        <option value="9">Octubre</option>
+                        <option value="10">Noviembre</option>
+                        <option value="11">Diciembre</option>
+                    </select>
                 </div>
             </div>
+
+            
+            <div class="table-responsive">
+                <h3>Registros de Usuarios</h3>
+                <table class="table table-striped" id="listaTodosRegistros">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Email</th>
+                            <th>Hora</th>
+                            <th>Acción</th>
+                            <th>Comentarios</th>
+                            <th>Horas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Registros se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+                <div id="mobileUser List" class="mobile-user-list"></div>
+            </div>
+        
+            <div class="table-responsive">
+                <h3>Resumen de Asistencia</h3>
+                <table class="table table-striped" id="listaTodosAsistencia">
+                    <thead>
+                        <tr>
+                            <th>Mes</th>
+                            <th>Email</th>
+                            <th>Total Horas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Registros se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+                <div class="acciones">
+                    <button class="btn btn-primary mb-3" onclick="descargarRegistros()">Descargar</button>
+                    <button class="btn btn-primary mb-3" onclick="imprimirRegistros()">Imprimir</button>
+                </div>
+                <div id="mobileUser List" class="mobile-user-list"></div>
+            </div>
         </div>
-    </div>
 
     <!-- Modal Nuevo Usuario -->
     <div class="modal fade" id="modalNuevoUsuario">
