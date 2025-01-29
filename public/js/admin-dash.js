@@ -2928,3 +2928,54 @@ function imprimirDivGenerico(boton) {
     // Cerrar la escritura del documento
     ventanaImpresion.document.close();
 }
+
+
+//Exportar a PDF
+async function descargarDivComoPDF(boton) {
+    // Función para cargar un script de forma dinámica
+    async function cargarScript(url) {
+        return new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${url}"]`)) {
+                resolve(); // Si ya está cargado, continuar
+                return;
+            }
+            let script = document.createElement("script");
+            script.src = url;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    // Cargar librerías si no están disponibles
+    await cargarScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    await cargarScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+
+    // Verificar que las librerías están disponibles
+    if (!window.jspdf || !window.html2canvas) {
+        alert("Error al cargar las librerías para generar el PDF.");
+        return;
+    }
+
+    // Obtener el div más cercano al botón
+    let divContenedor = boton.closest('div.table-responsive');
+    if (!divContenedor) {
+        alert("No se encontró el contenido a descargar.");
+        return;
+    }
+
+    let nombreArchivo = "reporte.pdf";
+
+    // Capturar el div como imagen y convertirlo en PDF
+    html2canvas(divContenedor, { scale: 2 }).then(canvas => {
+        let imgData = canvas.toDataURL("image/png");
+        let pdf = new jspdf.jsPDF("p", "mm", "a4");
+
+        let imgWidth = 210; // A4 width en mm
+        let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        pdf.addImage(imgData, "PNG", 0, 10, imgWidth, imgHeight);
+        pdf.save(nombreArchivo);
+    });
+}
+
