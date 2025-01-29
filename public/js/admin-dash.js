@@ -2899,6 +2899,9 @@ function imprimirDivGenerico(boton) {
     // Obtener el contenido del div
     let contenido = divContenedor.innerHTML;
 
+    // Ruta del logo (puedes poner la URL de tu logo o usar un archivo local)
+    let logoUrl = 'logo.png'; // Cambia esto por la ruta de tu logo
+
     // Crear una nueva ventana emergente para imprimir
     let ventanaImpresion = window.open('', '', 'width=800,height=600');
 
@@ -2909,18 +2912,35 @@ function imprimirDivGenerico(boton) {
             <title>Impresión</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <style>
-                body { font-family: Arial, sans-serif; padding: 20px; }
-                table { width: 100%; border-collapse: collapse; }
-                th, td { border: 1px solid black; padding: 8px; text-align: left; }
+                body { font-family: Arial, sans-serif; padding: 30px; }
+                .header { text-align: center; margin-bottom: 20px; }
+                .header img { max-width: 150px; }
+                .table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                th, td { border: 1px solid black; padding: 10px; text-align: left; }
                 th { background-color: #f2f2f2; }
                 .acciones { display: none; } /* Ocultar los botones al imprimir */
+                .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #888; }
             </style>
         </head>
         <body>
-            ${contenido}  
+            <div class="header">
+                <img src="${logoUrl}" alt="Logo de la Empresa">
+                <h2>Reporte de Asistencia</h2>
+                <p>Este es un reporte detallado de la asistencia de los empleados.</p>
+            </div>
+
+            ${contenido}
+
+            <div class="footer">
+                <p>Este documento es confidencial y propiedad de [Nombre de tu Empresa].</p>
+            </div>
+
             <script>
-                window.onload = function() { window.print(); window.close(); }
-            <\/script>
+                window.onload = function() {
+                    window.print();
+                    window.close();
+                }
+            </script>
         </body>
         </html>
     `);
@@ -2928,6 +2948,7 @@ function imprimirDivGenerico(boton) {
     // Cerrar la escritura del documento
     ventanaImpresion.document.close();
 }
+
 
 //////////// Global //////
 window.descargarDivComoPDF = descargarDivComoPDF;
