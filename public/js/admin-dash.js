@@ -2774,7 +2774,7 @@ async function cargarResumenAsistencia() {
     const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
 
     // Validar que se haya seleccionado un mes
-    if (mesSeleccionado === "") {
+    if (!mesSeleccionado || mesSeleccionado === "") {
         Swal.fire({
             icon: 'warning',
             title: 'Selecciona un mes',
