@@ -1630,9 +1630,7 @@ window.descargarInformeUsuarios = async function () {
     }
 };
   
-  // Asignar la función al botón "Informe de Usuarios"
-  //document.querySelector('.btn-warning').addEventListener('click', descargarInformeUsuarios);
-  
+ 
   // Función para descargar usuarios en CSV
 function descargarListaUsuarios() {
     try {
@@ -2625,11 +2623,90 @@ function imprimirRegistros() {
 }
 window.imprimirRegistros = imprimirRegistros;
 window.descargarRegistros = descargarRegistros;
+window.cargarRegistrosTotales = cargarRegistrosTotales;
+async function cargarRegistrosTotales() {
+    const mesSeleccionado = document.getElementById('selectMestotal').value;
+    const listaRegistros = document.getElementById('listaTodosRegistros').getElementsByTagName('tbody')[0];
+    const totalRegistros = document.getElementById('totalRegistros');
 
-function cargarRegistrosTotales() {
+    // Limpiar tabla
+    listaRegistros.innerHTML = '';
+    totalRegistros.textContent = '0';
 
-    // Lógica para cargar registros por usuario
+    try {
+        const registrosRef = collection(db, 'registros');
+        const q = query(
+            registrosRef,
+            orderBy('fecha', 'desc') // Orden descendente por fecha
+        );
 
-    console.log('Cargando registros por usuario...');
+        const querySnapshot = await getDocs(q);
+        
+        // Filtrar registros por mes si se ha seleccionado un mes
+        let registrosFiltrados = querySnapshot.docs;
 
+        if (mesSeleccionado !== "") {
+            registrosFiltrados = querySnapshot.docs.filter(doc => {
+                const fecha = doc.data().fecha?.toDate();
+                return fecha && fecha.getMonth() == mesSeleccionado; // Filtrar por mes
+            });
+        }
+
+        // Actualizar total de registros
+        totalRegistros.textContent = registrosFiltrados.length;
+
+        if (registrosFiltrados.length === 0) {
+            listaRegistros.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center">No hay registros para este mes</td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Procesar registros y agrupar por días
+        const registrosPorDia = agruparRegistrosPorDia(registrosFiltrados);
+
+        // Renderizar tabla
+        Object.keys(registrosPorDia).forEach((dia) => {
+            const registros = registrosPorDia[dia];
+            const horasTrabajadas = calcularHorasTrabajadas(registros);
+
+            registros.forEach((registro, index) => {
+                const fecha = registro.fecha?.toDate();
+                const hora = fecha ? fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A'; // Formato de hora
+                const fila = `
+                    <tr data-id="${registro.id}">
+                        <td>${index === 0 ? dia : ''}</td>
+                        <td>${registro.email || 'N/A'}</td>
+                        <td>${hora}</td>
+                        <td>${registro.accion_registro || 'N/A'}</td>
+                        <td>${registro.comentario || 'Sin Comentarios'}</td>
+                        <td>${index === 0 ? horasTrabajadas : ''}</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
+                                    <i class="fas fa-comment"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="editarRegistro('${registro.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${registro.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                listaRegistros.insertAdjacentHTML('beforeend', fila);
+            });
+        });
+    } catch (error) {
+        console.error('Error al cargar registros:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los registros'
+        });
+    }
 }
