@@ -2019,6 +2019,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p><strong>Días Trabajados:</strong> ${cells[2].textContent}</p>
                         <p><strong>Horas Trabajadas:</strong> ${cells[3].textContent || 'Sin Horas'}</p>
                     </div>
+                    <div class="acciones">
+                    <button class="btn btn-primary mb-3" onclick="descargarDivComoPDF(this)">Descargar PDF</button>
+                    <button class="btn btn-primary mb-3" onclick="imprimirDivGenerico(this)">Imprimir</button>
+                </div>
                 `;
 
                 mobileList.appendChild(registroCard);
