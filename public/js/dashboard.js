@@ -241,6 +241,7 @@ onAuthStateChanged(auth, async (user) => {
       // Mostrar último registro del usuario
       await mostrarUltimoRegistro(user.uid);
       await calcularHorasTrabajadasHoy();
+      verificarSalidaAnterior();
 
     } else {
       //console.log("No se encontraron datos para este usuario.");
@@ -1109,3 +1110,23 @@ window.addEventListener('click', function(event) {
       cerrarModalIncidencia();
   }
 });
+/////////////////////////////////////
+// POP informando que ayer no ficho //
+//////////////////////////////////////
+async function verificarSalidaAnterior() {
+  try {
+      const response = await fetch('/api/ultimo-fichaje'); // Ajusta la API según tu backend
+      const data = await response.json();
+
+      if (data && data.accion === "Entrada" && !data.salidaConfirmada) {
+          Swal.fire({
+              title: "Fichaje Incompleto",
+              text: "Ayer no registraste una salida. Informa a tu administrador por favor",
+              icon: "warning",
+              confirmButtonText: "OK"
+          });
+      }
+  } catch (error) {
+      console.error("Error verificando fichaje anterior:", error);
+  }
+}
