@@ -2773,16 +2773,16 @@ async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
 
-        // Validar que se haya seleccionado un mes
-        if (!mesSeleccionado) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Selecciona un mes',
-                text: 'Por favor, elige un mes para generar el resumen de asistencia',
-                confirmButtonText: 'Entendido'
-            });
-            return;
-        }
+    // Validar que se haya seleccionado un mes
+    if (mesSeleccionado === "") {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona un mes',
+            text: 'Por favor, elige un mes para generar el resumen de asistencia',
+            confirmButtonText: 'Entendido'
+        });
+        return;
+    }
 
     // Limpiar tabla
     listaAsistencia.innerHTML = '';
@@ -2867,7 +2867,7 @@ async function cargarResumenAsistencia() {
                     <td>${horasFormateadas}</td>
                 </tr>
             `;
-                        listaAsistencia.insertAdjacentHTML('beforeend', fila);
+            listaAsistencia.insertAdjacentHTML('beforeend', fila);
         });
 
     } catch (error) {
@@ -2879,8 +2879,8 @@ async function cargarResumenAsistencia() {
         });
     }
 }
-// Cuando cambia el combo del mes se ejecutan las 2 funciones"
+
+// Agregar el evento para cargar el resumen al cambiar el mes
 document.getElementById('selectMestotal').addEventListener('change', () => {
     cargarResumenAsistencia();
 });
-``
