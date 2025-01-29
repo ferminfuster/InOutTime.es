@@ -2771,10 +2771,15 @@ async function obtenerEmpresaId() {
 //Cargar resumen
 async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
-   // const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
+    const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
 
-    // Validar que se haya seleccionado un mes
-    if (!mesSeleccionado || mesSeleccionado === "") {
+    //const mesSeleccionado = document.getElementById('selectMestotal').value;
+    console.log("Mes seleccionado:", mesSeleccionado);  // Depuración para ver el valor obtenido
+
+    //const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
+
+    // Validar que se haya seleccionado un mes (no vacío y es un número entre 0 y 11)
+    if (mesSeleccionado === "" || isNaN(mesSeleccionado) || mesSeleccionado < 0 || mesSeleccionado > 11) {
         Swal.fire({
             icon: 'warning',
             title: 'Selecciona un mes',
