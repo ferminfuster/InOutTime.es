@@ -2900,7 +2900,7 @@ function imprimirDivGenerico(boton) {
     let contenido = divContenedor.innerHTML;
 
     // Ruta del logo (puedes poner la URL de tu logo o usar un archivo local)
-    let logoUrl = 'logo.png'; // Cambia esto por la ruta de tu logo
+    let logoUrl = 'images/logo.png'; // Cambia esto por la ruta de tu logo
 
     // Crear una nueva ventana emergente para imprimir
     let ventanaImpresion = window.open('', '', 'width=800,height=600');
@@ -2925,14 +2925,14 @@ function imprimirDivGenerico(boton) {
         <body>
             <div class="header">
                 <img src="${logoUrl}" alt="Logo de la Empresa">
-                <h2>Reporte de Asistencia</h2>
-                <p>Este es un reporte detallado de la asistencia de los empleados.</p>
+                <h2>InOutTime</h2>
+                <p>Simplicidad que impulsa tu negocio</p>
             </div>
 
             ${contenido}
 
             <div class="footer">
-                <p>Este documento es confidencial y propiedad de [Nombre de tu Empresa].</p>
+                <p>Este documento ha sido generado por InOutTime.</p>
             </div>
 
             <script>
