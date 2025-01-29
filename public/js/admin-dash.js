@@ -2821,12 +2821,17 @@ async function cargarResumenAsistencia() {
             let totalHoras = 0; 
             const diasTrabajados = new Set(); 
 
-            registrosSnapshot.docs.forEach(registroDoc => {
-                const registro = registroDoc.data();
+            // Asegúrate de que los registros se procesen correctamente
+            const registros = registrosSnapshot.docs.map(doc => doc.data());
+
+            registros.forEach(registroDoc => {
+                const registro = registroDoc;
                 const fecha = registro.fecha.toDate();
                 diasTrabajados.add(fecha.toLocaleDateString());
-                totalHoras += calcularHorasTrabajadas([registro]); 
             });
+
+            // Calcular horas trabajadas usando la función
+            totalHoras = calcularHorasTrabajadas(registros);
 
             return {
                 email: usuario.email,
@@ -2838,16 +2843,9 @@ async function cargarResumenAsistencia() {
         // Esperar a que se procesen todos los usuarios
         const resumen = await Promise.all(resumenPromises);
 
-        // Renderizar resumen con verificación adicional
+        // Renderizar resumen
         resumen.forEach(item => {
-            // Asegurar que totalHoras sea un número
-            const horasTrabajadas = Number(item.totalHoras);
-            
-            // Verificar si es un número válido
-            const horasFormateadas = !isNaN(horasTrabajadas) 
-                ? horasTrabajadas.toFixed(2) 
-                : '0.00';
-
+            const horasFormateadas = typeof item.totalHoras === 'string' ? item.totalHoras : item.totalHoras.toFixed(2) + ' hrs';
             const fila = `
                 <tr>
                     <td>${mesSeleccionado !== "" 
@@ -2855,10 +2853,10 @@ async function cargarResumenAsistencia() {
                         : 'Todos los meses'}</td>
                     <td>${item.email}</td>
                     <td>${item.diasTrabajados}</td>
-                    <td>${horasFormateadas} hrs</td>
+                    <td>${horasFormateadas}</td>
                 </tr>
             `;
-            listaAsistencia.insertAdjacentHTML('beforeend', fila);
+                        listaAsistencia.insertAdjacentHTML('beforeend', fila);
         });
 
     } catch (error) {
