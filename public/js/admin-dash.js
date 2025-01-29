@@ -2904,86 +2904,25 @@ function imprimirDivGenerico(boton) {
 
     // Escribir el contenido en la nueva ventana
     ventanaImpresion.document.write(`
-    <html>
-    <head>
-        <title>Informe de Horas</title>
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
-            
-            body { 
-                font-family: 'Roboto', Arial, sans-serif; 
-                margin: 0;
-                padding: 20px;
-                line-height: 1.6;
-                color: #333;
-            }
-            .header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 2px solid #007bff;
-                padding-bottom: 15px;
-                margin-bottom: 20px;
-            }
-            .logo {
-                max-width: 80px;  // Reducido de 150px a 80px
-                max-height: 50px; // Reducido de 80px a 50px
-                object-fit: contain; // Mantiene la proporción
-            }
-            .header-info {
-                text-align: right;
-            }
-            table { 
-                width: 100%; 
-                border-collapse: collapse; 
-                margin-bottom: 20px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-            th, td { 
-                border: 1px solid #ddd; 
-                padding: 10px; 
-                text-align: center; 
-            }
-            th { 
-                background-color: #f8f9fa;
-                font-weight: 600;
-                color: #333;
-            }
-            .footer {
-                text-align: center;
-                border-top: 1px solid #ddd;
-                padding-top: 10px;
-                font-size: 0.9em;
-                color: #666;
-            }
-            @media print {
-                body { 
-                    margin: 0; 
-                    padding: 0;
-                }
-                .no-print {
-                    display: none;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-        <img src="images/logo.png" alt="InOutTime Logo" class="logo">
-            <div class="header-info">
-                <h2>Informe de Horas Trabajadas</h2>
-                <p>Empleado: ${user ? user.email || user.email : 'Usuario'}</p>
-                <p>Fecha de generación: ${new Date().toLocaleDateString('es-ES')}</p>
-            </div>
-        </div>
-
-        ${contenidoImpresion}
-
-        <div class="footer">
-            <p>Informe generado por InOutTime | © ${new Date().getFullYear()}</p>
-        </div>
-    </body>
-</html>
+        <html>
+        <head>
+            <title>Impresión</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid black; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .acciones { display: none; } /* Ocultar los botones al imprimir */
+            </style>
+        </head>
+        <body>
+            ${contenido}  
+            <script>
+                window.onload = function() { window.print(); window.close(); }
+            <\/script>
+        </body>
+        </html>
     `);
 
     // Cerrar la escritura del documento
@@ -2994,11 +2933,11 @@ function imprimirDivGenerico(boton) {
 window.descargarDivComoPDF = descargarDivComoPDF;
 // Exportar a PDF
 async function descargarDivComoPDF(boton) {
-    // Función para cargar un script de forma dinámica
+    // Cargar librerías dinámicamente si no están disponibles
     async function cargarScript(url) {
         return new Promise((resolve, reject) => {
             if (document.querySelector(`script[src="${url}"]`)) {
-                resolve(); // Si ya está cargado, continuar
+                resolve();
                 return;
             }
             let script = document.createElement("script");
@@ -3009,7 +2948,7 @@ async function descargarDivComoPDF(boton) {
         });
     }
 
-    // Cargar librerías si no están disponibles
+    // Cargar las librerías si no están ya cargadas
     await cargarScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
     await cargarScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
 
@@ -3019,7 +2958,6 @@ async function descargarDivComoPDF(boton) {
         return;
     }
 
-    // Obtener el div más cercano al botón
     let divContenedor = boton.closest('div.table-responsive');
     if (!divContenedor) {
         alert("No se encontró el contenido a descargar.");
@@ -3028,16 +2966,39 @@ async function descargarDivComoPDF(boton) {
 
     let nombreArchivo = "reporte.pdf";
 
-    // Capturar el div como imagen y convertirlo en PDF
+    // Convertir el div a una imagen
     html2canvas(divContenedor, { scale: 2 }).then(canvas => {
         let imgData = canvas.toDataURL("image/png");
         let pdf = new jspdf.jsPDF("p", "mm", "a4");
+        let imgWidth = 210; // Ancho de A4 en mm
+        let pageHeight = 297; // Alto de A4 en mm
+        let imgHeight = (canvas.height * imgWidth) / canvas.width; // Ajustar la altura proporcionalmente
 
-        let imgWidth = 210; // A4 width en mm
-        let imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let yPos = 10; // Posición inicial en la página
 
-        pdf.addImage(imgData, "PNG", 0, 10, imgWidth, imgHeight);
+        // Si la imagen es más alta que una página, dividir en varias páginas
+        if (imgHeight > pageHeight) {
+            let totalPages = Math.ceil(imgHeight / pageHeight);
+
+            for (let i = 0; i < totalPages; i++) {
+                let cropCanvas = document.createElement("canvas");
+                let cropContext = cropCanvas.getContext("2d");
+                cropCanvas.width = canvas.width;
+                cropCanvas.height = (canvas.height / totalPages);
+
+                cropContext.drawImage(canvas, 0, -(i * cropCanvas.height), canvas.width, canvas.height);
+                
+                let croppedImage = cropCanvas.toDataURL("image/png");
+                
+                if (i > 0) pdf.addPage(); // Agregar nueva página después de la primera
+                pdf.addImage(croppedImage, "PNG", 0, yPos, imgWidth, pageHeight);
+            }
+        } else {
+            pdf.addImage(imgData, "PNG", 0, yPos, imgWidth, imgHeight);
+        }
+
         pdf.save(nombreArchivo);
     });
 }
+
 
