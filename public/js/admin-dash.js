@@ -166,7 +166,7 @@ async function cargarUsuarios() {
 
         // LLamar a la función contarFichajesHoy
         contarFichajesHoy();
-        fichajesPendientes();
+        //fichajesPendientes();
 
 
         if (querySnapshot.empty) {
@@ -592,7 +592,7 @@ async function obtenerDetallesFichajesHoy() {
         return new Map();
     }
 }
-
+/*
 async function revisarFichajesPendientes() {
     try {
         if (!window.empresaGlobal) {
@@ -679,7 +679,7 @@ async function revisarFichajesPendientes() {
         return {};
     }
 }
-
+*/
 // En la función revisarFichajesPendientes
 //const contadorPendientes = document.getElementById('fichajesPendientes');
 //contadorPendientes.textContent = Object.keys(usuariosARevisar).length;
