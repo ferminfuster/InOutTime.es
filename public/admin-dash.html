@@ -201,9 +201,9 @@
         </div>
     </div>
 
-    <div class="form-check form-switch mb-3">
-        <input class="form-check-input" type="checkbox" id="toggleView" onchange="alternarVista()">
-        <label class="form-check-label" for="toggleView">Ver Resumen de Asistencia</label>
+    <div class="acciones mb-3">
+        <button class="btn btn-primary" onclick="mostrarTabla('registros')">Lista de Registros</button>
+        <button class="btn btn-secondary" onclick="mostrarTabla('asistencia')">Lista de Asistencia</button>
     </div>
 
     <div id="tablaRegistros" class="table-responsive">
@@ -244,10 +244,9 @@
 </div>
 
 <script>
-    function alternarVista() {
-        let isChecked = document.getElementById("toggleView").checked;
-        document.getElementById("tablaRegistros").classList.toggle("d-none", isChecked);
-        document.getElementById("tablaAsistencia").classList.toggle("d-none", !isChecked);
+    function mostrarTabla(tipo) {
+        document.getElementById("tablaRegistros").classList.toggle("d-none", tipo !== "registros");
+        document.getElementById("tablaAsistencia").classList.toggle("d-none", tipo !== "asistencia");
     }
 </script>
 
