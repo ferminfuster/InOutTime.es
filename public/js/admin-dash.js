@@ -2986,74 +2986,40 @@ async function descargarDivComoPDF(boton) {
     }
 
     let nombreArchivo = "InOutTime_reporte.pdf";
-    let logoUrl = 'images/logo.png'; // Cambia esto por la ruta de tu logo
 
-    // Crear un canvas para la cabecera
-    let cabeceraCanvas = document.createElement("canvas");
-    let ctx = cabeceraCanvas.getContext("2d");
+    // Convertir el div a una imagen
+    html2canvas(divContenedor, { scale: 2 }).then(canvas => {
+        let imgData = canvas.toDataURL("image/png");
+        let pdf = new jspdf.jsPDF("p", "mm", "a4");
+        let imgWidth = 210; // Ancho de A4 en mm
+        let pageHeight = 297; // Alto de A4 en mm
+        let imgHeight = (canvas.height * imgWidth) / canvas.width; // Ajustar la altura proporcionalmente
 
-    // Establecer dimensiones del canvas para la cabecera
-    cabeceraCanvas.width = 210; // Ancho de A4 en mm
-    cabeceraCanvas.height = 50; // Altura de la cabecera
+        let yPos = 10; // Posición inicial en la página
 
-    // Dibujar la cabecera (logo y texto)
-    ctx.fillStyle = "#333"; // Color de texto
-    ctx.font = "16px Arial"; // Titulo con tamaño más pequeño
-    ctx.textAlign = "center";
-    
-    // Cargar el logo
-    let logoImage = new Image();
-    logoImage.src = logoUrl;
-    logoImage.onload = function() {
-        // Ajustar el tamaño del logo para que no se distorsione
-        let logoWidth = 30; // Ancho del logo
-        let logoHeight = 30; // Altura del logo
-        ctx.drawImage(logoImage, 10, 10, logoWidth, logoHeight); // Dibuja el logo en el canvas
+        // Si la imagen es más alta que una página, dividir en varias páginas
+        if (imgHeight > pageHeight) {
+            let totalPages = Math.ceil(imgHeight / pageHeight);
 
-        // Agregar el texto
-        ctx.font = "16px Arial"; // Título
-        ctx.fillText("InOutTime", 70, 20); // Título
-        ctx.font = "12px Arial"; // Subtítulo
-        ctx.fillText("Simplicidad que impulsa tu negocio", 70, 40); // Subtítulo
+            for (let i = 0; i < totalPages; i++) {
+                let cropCanvas = document.createElement("canvas");
+                let cropContext = cropCanvas.getContext("2d");
+                cropCanvas.width = canvas.width;
+                cropCanvas.height = (canvas.height / totalPages);
 
-        // Convertir el canvas de cabecera a imagen
-        let cabeceraData = cabeceraCanvas.toDataURL("image/png");
-
-        // Convertir el div a una imagen
-        html2canvas(divContenedor, { scale: 2 }).then(canvas => {
-            let imgData = canvas.toDataURL("image/png");
-            let pdf = new jspdf.jsPDF("p", "mm", "a4");
-            let imgWidth = 210; // Ancho de A4 en mm
-            let pageHeight = 297; // Alto de A4 en mm
-            let imgHeight = (canvas.height * imgWidth) / canvas.width; // Ajustar la altura proporcionalmente
-
-            let yPos = 50; // Posición inicial en la página (debajo de la cabecera)
-
-            // Agregar la cabecera en la primera página
-            pdf.addImage(cabeceraData, "PNG", 0, 0, imgWidth, 50);
-
-            // Si la imagen del contenido es más alta que una página, dividir en varias páginas
-            if (imgHeight > pageHeight) {
-                let totalPages = Math.ceil(imgHeight / pageHeight);
-
-                for (let i = 0; i < totalPages; i++) {
-                    let cropCanvas = document.createElement("canvas");
-                    let cropContext = cropCanvas.getContext("2d");
-                    cropCanvas.width = canvas.width;
-                    cropCanvas.height = (canvas.height / totalPages);
-
-                    cropContext.drawImage(canvas, 0, -(i * cropCanvas.height), canvas.width, canvas.height);
-                    
-                    let croppedImage = cropCanvas.toDataURL("image/png");
-                    
-                    if (i > 0) pdf.addPage(); // Agregar nueva página después de la primera
-                    pdf.addImage(croppedImage, "PNG", 0, yPos, imgWidth, pageHeight);
-                }
-            } else {
-                pdf.addImage(imgData, "PNG", 0, yPos, imgWidth, imgHeight);
+                cropContext.drawImage(canvas, 0, -(i * cropCanvas.height), canvas.width, canvas.height);
+                
+                let croppedImage = cropCanvas.toDataURL("image/png");
+                
+                if (i > 0) pdf.addPage(); // Agregar nueva página después de la primera
+                pdf.addImage(croppedImage, "PNG", 0, yPos, imgWidth, pageHeight);
             }
+        } else {
+            pdf.addImage(imgData, "PNG", 0, yPos, imgWidth, imgHeight);
+        }
 
-            pdf.save(nombreArchivo);
-        });
-    };
+        pdf.save(nombreArchivo);
+    });
 }
+
+
