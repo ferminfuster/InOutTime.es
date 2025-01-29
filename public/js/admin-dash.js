@@ -2630,6 +2630,17 @@ async function cargarRegistrosTotales() {
     const listaRegistros = document.getElementById('listaTodosRegistros').getElementsByTagName('tbody')[0];
     const totalRegistros = document.getElementById('totalRegistros');
 
+        // Validar que se haya seleccionado un mes (no vacío y es un número entre 0 y 11)
+        if (mesSeleccionado === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Selecciona un mes',
+                text: 'Por favor, elige un mes para generar el resumen de asistencia',
+                confirmButtonText: 'Entendido'
+            });
+            return;
+        }
+
     // Limpiar tabla
     listaRegistros.innerHTML = '';
     totalRegistros.textContent = '0';
