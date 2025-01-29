@@ -2624,22 +2624,23 @@ window.descargarRegistros = descargarRegistros;
 /// SECCION INFORMES ///
 ////////////////////////
 window.cargarRegistrosTotales = cargarRegistrosTotales;
+
 // Cargar Registros de todos los usuarios.
 async function cargarRegistrosTotales() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const listaRegistros = document.getElementById('listaTodosRegistros').getElementsByTagName('tbody')[0];
     const totalRegistros = document.getElementById('totalRegistros');
 
-        // Validar que se haya seleccionado un mes (no vacío y es un número entre 0 y 11)
-        if (mesSeleccionado === "") {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Selecciona un mes',
-                text: 'Por favor, elige un mes para generar el resumen de asistencia',
-                confirmButtonText: 'Entendido'
-            });
-            return;
-        }
+    // Validar que se haya seleccionado un mes (no vacío)
+    if (mesSeleccionado === "") {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona un mes',
+            text: 'Por favor, elige un mes para generar el resumen de asistencia',
+            confirmButtonText: 'Entendido'
+        });
+        return;
+    }
 
     // Limpiar tabla
     listaRegistros.innerHTML = '';
@@ -2717,19 +2718,26 @@ async function cargarRegistrosTotales() {
         // Renderizar tabla
         Object.keys(registrosPorDia).forEach((dia) => {
             const registros = registrosPorDia[dia];
-            const horasTrabajadas = calcularHorasTrabajadas(registros);
+            const horasTrabajadas = calcularHorasTrabajadas(registros); // Total de horas para el día
 
-            registros.forEach((registro, index) => {
+            // Fila para el día
+            const filaDia = `
+                <tr>
+                    <td colspan="6" class="text-center"><strong>${dia}</strong></td>
+                </tr>
+            `;
+            listaRegistros.insertAdjacentHTML('beforeend', filaDia);
+
+            registros.forEach((registro) => {
                 const fecha = registro.fecha?.toDate();
                 const hora = fecha ? fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A'; // Formato de hora
-                const fila = `
+                const filaRegistro = `
                     <tr data-id="${registro.id}">
-                        <td>${index === 0 ? dia : ''}</td>
                         <td>${registro.email || 'N/A'}</td>
                         <td>${hora}</td>
                         <td>${registro.accion_registro || 'N/A'}</td>
                         <td>${registro.comentario || 'Sin Comentarios'}</td>
-                        <td>${index === 0 ? horasTrabajadas : ''}</td>
+                                                <td></td> <!-- Columna de horas vacía, ya que se mostrará al final -->
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
@@ -2745,9 +2753,20 @@ async function cargarRegistrosTotales() {
                         </td>
                     </tr>
                 `;
-                listaRegistros.insertAdjacentHTML('beforeend', fila);
+                listaRegistros.insertAdjacentHTML('beforeend', filaRegistro);
             });
+
+            // Fila para las horas trabajadas totales del día
+            const filaHoras = `
+                <tr class="total-horas-dia">
+                    <td colspan="4" class="text-right"><strong>Total Horas:</strong></td>
+                    <td><strong>${horasTrabajadas} hrs</strong></td>
+                    <td></td> <!-- Columna de acciones vacía -->
+                </tr>
+            `;
+            listaRegistros.insertAdjacentHTML('beforeend', filaHoras);
         });
+
     } catch (error) {
         console.error('Error al cargar registros:', error);
         Swal.fire({
@@ -2756,6 +2775,48 @@ async function cargarRegistrosTotales() {
             text: 'No se pudieron cargar los registros'
         });
     }
+}
+
+// Función auxiliar para agrupar registros por día
+function agruparRegistrosPorDia(registros) {
+    const registrosPorDia = {};
+
+    registros.forEach(registro => {
+        const datos = registro.data();
+        const fecha = datos.fecha?.toDate();
+        
+        if (fecha) {
+            const diaFormateado = fecha.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+            // Añadir email al registro para poder mostrarlo
+            datos.email = datos.email || 'N/A';
+            datos.id = registro.id;
+
+            if (!registrosPorDia[diaFormateado]) {
+                registrosPorDia[diaFormateado] = [];
+            }
+            registrosPorDia[diaFormateado].push(datos);
+        }
+    });
+
+    // Ordenar los días de forma descendente
+    const diasOrdenados = Object.keys(registrosPorDia).sort((a, b) => {
+        const fechaA = new Date(a.split('/').reverse().join('-'));
+        const fechaB = new Date(b.split('/').reverse().join('-'));
+        return fechaB - fechaA;
+    });
+
+    // Crear un nuevo objeto con los días ordenados
+    const registrosPorDiaOrdenados = {};
+    diasOrdenados.forEach(dia => {
+        registrosPorDiaOrdenados[dia] = registrosPorDia[dia];
+    });
+
+    return registrosPorDiaOrdenados;
 }
 
 // Función para obtener el ID de la empresa del usuario actual
