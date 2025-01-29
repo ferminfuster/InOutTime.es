@@ -2768,3 +2768,109 @@ async function obtenerEmpresaId() {
         return null;
     }
 }
+
+async function cargarResumenAsistencia() {
+    const mesSeleccionado = document.getElementById('selectMestotal').value;
+    const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
+
+    // Limpiar tabla
+    listaAsistencia.innerHTML = '';
+
+    try {
+        const empresaId = await obtenerEmpresaId();
+        if (!empresaId) {
+            console.error('No se pudo obtener el ID de la empresa');
+            return;
+        }
+
+        // Consultar todos los usuarios de la misma empresa
+        const usuariosRef = collection(db, 'usuarios');
+        const qUsuarios = query(usuariosRef, where('empresa', '==', empresaId));
+        const usuariosSnapshot = await getDocs(qUsuarios);
+
+        // Verificar si hay empleados
+        if (usuariosSnapshot.empty) {
+            console.log("No hay empleados registrados en la empresa");
+            listaAsistencia.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center">No hay empleados registrados en la empresa</td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Procesar cada usuario
+        const resumenPromises = usuariosSnapshot.docs.map(async (usuarioDoc) => {
+            const usuario = usuarioDoc.data();
+            const usuarioId = usuarioDoc.id;
+
+            // Consultar registros de este usuario
+            const registrosRef = collection(db, 'registros');
+            const qRegistros = query(
+                registrosRef,
+                where('userId', '==', usuarioId),
+                ...(mesSeleccionado !== "" 
+                    ? [where('fecha', '>=', new Date(new Date().getFullYear(), mesSeleccionado, 1)),
+                       where('fecha', '<=', new Date(new Date().getFullYear(), mesSeleccionado + 1, 0))] 
+                    : [])
+            );
+
+            const registrosSnapshot = await getDocs(qRegistros);
+
+            // Calcular total de horas
+            let totalHoras = 0;
+            const registrosPorDia = {};
+
+            registrosSnapshot.docs.forEach(registroDoc => {
+                const registro = registroDoc.data();
+                const fecha = registro.fecha.toDate();
+                const diaKey = fecha.toLocaleDateString();
+
+                if (!registrosPorDia[diaKey]) {
+                    registrosPorDia[diaKey] = [];
+                }
+                registrosPorDia[diaKey].push(registro);
+            });
+
+            // Calcular horas por día
+            Object.values(registrosPorDia).forEach(registrosDia => {
+                const horasDia = calcularHorasTrabajadas(registrosDia);
+                totalHoras += parseFloat(horasDia);
+            });
+
+            return {
+                email: usuario.email,
+                totalHoras: totalHoras.toFixed(2) // Formatear a dos decimales
+            };
+        });
+
+        // Esperar a que se procesen todos los usuarios
+        const resumen = await Promise.all(resumenPromises);
+
+        // Renderizar resumen
+        resumen.forEach(item => {
+            const fila = `
+                <tr>
+                    <td>${mesSeleccionado !== "" ? new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' }) : 'Todos los meses'}</td>
+                    <td>${item.email}</td>
+                    <td>${item.totalHoras} hrs</td>
+                </tr>
+            `;
+            listaAsistencia.insertAdjacentHTML('beforeend', fila);
+        });
+
+    } catch (error) {
+        console.error('Error al generar resumen de asistencia:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo generar el resumen de asistencia'
+        });
+    }
+}
+
+document.getElementById('selectMestotal').addEventListener('change', () => {
+    cargarRegistrosTotales();
+    cargarResumenAsistencia();
+});
+``
