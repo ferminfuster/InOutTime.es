@@ -2713,7 +2713,7 @@ async function cargarRegistrosTotales() {
         }
 
         // Procesar registros y agrupar por días
-        const registrosPorDia = agruparRegistrosPorDia(todosLosRegistros);
+        const registrosPorDia = agruparRegistrosPorDias(todosLosRegistros);
 
         // Renderizar tabla
         Object.keys(registrosPorDia).forEach((dia) => {
@@ -2778,7 +2778,7 @@ async function cargarRegistrosTotales() {
 }
 
 // Función auxiliar para agrupar registros por día
-function agruparRegistrosPorDia(registros) {
+function agruparRegistrosPorDias(registros) {
     const registrosPorDia = {};
 
     registros.forEach(registro => {
