@@ -2771,7 +2771,7 @@ async function obtenerEmpresaId() {
 //Cargar resumen
 async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
-    const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
+   // const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
 
     // Validar que se haya seleccionado un mes
     if (!mesSeleccionado || mesSeleccionado === "") {
