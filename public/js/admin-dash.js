@@ -2034,8 +2034,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-
-    //    // Función para ejecutar la transformación de forma inmediata
+    // Ejecutar transformación de inmediato
     function initializeRegistrosTransform() {
         // Ejecutar transformación
         transformRegistrosForMobile();
@@ -2044,7 +2043,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(transformRegistrosForMobile, 100);
     }
 
-    // Eventos para transformación
+    // Ejecutar transformación al cargar la página y al redimensionar
     window.addEventListener('load', initializeRegistrosTransform);
     window.addEventListener('resize', transformRegistrosForMobile);
 
@@ -2066,6 +2065,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 
 ///////////////////////////////////////////////
 // Cargar usuarios en el combo de selección //
