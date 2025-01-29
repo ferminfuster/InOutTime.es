@@ -2870,7 +2870,7 @@ async function cargarResumenAsistencia() {
 }
 // Cuando cambia el combo del mes se ejecutan las 2 funciones"
 document.getElementById('selectMestotal').addEventListener('change', () => {
-    cargarRegistrosTotales();
+   // cargarRegistrosTotales();
     cargarResumenAsistencia();
 });
 ``
