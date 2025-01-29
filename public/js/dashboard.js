@@ -241,7 +241,7 @@ onAuthStateChanged(auth, async (user) => {
       // Mostrar último registro del usuario
       await mostrarUltimoRegistro(user.uid);
       await calcularHorasTrabajadasHoy();
-      verificarSalidaAnterior();
+      //verificarSalidaAnterior();
 
     } else {
       //console.log("No se encontraron datos para este usuario.");
@@ -1113,6 +1113,7 @@ window.addEventListener('click', function(event) {
 /////////////////////////////////////
 // POP informando que ayer no ficho //
 //////////////////////////////////////
+/*
 async function verificarSalidaAnterior() {
   try {
       const response = await fetch('/api/ultimo-fichaje'); // Ajusta la API según tu backend
@@ -1129,4 +1130,4 @@ async function verificarSalidaAnterior() {
   } catch (error) {
       console.error("Error verificando fichaje anterior:", error);
   }
-}
+}*/
