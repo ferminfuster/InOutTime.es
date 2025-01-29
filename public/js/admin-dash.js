@@ -164,8 +164,8 @@ async function cargarUsuarios() {
         // Actualizar contador de usuarios
         document.getElementById('totalUsuarios').textContent = querySnapshot.size;
 
-        // LLamar a la función contarFichajesHoy
-        contarFichajesHoy();
+        // LLamar a la función contarUsuariosTrabajando
+        contarUsuariosTrabajando();
         //fichajesPendientes();
 
 
@@ -489,67 +489,70 @@ window.crearNuevoUsuario = async function (event) {
 /////////////////////////////////////
 // Añadir fichajes en Dashboard
 /////////////////////////////////////
-async function contarFichajesHoy() {
-    try {
-        if (!window.empresaGlobal) {
-            throw new Error("Empresa no definida");
+async function contarUsuariosTrabajando() {
+        try {
+            if (!window.empresaGlobal) {
+                throw new Error("Empresa no definida");
+            }
+    
+            // Obtener la fecha de hoy al inicio del día
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+    
+            // Referencia a la colección de registros
+            const registrosRef = collection(db, 'registros');
+    
+            // Consulta para obtener todos los fichajes (entrada y salida) de hoy
+            const q = query(
+                registrosRef,
+                where('empresa', '==', window.empresaGlobal),
+                where('fecha', '>=', Timestamp.fromDate(hoy)),
+                where('fecha', '<', Timestamp.fromDate(new Date(hoy.getTime() + 24 * 60 * 60 * 1000)))
+            );
+    
+            // Obtener snapshot
+            const querySnapshot = await getDocs(q);
+    
+            // Objeto para almacenar el último registro de cada usuario
+            const registrosPorUsuario = new Map();
+    
+            querySnapshot.forEach((doc) => {
+                const { email, accion_registro, fecha } = doc.data();
+    
+                // Guardar solo el registro más reciente de cada usuario
+                if (!registrosPorUsuario.has(email) || registrosPorUsuario.get(email).fecha.toMillis() < fecha.toMillis()) {
+                    registrosPorUsuario.set(email, { accion_registro, fecha });
+                }
+            });
+    
+            // Contar usuarios cuyo último registro es "entrada"
+            const usuariosTrabajando = Array.from(registrosPorUsuario.values())
+                .filter(registro => registro.accion_registro === 'entrada')
+                .length;
+    
+            // Actualizar el contador en el HTML
+            document.getElementById('fichajeshoy').textContent = usuariosTrabajando;
+    
+            console.log(`Usuarios actualmente trabajando en ${window.empresaGlobal}: ${usuariosTrabajando}`);
+            return usuariosTrabajando;
+    
+        } catch (error) {
+            console.error("Error al contar usuarios trabajando:", error);
+            
+            // Mostrar 0 en caso de error
+            document.getElementById('fichajeshoy').textContent = '0';
+    
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo contar los usuarios trabajando',
+                confirmButtonText: 'Entendido'
+            });
+    
+            return 0;
         }
-
-        // Obtener la fecha de hoy al inicio del día
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-
-        // Referencia a la colección de registros
-        const registrosRef = collection(db, 'registros');
-        
-        // Consulta para filtrar registros de hoy de la empresa actual
-        const q = query(
-            registrosRef, 
-            where('empresa', '==', window.empresaGlobal),
-            where('accion_registro', '==', 'entrada'),
-            where('fecha', '>=', Timestamp.fromDate(hoy)),
-            where('fecha', '<', Timestamp.fromDate(new Date(hoy.getTime() + 24 * 60 * 60 * 1000)))
-        );
-
-        // Obtener snapshot
-        const querySnapshot = await getDocs(q);
-
-        // Actualizar contador en el HTML
-        const contadorFichajes = document.getElementById('fichajeshoy');
-        
-        // Usar un Set para contar solo una entrada por usuario
-        const usuariosFichados = new Set();
-        querySnapshot.forEach((doc) => {
-            const email = doc.data().email; // Suponiendo que el campo email existe
-            usuariosFichados.add(email); // Agregar el email al Set
-        });
-
-        // Actualizar el contador con el tamaño del Set
-        contadorFichajes.textContent = usuariosFichados.size;
-
-        console.log(`Usuarios fichados hoy en ${window.empresaGlobal}: ${usuariosFichados.size}`);
-        console.log('Usuarios fichados:', Array.from(usuariosFichados));
-
-        return usuariosFichados.size;
-
-    } catch (error) {
-        console.error("Error al contar fichajes de hoy:", error);
-        
-        // Mostrar 0 en caso de error
-        const contadorFichajes = document.getElementById('fichajeshoy');
-        contadorFichajes.textContent = '0';
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo contar los fichajes de hoy',
-            confirmButtonText: 'Entendido'
-        });
-
-        return 0;
     }
-}
-
+    
 // Función para obtener más detalles de los fichajes de hoy
 async function obtenerDetallesFichajesHoy() {
     try {
