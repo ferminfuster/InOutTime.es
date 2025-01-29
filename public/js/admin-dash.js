@@ -2015,10 +2015,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 registroCard.innerHTML = `
                     <div class="registro-card-content">
                         <h3>${cells[0].textContent}</h3>
-                        <p><strong>Mes:</strong> ${cells[1].textContent}</p>
-                        <p><strong>Email:</strong> ${cells[2].textContent}</p>
-                        <p><strong>Dias:</strong> ${cells[3].textContent}</p>
-                        <p><strong>Horas:</strong> ${cells[4].textContent || 'Sin Horas'}</p>
+                        <p><strong>Email:</strong> ${cells[1].textContent}</p>
+                        <p><strong>Días Trabajados:</strong> ${cells[2].textContent}</p>
+                        <p><strong>Horas Trabajadas:</strong> ${cells[3].textContent || 'Sin Horas'}</p>
                     </div>
                 `;
 
@@ -2065,8 +2064,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-
 ///////////////////////////////////////////////
 // Cargar usuarios en el combo de selección //
 //////////////////////////////////////////////
