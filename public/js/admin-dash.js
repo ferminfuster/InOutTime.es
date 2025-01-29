@@ -2626,3 +2626,10 @@ function imprimirRegistros() {
 window.imprimirRegistros = imprimirRegistros;
 window.descargarRegistros = descargarRegistros;
 
+function cargarRegistrosTotales() {
+
+    // Lógica para cargar registros por usuario
+
+    console.log('Cargando registros por usuario...');
+
+}
