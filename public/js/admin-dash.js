@@ -2884,3 +2884,38 @@ async function cargarResumenAsistencia() {
 document.getElementById('selectMestotal').addEventListener('change', () => {
     cargarResumenAsistencia();
 });
+
+window.Impresora = Impresora;
+/////
+function Impresora() {
+    // Seleccionar el div que contiene la tabla
+    let contenido = document.querySelector('.table-responsive').innerHTML;
+
+    // Crear una ventana nueva
+    let ventanaImpresion = window.open('', '', 'width=800,height=600');
+
+    // Insertar contenido en la nueva ventana
+    ventanaImpresion.document.write(`
+        <html>
+        <head>
+            <title>Resumen de Asistencia</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid black; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+            </style>
+        </head>
+        <body>
+            ${contenido}  <!-- Se inserta la tabla en el documento -->
+            <script>
+                window.onload = function() { window.print(); window.close(); }
+            </script>
+        </body>
+        </html>
+    `);
+
+    // Cerrar la escritura del documento
+    ventanaImpresion.document.close();
+}
