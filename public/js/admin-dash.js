@@ -1725,9 +1725,6 @@ function descargarListaUsuarios() {
     }
 }
 
-// Asignar la función al botón
-document.querySelector('.btn-success').addEventListener('click', descargarListaUsuarios);
-
 
 ////////////////////////////////////////////
 // FUNCION ESCONDER EL BOTON EL MOVILES ////
