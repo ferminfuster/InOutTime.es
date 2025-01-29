@@ -2930,7 +2930,7 @@ function imprimirDivGenerico(boton) {
 }
 
 //////////// Global //////
-window.imprimirDivGenerico = imprimirDivGenerico;
+window.descargarDivComoPDF = descargarDivComoPDF;
 // Exportar a PDF
 async function descargarDivComoPDF(boton) {
     // Función para cargar un script de forma dinámica
