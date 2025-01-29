@@ -2768,7 +2768,7 @@ async function obtenerEmpresaId() {
         return null;
     }
 }
-
+//Cargar resumen
 async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
@@ -2818,19 +2818,19 @@ async function cargarResumenAsistencia() {
             const registrosSnapshot = await getDocs(qRegistros);
 
             // Calcular total de horas y días trabajados
-            let totalHoras = 0; // Asegúrate de que sea un número
-            const diasTrabajados = new Set(); // Usar un Set para contar días únicos
+            let totalHoras = 0; 
+            const diasTrabajados = new Set(); 
 
             registrosSnapshot.docs.forEach(registroDoc => {
                 const registro = registroDoc.data();
                 const fecha = registro.fecha.toDate();
-                diasTrabajados.add(fecha.toLocaleDateString()); // Agregar el día al Set
-                totalHoras += calcularHorasTrabajadas([registro]); // Sumar horas trabajadas
+                diasTrabajados.add(fecha.toLocaleDateString());
+                totalHoras += calcularHorasTrabajadas([registro]); 
             });
 
             return {
                 email: usuario.email,
-                diasTrabajados: diasTrabajados.size, // Número de días únicos
+                diasTrabajados: diasTrabajados.size,
                 totalHoras: totalHoras // Mantener como número
             };
         });
@@ -2838,14 +2838,24 @@ async function cargarResumenAsistencia() {
         // Esperar a que se procesen todos los usuarios
         const resumen = await Promise.all(resumenPromises);
 
-        // Renderizar resumen
+        // Renderizar resumen con verificación adicional
         resumen.forEach(item => {
+            // Asegurar que totalHoras sea un número
+            const horasTrabajadas = Number(item.totalHoras);
+            
+            // Verificar si es un número válido
+            const horasFormateadas = !isNaN(horasTrabajadas) 
+                ? horasTrabajadas.toFixed(2) 
+                : '0.00';
+
             const fila = `
                 <tr>
-                    <td>${mesSeleccionado !== "" ? new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' }) : 'Todos los meses'}</td>
+                    <td>${mesSeleccionado !== "" 
+                        ? new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' }) 
+                        : 'Todos los meses'}</td>
                     <td>${item.email}</td>
                     <td>${item.diasTrabajados}</td>
-                    <td>${item.totalHoras.toFixed(2)} hrs</td> <!-- Asegúrate de que totalHoras sea un número -->
+                    <td>${horasFormateadas} hrs</td>
                 </tr>
             `;
             listaAsistencia.insertAdjacentHTML('beforeend', fila);
@@ -2860,7 +2870,7 @@ async function cargarResumenAsistencia() {
         });
     }
 }
-
+// Cuando cambia el combo del mes se ejecutan las 2 funciones"
 document.getElementById('selectMestotal').addEventListener('change', () => {
     cargarRegistrosTotales();
     cargarResumenAsistencia();
