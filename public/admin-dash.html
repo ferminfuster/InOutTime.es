@@ -52,13 +52,12 @@
 
     <!-- Contenido Principal -->
     <div class="content" id="content">
+        <!-- Dashboard -->
         <div id="dashboard-section" class="content-section active-section">
             <h1>Panel de Control</h1>
-            
-            <!-- Sección de Resumen Principal -->
             <div class="row">
                 <div class="col-md-4">
-                    <div class="card bg-primary-light text-white mb-3">
+                    <div class="card bg-primary text-white mb-3">
                         <div class="card-body">
                             <h5>Total Usuarios</h5>
                             <h2 id="totalUsuarios">0</h2>
@@ -66,7 +65,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card bg-primary-light text-white mb-3">
+                    <div class="card bg-succes text-white mb-3">
                         <div class="card-body">
                             <h5>Usuarios Trabajando</h5>
                             <h2 id="fichajeshoy">0</h2>
@@ -74,48 +73,23 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card bg-danger-light text-white mb-3">
+                    <div class="card bg-warning text-white mb-3">
+                        <div class="card-body">
+                            <h5>Usuarios No trabajando</h5>
+                            <h2 id="fichajesPendientes">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white mb-3">
                         <div class="card-body">
                             <h5>Usuarios a Revisar</h5>
-                            <h2 id="UsuarioArevisar">0</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Sección de Información Adicional -->
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card bg-primary-light text-white mb-3">
-                        <div class="card-body">
-                            <h5>Licencia Actual</h5>
-                            <p id="tipoLicencia">Plan Básico</p>
-                            <small id="fechaExpiracion">Expira: 31/12/2024</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-primary-light text-white mb-3">
-                        <div class="card-body">
-                            <h5>Estado de la Empresa</h5>
-                            <p id="estadoEmpresa">Activo</p>
-                            <small id="empleadosActivos">Empleados Activos: 25</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-primary-light text-white mb-3">
-                        <div class="card-body">
-                            <h5>Productividad</h5>
-                            <h2 id="indiceProductividad">85%</h2>
-                            <small>Basado en horas trabajadas</small>
+                            <h2 id="fichajesPendientes">0</h2>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-            
 
 <!-- Sección Registros -->
 <div id="registros-section" class="content-section">
