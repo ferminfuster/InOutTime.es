@@ -2818,7 +2818,7 @@ async function cargarResumenAsistencia() {
             const registrosSnapshot = await getDocs(qRegistros);
 
             // Calcular total de horas y días trabajados
-            let totalHoras = 0;
+            let totalHoras = 0; // Asegúrate de que sea un número
             const diasTrabajados = new Set(); // Usar un Set para contar días únicos
 
             registrosSnapshot.docs.forEach(registroDoc => {
@@ -2831,7 +2831,7 @@ async function cargarResumenAsistencia() {
             return {
                 email: usuario.email,
                 diasTrabajados: diasTrabajados.size, // Número de días únicos
-                totalHoras: totalHoras.toFixed(2) // Formatear a dos decimales
+                totalHoras: totalHoras // Mantener como número
             };
         });
 
@@ -2845,7 +2845,7 @@ async function cargarResumenAsistencia() {
                     <td>${mesSeleccionado !== "" ? new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' }) : 'Todos los meses'}</td>
                     <td>${item.email}</td>
                     <td>${item.diasTrabajados}</td>
-                    <td>${item.totalHoras} hrs</td>
+                    <td>${item.totalHoras.toFixed(2)} hrs</td> <!-- Asegúrate de que totalHoras sea un número -->
                 </tr>
             `;
             listaAsistencia.insertAdjacentHTML('beforeend', fila);
