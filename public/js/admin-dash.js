@@ -2985,7 +2985,7 @@ async function descargarDivComoPDF(boton) {
         return;
     }
 
-    let nombreArchivo = "InOuttime_reporte.pdf";
+    let nombreArchivo = "InOutTime_reporte.pdf";
     let logoUrl = 'images/logo.png'; // Cambia esto por la ruta de tu logo
 
     // Crear un canvas para la cabecera
@@ -2994,24 +2994,27 @@ async function descargarDivComoPDF(boton) {
 
     // Establecer dimensiones del canvas para la cabecera
     cabeceraCanvas.width = 210; // Ancho de A4 en mm
-    cabeceraCanvas.height = 40; // Altura de la cabecera
+    cabeceraCanvas.height = 50; // Altura de la cabecera
 
     // Dibujar la cabecera (logo y texto)
     ctx.fillStyle = "#333"; // Color de texto
-    ctx.font = "18px Arial";
+    ctx.font = "16px Arial"; // Titulo con tamaño más pequeño
     ctx.textAlign = "center";
     
     // Cargar el logo
     let logoImage = new Image();
     logoImage.src = logoUrl;
     logoImage.onload = function() {
-        ctx.drawImage(logoImage, 10, 5, 30, 30); // Dibuja el logo en el canvas
+        // Ajustar el tamaño del logo para que no se distorsione
+        let logoWidth = 30; // Ancho del logo
+        let logoHeight = 30; // Altura del logo
+        ctx.drawImage(logoImage, 10, 10, logoWidth, logoHeight); // Dibuja el logo en el canvas
 
         // Agregar el texto
-        ctx.font = "18px Arial";
+        ctx.font = "16px Arial"; // Título
         ctx.fillText("InOutTime", 70, 20); // Título
-        ctx.font = "12px Arial";
-        ctx.fillText("Simplicidad que impulsa tu negocio", 70, 35); // Subtítulo
+        ctx.font = "12px Arial"; // Subtítulo
+        ctx.fillText("Simplicidad que impulsa tu negocio", 70, 40); // Subtítulo
 
         // Convertir el canvas de cabecera a imagen
         let cabeceraData = cabeceraCanvas.toDataURL("image/png");
@@ -3024,10 +3027,10 @@ async function descargarDivComoPDF(boton) {
             let pageHeight = 297; // Alto de A4 en mm
             let imgHeight = (canvas.height * imgWidth) / canvas.width; // Ajustar la altura proporcionalmente
 
-            let yPos = 40; // Posición inicial en la página (debajo de la cabecera)
+            let yPos = 50; // Posición inicial en la página (debajo de la cabecera)
 
             // Agregar la cabecera en la primera página
-            pdf.addImage(cabeceraData, "PNG", 0, 0, imgWidth, 40);
+            pdf.addImage(cabeceraData, "PNG", 0, 0, imgWidth, 50);
 
             // Si la imagen del contenido es más alta que una página, dividir en varias páginas
             if (imgHeight > pageHeight) {
@@ -3054,4 +3057,3 @@ async function descargarDivComoPDF(boton) {
         });
     };
 }
-
