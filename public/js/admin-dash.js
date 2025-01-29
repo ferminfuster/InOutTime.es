@@ -2728,8 +2728,7 @@ async function cargarRegistrosTotales() {
                         <td>${registro.email || 'N/A'}</td>
                         <td>${hora}</td>
                         <td>${registro.accion_registro || 'N/A'}</td>
-                        <td>${registro.comentario || 'Sin Comentarios'}</td>
-                        <td>${index === 0 ? horasTrabajadas : ''}</td>
+                        <td>${registro.comentario || 'Sin Comentarios'}</td>                   
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
