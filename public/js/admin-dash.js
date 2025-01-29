@@ -2929,8 +2929,9 @@ function imprimirDivGenerico(boton) {
     ventanaImpresion.document.close();
 }
 
-
-//Exportar a PDF
+//////////// Global //////
+window.imprimirDivGenerico = imprimirDivGenerico;
+// Exportar a PDF
 async function descargarDivComoPDF(boton) {
     // Función para cargar un script de forma dinámica
     async function cargarScript(url) {
