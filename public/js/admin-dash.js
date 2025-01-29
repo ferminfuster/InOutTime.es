@@ -1631,7 +1631,7 @@ window.descargarInformeUsuarios = async function () {
 };
   
   // Asignar la función al botón "Informe de Usuarios"
-  document.querySelector('.btn-warning').addEventListener('click', descargarInformeUsuarios);
+  //document.querySelector('.btn-warning').addEventListener('click', descargarInformeUsuarios);
   
   // Función para descargar usuarios en CSV
 function descargarListaUsuarios() {
