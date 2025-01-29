@@ -2773,6 +2773,17 @@ async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
 
+        // Validar que se haya seleccionado un mes
+        if (mesSeleccionado === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Selecciona un mes',
+                text: 'Por favor, elige un mes para generar el resumen de asistencia',
+                confirmButtonText: 'Entendido'
+            });
+            return;
+        }
+        
     // Limpiar tabla
     listaAsistencia.innerHTML = '';
 
@@ -2870,7 +2881,6 @@ async function cargarResumenAsistencia() {
 }
 // Cuando cambia el combo del mes se ejecutan las 2 funciones"
 document.getElementById('selectMestotal').addEventListener('change', () => {
-   // cargarRegistrosTotales();
     cargarResumenAsistencia();
 });
 ``
