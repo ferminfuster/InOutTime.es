@@ -2082,7 +2082,7 @@ async function cargarEmpresasCombo() {
         querySnapshot.forEach((doc) => {
             const empresa = doc.data();
             const option = document.createElement('option');
-            option.value = doc.id;
+            option.value = empresa.nombre_empresa;
             option.textContent = empresa.nombre_empresa; // Asegúrate de que el campo en Firestore se llama así
             selectEmpresas.appendChild(option);
         });
