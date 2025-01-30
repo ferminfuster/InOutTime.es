@@ -2103,7 +2103,7 @@ async function cargarEmpresasCombo() {
             selectEmpresa.add(option);
         });
         
-        console.log('Empresas cargadas exitosamente');
+        console.log('Empresas cargadas exitosamente para el combo');
     } catch (error) {
         console.error('Error al cargar empresas:', error);
         
@@ -2120,7 +2120,7 @@ async function cargarEmpresasCombo() {
 async function cargarInformeEmpresa() {
     // Obtener el select de empresas
     const selectEmpresa = document.getElementById('selectEmpresa');
-    selectUsuarios.innerHTML = '<option value="">Seleccione un empresa</option>';
+    selectEmpresa.innerHTML = '<option value="">Seleccione un empresa</option>';
     
     // Obtener el ID de la empresa seleccionada
     const empresaId = selectEmpresa.value;
