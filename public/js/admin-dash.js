@@ -493,69 +493,107 @@ window.crearNuevoUsuario = async function (event) {
 // Añadir Usuarios online en Dashboard
 /////////////////////////////////////
 async function contarUsuariosTrabajando() {
-        try {
-            if (!window.empresaGlobal) {
-                throw new Error("Empresa no definida");
-            }
-    
-            // Obtener la fecha de hoy al inicio del día
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
-    
-            // Referencia a la colección de registros
-            const registrosRef = collection(db, 'registros');
-    
-            // Consulta para obtener todos los fichajes (entrada y salida) de hoy
-            const q = query(
-                registrosRef,
-                where('empresa', '==', window.empresaGlobal),
-                where('fecha', '>=', Timestamp.fromDate(hoy)),
-                where('fecha', '<', Timestamp.fromDate(new Date(hoy.getTime() + 24 * 60 * 60 * 1000)))
-            );
-    
-            // Obtener snapshot
-            const querySnapshot = await getDocs(q);
-    
-            // Objeto para almacenar el último registro de cada usuario
-            const registrosPorUsuario = new Map();
-    
-            querySnapshot.forEach((doc) => {
-                const { email, accion_registro, fecha } = doc.data();
-    
-                // Guardar solo el registro más reciente de cada usuario
-                if (!registrosPorUsuario.has(email) || registrosPorUsuario.get(email).fecha.toMillis() < fecha.toMillis()) {
-                    registrosPorUsuario.set(email, { accion_registro, fecha });
-                }
-            });
-    
-            // Contar usuarios cuyo último registro es "entrada"
-            const usuariosTrabajando = Array.from(registrosPorUsuario.values())
-                .filter(registro => registro.accion_registro === 'entrada')
-                .length;
-    
-            // Actualizar el contador en el HTML
-            document.getElementById('fichajeshoy').textContent = usuariosTrabajando;
-    
-            console.log(`Usuarios actualmente trabajando en ${window.empresaGlobal}: ${usuariosTrabajando}`);
-            return usuariosTrabajando;
-    
-        } catch (error) {
-            console.error("Error al contar usuarios trabajando:", error);
-            
-            // Mostrar 0 en caso de error
-            document.getElementById('fichajeshoy').textContent = '0';
-    
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudo contar los usuarios trabajando',
-                confirmButtonText: 'Entendido'
-            });
-    
-            return 0;
+    try {
+        if (!window.empresaGlobal) {
+            throw new Error("Empresa no definida");
         }
-    }
 
+        // Obtener la fecha de hoy al inicio del día
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        // Referencia a la colección de registros
+        const registrosRef = collection(db, 'registros');
+
+        // Consulta para obtener todos los fichajes (entrada y salida) de hoy
+        const q = query(
+            registrosRef,
+            where('empresa', '==', window.empresaGlobal),
+            where('fecha', '>=', Timestamp.fromDate(hoy)),
+            where('fecha', '<', Timestamp.fromDate(new Date(hoy.getTime() + 24 * 60 * 60 * 1000)))
+        );
+
+        // Obtener snapshot
+        const querySnapshot = await getDocs(q);
+
+        // Objeto para almacenar el último registro de cada usuario
+        const registrosPorUsuario = new Map();
+
+        querySnapshot.forEach((doc) => {
+            const { email, accion_registro, fecha } = doc.data();
+
+            // Guardar solo el registro más reciente de cada usuario
+            if (!registrosPorUsuario.has(email) || registrosPorUsuario.get(email).fecha.toMillis() < fecha.toMillis()) {
+                registrosPorUsuario.set(email, { accion_registro, fecha });
+            }
+        });
+
+        // Convertir el Map a un array de usuarios trabajando
+        const usuariosTrabajando = Array.from(registrosPorUsuario.entries())
+            .filter(([_, registro]) => registro.accion_registro === 'entrada')
+            .map(([email, registro]) => ({
+                email,
+                ultimoRegistro: registro.fecha.toDate().toLocaleString()
+            }));
+
+        // Actualizar el contador en el HTML
+        const contadorElement = document.getElementById('fichajeshoy');
+        contadorElement.textContent = usuariosTrabajando.length;
+
+        // Hacer la tarjeta clickeable solo si hay usuarios trabajando
+        const cardElement = contadorElement.closest('.card');
+        if (usuariosTrabajando.length > 0) {
+            cardElement.style.cursor = 'pointer';
+            cardElement.onclick = () => {
+                Swal.fire({
+                    title: 'Usuarios Trabajando',
+                    icon: 'info',
+                    html: `
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Último Registro</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${usuariosTrabajando.map(user => `
+                                    <tr>
+                                        <td>${user.email}</td>
+                                        <td>${user.ultimoRegistro}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `,
+                    confirmButtonText: 'Entendido',
+                    width: '800px'
+                });
+            };
+        } else {
+            cardElement.style.cursor = 'default';
+            cardElement.onclick = null; // Eliminar evento de clic si no hay usuarios
+        }
+
+        console.log(`Usuarios actualmente trabajando en ${window.empresaGlobal}: ${usuariosTrabajando.length}`);
+        return usuariosTrabajando.length;
+
+    } catch (error) {
+        console.error("Error al contar usuarios trabajando:", error);
+        
+        // Mostrar 0 en caso de error
+        document.getElementById('fichajeshoy').textContent = '0';
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo contar los usuarios trabajando',
+            confirmButtonText: 'Entendido'
+        });
+
+        return 0;
+    }
+}
 ///////////////////////////////
 // Añadir Usuarios a Revisar //
 ///////////////////////////////
