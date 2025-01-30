@@ -590,17 +590,21 @@ async function contarUsuariosRevisar() {
 
             // Verificar si fecha es un Timestamp
             if (fecha instanceof Timestamp) {
-                // Convertir el Timestamp a Date
                 const fechaRegistro = fecha.toDate();
 
                 // Guardar solo el registro más reciente del usuario
                 if (!ultimosRegistrosPorUsuario.has(email)) {
-                    // Verificar que el registro sea anterior a hoy y sea una entrada
-                    if (fechaRegistro < hoy && accion_registro === 'entrada') {
+                    ultimosRegistrosPorUsuario.set(email, { 
+                        accion_registro, 
+                        fecha: fechaRegistro 
+                    });
+                } else {
+                    // Actualizar el registro si es más reciente
+                    const registroActual = ultimosRegistrosPorUsuario.get(email);
+                    if (fechaRegistro > registroActual.fecha) {
                         ultimosRegistrosPorUsuario.set(email, { 
                             accion_registro, 
-                            fecha, 
-                            fechaFormateada: fechaRegistro.toLocaleString() 
+                            fecha: fechaRegistro 
                         });
                     }
                 }
@@ -609,11 +613,12 @@ async function contarUsuariosRevisar() {
             }
         });
 
-        // Convertir el Map a un array de usuarios a revisar
+        // Filtrar usuarios cuyo último registro fue "entrada" y es anterior a hoy
         const usuariosRevisar = Array.from(ultimosRegistrosPorUsuario.entries())
+            .filter(([_, registro]) => registro.accion_registro === 'entrada' && registro.fecha < hoy)
             .map(([email, registro]) => ({
                 email,
-                ultimoRegistro: registro.fechaFormateada
+                ultimoRegistro: registro.fecha.toLocaleString()
             }));
 
         // Actualizar el contador en el HTML
