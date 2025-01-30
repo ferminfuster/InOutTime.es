@@ -565,6 +565,10 @@ async function contarUsuariosRevisar() {
             throw new Error("Empresa no definida");
         }
 
+        // Obtener la fecha de hoy al inicio del día
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
         // Referencia a la colección de registros
         const registrosRef = collection(db, 'registros');
 
@@ -586,22 +590,27 @@ async function contarUsuariosRevisar() {
 
             // Verificar si fecha es un Timestamp
             if (fecha instanceof Timestamp) {
+                // Convertir el Timestamp a Date
+                const fechaRegistro = fecha.toDate();
+
                 // Guardar solo el registro más reciente del usuario
                 if (!ultimosRegistrosPorUsuario.has(email)) {
-                    ultimosRegistrosPorUsuario.set(email, { 
-                        accion_registro, 
-                        fecha, 
-                        fechaFormateada: fecha.toDate().toLocaleString() 
-                    });
+                    // Verificar que el registro sea anterior a hoy y sea una entrada
+                    if (fechaRegistro < hoy && accion_registro === 'entrada') {
+                        ultimosRegistrosPorUsuario.set(email, { 
+                            accion_registro, 
+                            fecha, 
+                            fechaFormateada: fechaRegistro.toLocaleString() 
+                        });
+                    }
                 }
             } else {
                 console.warn(`El campo 'fecha' no es un Timestamp para el usuario: ${email}`);
             }
         });
 
-        // Filtrar usuarios cuyo último registro fue "entrada"
+        // Convertir el Map a un array de usuarios a revisar
         const usuariosRevisar = Array.from(ultimosRegistrosPorUsuario.entries())
-            .filter(([_, registro]) => registro.accion_registro === 'entrada')
             .map(([email, registro]) => ({
                 email,
                 ultimoRegistro: registro.fechaFormateada
@@ -646,7 +655,7 @@ async function contarUsuariosRevisar() {
             cardElement.onclick = null;
         }
 
-                console.log(`Usuarios a revisar en ${window.empresaGlobal}: ${usuariosRevisar.length}`);
+        console.log(`Usuarios a revisar en ${window.empresaGlobal}: ${usuariosRevisar.length}`);
         return usuariosRevisar.length;
 
     } catch (error) {
