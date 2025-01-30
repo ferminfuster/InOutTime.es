@@ -2230,6 +2230,25 @@ function calcularHorasTrabajadas(registros) {
 
     return horasTrabajadas > 0 ? horasTrabajadas.toFixed(2) + ' hrs' : 'N/A';
 }
+
+// Función para agrupar registros por día
+function agruparRegistrosPorDia(querySnapshot) {
+    const registrosPorDia = {};
+
+    querySnapshot.forEach((doc) => {
+        const registro = { ...doc.data(), id: doc.id };
+        const fecha = registro.fecha?.toDate();
+        const dia = fecha?.toLocaleDateString('es-ES');
+
+        if (!registrosPorDia[dia]) {
+            registrosPorDia[dia] = [];
+        }
+        registrosPorDia[dia].push(registro);
+    });
+
+    return registrosPorDia;
+}
+
 // Llamada Global - Cargar Registros de todos los usuarios
 window.cargarRegistrosTotales = cargarRegistrosTotales;
 // Cargar Registros de todos los usuarios.
