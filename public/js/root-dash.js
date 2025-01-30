@@ -2183,6 +2183,7 @@ async function cargarResumenAsistencia() {
             const fila = `
                 <tr>
                     <td>${new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' })}</td>
+                    <td>${item.nombre}</td>
                     <td>${item.email}</td>
                     <td>${item.diasTrabajados}</td>
                     <td>${horasFormateadas}</td>
