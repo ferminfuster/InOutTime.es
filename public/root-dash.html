@@ -151,6 +151,12 @@
             <h2>Informes</h2>
             <div class="row mb-3">
                 <div class="col-md-6">
+                    <label for="selectEmpresa">Seleccionar Empresa:</label>
+                    <select id="selectEmpresa" class="form-control" onchange="cargarInformeEmpresa()">
+                        <option value="">Seleccione un usuario</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
                     <label for="selectMestotal">Seleccionar Mes:</label>
                     <select id="selectMestotal" class="form-control" >
                         <option value="">Seleccione un mes</option>
@@ -221,7 +227,7 @@
         
 
         </div>
-        
+
 <!-- Modal Nueva Empresa -->
 <div class="modal fade" id="modalNuevaEmpresa">
     <div class="modal-dialog modal-custom">
