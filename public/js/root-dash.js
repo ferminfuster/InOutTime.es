@@ -2097,6 +2097,8 @@ async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const empresaId = document.getElementById('selectEmpresa').value; // Ya es el ID de la empresa
     const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
+    const listaRegistros = document.getElementById('listaTodosRegistros').getElementsByTagName('tbody')[0]; //Limpia la tabla Mostrar detalles
+    const totalRegistros = document.getElementById('totalRegistros'); // Limpia el valor de abajo.
 
     console.log("Mes seleccionado:", mesSeleccionado);
     console.log("ID de Empresa seleccionada:", empresaId);
@@ -2114,6 +2116,10 @@ async function cargarResumenAsistencia() {
 
     // Limpiar tabla
     listaAsistencia.innerHTML = '';
+
+    // Limpiar tabla Totales
+    listaRegistros.innerHTML = '';
+    totalRegistros.textContent = '0';
 
     try {
         // Consultar todos los usuarios de la empresa
