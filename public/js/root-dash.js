@@ -2230,7 +2230,8 @@ function calcularHorasTrabajadas(registros) {
 
     return horasTrabajadas > 0 ? horasTrabajadas.toFixed(2) + ' hrs' : 'N/A';
 }
-
+// Llamada Global - Cargar Registros de todos los usuarios
+window.cargarRegistrosTotales = cargarRegistrosTotales;
 // Cargar Registros de todos los usuarios.
 async function cargarRegistrosTotales() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
