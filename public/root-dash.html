@@ -158,7 +158,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="selectMestotal">Seleccionar Mes:</label>
-                    <select id="selectMestotal" class="form-control" onchange="cargarResumenAsistencia()" >
+                    <select id="selectMestotal" class="form-control" >
                         <option value="">Seleccione un mes</option>
                         <option value="0">Enero</option>
                         <option value="1">Febrero</option>
@@ -222,6 +222,11 @@
                 <div class="acciones">
                     <button class="btn btn-primary mb-3" onclick="descargarDivComoPDF(this)">Descargar PDF</button>
                     <button class="btn btn-primary mb-3" onclick="imprimirDivGenerico(this)">Imprimir</button>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <strong>Total Registros: <span id="totalRegistros">0</span></strong>
+                    </div>
                 </div>
             </div>
         
