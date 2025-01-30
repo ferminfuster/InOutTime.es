@@ -1339,11 +1339,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.cargarUsuarios();
     }
 
-    // Cargar Empresas al iniciar
-    if (document.getElementById('usuarios-section')) {
-        console.log("Sección de Informes cargando empresas en combo");
-        window.cargarEmpresas();
-    }
+
 });
 
 /////////// ACCIONES CON BOTONES USUARIO////////////////////////

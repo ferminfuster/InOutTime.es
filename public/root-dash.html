@@ -151,9 +151,9 @@
             <h2>Informes</h2>
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="selectEmpresa">Seleccionar Empresa:</label>
-                    <select id="selectEmpresa" class="form-control" onchange="cargarInformeEmpresa()">
-                        <option value="">Seleccione un empresa</option>
+                    <select class="form-control mb-6" id="empresa" required>
+                        <option value="">Seleccionar Empresa</option>
+                        <!-- Las opciones de empresa se cargarán dinámicamente -->
                     </select>
                 </div>
                 <div class="col-md-6">
