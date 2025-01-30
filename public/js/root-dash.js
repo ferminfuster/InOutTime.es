@@ -1990,7 +1990,9 @@ function imprimirDivGenerico(boton) {
 }
 
 
-//////////// Global //////
+/////////////////////////////
+// Exportar a PDF ///////////
+///////////////////////////
 window.descargarDivComoPDF = descargarDivComoPDF;
 // Exportar a PDF
 async function descargarDivComoPDF(boton) {
@@ -2061,3 +2063,102 @@ async function descargarDivComoPDF(boton) {
         pdf.save(nombreArchivo);
     });
 }
+
+///////////////////////
+// Seccion INFORMES //
+//////////////////////
+
+// Función para cargar empresas en el select
+async function cargarEmpresas() {
+    try {
+        // Referencia a la colección de empresas
+        const empresasRef = collection(db, 'empresas');
+        
+        // Query para obtener todas las empresas
+        const q = query(empresasRef, orderBy('nombre')); // Opcional: ordenar por nombre
+        
+        // Obtener snapshot
+        const querySnapshot = await getDocs(q);
+        
+        // Obtener el elemento select
+        const selectEmpresa = document.getElementById('selectEmpresa');
+        
+        // Limpiar opciones existentes (excepto la primera)
+        while (selectEmpresa.options.length > 1) {
+            selectEmpresa.remove(1);
+        }
+        
+        // Iterar sobre las empresas y añadir al select
+        querySnapshot.forEach((doc) => {
+            const empresa = doc.data();
+            const option = document.createElement('option');
+            option.value = doc.id; // Usar el ID del documento como valor
+            option.text = empresa.nombre; // Mostrar el nombre de la empresa
+            
+            // Puedes añadir más atributos si lo necesitas
+            option.setAttribute('data-codigo', empresa.codigo);
+            
+            selectEmpresa.add(option);
+        });
+        
+        console.log('Empresas cargadas exitosamente');
+    } catch (error) {
+        console.error('Error al cargar empresas:', error);
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar las empresas',
+            confirmButtonText: 'Entendido'
+        });
+    }
+}
+
+// Función para cargar informes de la empresa seleccionada
+async function cargarInformeEmpresa() {
+    // Obtener el select de empresas
+    const selectEmpresa = document.getElementById('selectEmpresa');
+    
+    // Obtener el ID de la empresa seleccionada
+    const empresaId = selectEmpresa.value;
+    
+    if (!empresaId) {
+        // Si no se ha seleccionado empresa, limpiar o resetear informes
+        return;
+    }
+    
+    try {
+        // Aquí implementarías la lógica para cargar informes específicos de la empresa
+        // Por ejemplo, actualizar tablas, gráficos, etc.
+        
+        // Ejemplo de cómo podrías obtener datos de la empresa
+        const empresaRef = doc(db, 'empresas', empresaId);
+        const empresaSnap = await getDoc(empresaRef);
+        
+        if (empresaSnap.exists()) {
+            const empresaData = empresaSnap.data();
+            console.log('Datos de la empresa:', empresaData);
+            
+            // Actualizar elementos con información de la empresa
+            // document.getElementById('nombreEmpresa').textContent = empresaData.nombre;
+            
+            // Cargar informes específicos de la empresa
+            // await cargarRegistrosEmpresa(empresaId);
+            // await cargarUsuariosEmpresa(empresaId);
+        }
+    } catch (error) {
+        console.error('Error al cargar informe de empresa:', error);
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo cargar el informe de la empresa',
+            confirmButtonText: 'Entendido'
+        });
+    }
+}
+
+// Cargar empresas cuando se carga la página
+document.addEventListener('DOMContentLoaded', () => {
+    cargarEmpresas();
+});
