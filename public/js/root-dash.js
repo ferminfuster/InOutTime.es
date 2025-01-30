@@ -2170,7 +2170,8 @@ async function cargarResumenAsistencia() {
             return {
                 email: usuario.email,
                 diasTrabajados: diasTrabajados.size,
-                totalHoras: totalHoras
+                totalHoras: totalHoras,
+                nombre: usuario.nombre
             };
         });
 
@@ -2183,7 +2184,7 @@ async function cargarResumenAsistencia() {
             const fila = `
                 <tr>
                     <td>${new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' })}</td>
-                    <td>${usuario.nombre}</td>
+                    <td>${item.nombre}</td>
                     <td>${item.email}</td>
                     <td>${item.diasTrabajados}</td>
                     <td>${horasFormateadas}</td>
