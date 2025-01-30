@@ -582,13 +582,18 @@ async function contarUsuariosRevisar() {
         querySnapshot.forEach((doc) => {
             const { email, accion_registro, fecha } = doc.data();
 
-            // Guardar solo el registro más reciente del usuario
-            if (!ultimosRegistrosPorUsuario.has(email)) {
-                ultimosRegistrosPorUsuario.set(email, { 
-                    accion_registro, 
-                    fecha, 
-                    fechaFormateada: fecha.toDate().toLocaleString() 
-                });
+            // Verificar si fecha es un Timestamp
+            if (fecha instanceof Timestamp) {
+                // Guardar solo el registro más reciente del usuario
+                if (!ultimosRegistrosPorUsuario.has(email)) {
+                    ultimosRegistrosPorUsuario.set(email, { 
+                        accion_registro, 
+                        fecha, 
+                        fechaFormateada: fecha.toDate().toLocaleString() 
+                    });
+                }
+            } else {
+                console.warn(`El campo 'fecha' no es un Timestamp para el usuario: ${email}`);
             }
         });
 
@@ -639,7 +644,7 @@ async function contarUsuariosRevisar() {
             cardElement.onclick = null;
         }
 
-        console.log(`Usuarios a revisar en ${window.empresaGlobal}: ${usuariosRevisar.length}`);
+                console.log(`Usuarios a revisar en ${window.empresaGlobal}: ${usuariosRevisar.length}`);
         return usuariosRevisar.length;
 
     } catch (error) {
