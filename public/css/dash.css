@@ -50,8 +50,8 @@ body {
 .sidebar-toggle {
     display: none; /* Oculto por defecto */
     position: fixed;
-    left: 15px;
-    top: 15px;
+    left: 5px;
+    top: 5px;
     z-index: 1100;
     background: var(--primary-color);
     color: white;
