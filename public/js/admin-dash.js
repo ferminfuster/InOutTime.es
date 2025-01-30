@@ -3184,7 +3184,9 @@ async function cargarResumenAsistencia() {
 document.getElementById('selectMestotal').addEventListener('change', () => {
     cargarResumenAsistencia();
 });
-
+//////////////////////////
+// Imprimir Generico ////
+////////////////////////
 window.imprimirDivGenerico = imprimirDivGenerico;
 ///
 function imprimirDivGenerico(boton) {

@@ -1921,3 +1921,143 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+//////////////////////////
+// Imprimir Generico ////
+////////////////////////
+window.imprimirDivGenerico = imprimirDivGenerico;
+///
+function imprimirDivGenerico(boton) {
+    // Buscar el div contenedor más cercano al botón
+    let divContenedor = boton.closest('div.table-responsive');
+
+    if (!divContenedor) {
+        alert("No se encontró el contenido a imprimir.");
+        return;
+    }
+
+    // Obtener el contenido del div
+    let contenido = divContenedor.innerHTML;
+
+    // Ruta del logo (puedes poner la URL de tu logo o usar un archivo local)
+    let logoUrl = 'images/logo.png'; // Cambia esto por la ruta de tu logo
+
+    // Crear una nueva ventana emergente para imprimir
+    let ventanaImpresion = window.open('', '', 'width=800,height=600');
+
+    // Escribir el contenido en la nueva ventana
+    ventanaImpresion.document.write(`
+        <html>
+        <head>
+            <title>Impresión</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                body { font-family: Arial, sans-serif; padding: 30px; }
+                .header { text-align: center; margin-bottom: 20px; }
+                .header img { max-width: 150px; }
+                .table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                th, td { border: 1px solid black; padding: 10px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .acciones { display: none; } /* Ocultar los botones al imprimir */
+                .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #888; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <img src="${logoUrl}" alt="Logo de la Empresa">
+                <h2>InOutTime</h2>
+                <p>Simplicidad que impulsa tu negocio</p>
+            </div>
+
+            ${contenido}
+
+            <div class="footer">
+                <p>Este documento ha sido generado por InOutTime.</p>
+            </div>
+
+            <script>
+                window.onload = function() {
+                    window.print();
+                    window.close();
+                }
+            </script>
+        </body>
+        </html>
+    `);
+
+    // Cerrar la escritura del documento
+    ventanaImpresion.document.close();
+}
+
+
+//////////// Global //////
+window.descargarDivComoPDF = descargarDivComoPDF;
+// Exportar a PDF
+async function descargarDivComoPDF(boton) {
+    // Cargar librerías dinámicamente si no están disponibles
+    async function cargarScript(url) {
+        return new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${url}"]`)) {
+                resolve();
+                return;
+            }
+            let script = document.createElement("script");
+            script.src = url;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    // Cargar las librerías si no están ya cargadas
+    await cargarScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    await cargarScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+
+    // Verificar que las librerías están disponibles
+    if (!window.jspdf || !window.html2canvas) {
+        alert("Error al cargar las librerías para generar el PDF.");
+        return;
+    }
+
+    let divContenedor = boton.closest('div.table-responsive');
+    if (!divContenedor) {
+        alert("No se encontró el contenido a descargar.");
+        return;
+    }
+
+    let nombreArchivo = "InOutTime_reporte.pdf";
+
+    // Convertir el div a una imagen
+    html2canvas(divContenedor, { scale: 2 }).then(canvas => {
+        let imgData = canvas.toDataURL("image/png");
+        let pdf = new jspdf.jsPDF("p", "mm", "a4");
+        let imgWidth = 210; // Ancho de A4 en mm
+        let pageHeight = 297; // Alto de A4 en mm
+        let imgHeight = (canvas.height * imgWidth) / canvas.width; // Ajustar la altura proporcionalmente
+
+        let yPos = 10; // Posición inicial en la página
+
+        // Si la imagen es más alta que una página, dividir en varias páginas
+        if (imgHeight > pageHeight) {
+            let totalPages = Math.ceil(imgHeight / pageHeight);
+
+            for (let i = 0; i < totalPages; i++) {
+                let cropCanvas = document.createElement("canvas");
+                let cropContext = cropCanvas.getContext("2d");
+                cropCanvas.width = canvas.width;
+                cropCanvas.height = (canvas.height / totalPages);
+
+                cropContext.drawImage(canvas, 0, -(i * cropCanvas.height), canvas.width, canvas.height);
+                
+                let croppedImage = cropCanvas.toDataURL("image/png");
+                
+                if (i > 0) pdf.addPage(); // Agregar nueva página después de la primera
+                pdf.addImage(croppedImage, "PNG", 0, yPos, imgWidth, pageHeight);
+            }
+        } else {
+            pdf.addImage(imgData, "PNG", 0, yPos, imgWidth, imgHeight);
+        }
+
+        pdf.save(nombreArchivo);
+    });
+}
