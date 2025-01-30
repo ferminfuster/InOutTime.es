@@ -176,21 +176,21 @@ footer {
     align-items: center;
     width: 60px;
     height: 60px;
-    background-color: #25d366;
+    background-color: #25d366; /* Color de WhatsApp */
     color: white;
     border-radius: 50%;
     text-decoration: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
 
 .whatsapp-button i {
-    font-size: 30px;
+    font-size: 30px; /* Tamaño del ícono */
 }
 
 .whatsapp-button:hover {
-    background-color: #128c7e;
-    transform: scale(1.1);
+    background-color: #128c7e; /* Color de fondo al pasar el mouse */
+    transform: scale(1.1); /* Efecto de escala al pasar el mouse */
 }
 
 /* Animación de entrada */
@@ -206,7 +206,7 @@ footer {
 }
 
 .whatsapp-float {
-    animation: floatIn 0.5s ease-out;
+    animation: floatIn 0.5s ease-out; /* Animación al cargar */
 }
 
 /* Responsive */
@@ -222,6 +222,6 @@ footer {
     }
 
     .whatsapp-button i {
-        font-size: 25px;
+        font-size: 25px; /* Tamaño del ícono en móviles */
     }
 }
