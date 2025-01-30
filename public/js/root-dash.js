@@ -2095,18 +2095,29 @@ async function cargarEmpresasCombo() {
 
 async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
-    const nombreEmpresa = document.getElementById('selectEmpresa').value; // Obtener nombre de empresa
+    const empresaId = document.getElementById('selectEmpresa').value; // Tomar empresa desde el select
     const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
 
     console.log("Mes seleccionado:", mesSeleccionado);
-    console.log("Empresa seleccionada:", nombreEmpresa);
+    console.log("Empresa seleccionada:", empresaId);
+
+    // Validar selección de empresa
+    if (!empresaId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona una empresa',
+            text: 'Por favor, elige una empresa antes de generar el resumen de asistencia',
+            confirmButtonText: 'Entendido'
+        });
+        return;
+    }
 
     // Validar selección de mes
     if (mesSeleccionado === "" || isNaN(mesSeleccionado) || mesSeleccionado < 0 || mesSeleccionado > 11) {
         Swal.fire({
             icon: 'warning',
             title: 'Selecciona un mes',
-            text: 'Por favor, elige un mes para generar el resumen de asistencia',
+            text: 'Por favor, elige un mes válido para generar el resumen de asistencia',
             confirmButtonText: 'Entendido'
         });
         return;
@@ -2116,33 +2127,14 @@ async function cargarResumenAsistencia() {
     listaAsistencia.innerHTML = '';
 
     try {
-        // Obtener ID de la empresa a partir del nombre
-        const empresasRef = collection(db, 'empresas');
-        const qEmpresa = query(empresasRef, where('nombre', '==', nombreEmpresa));
-        const empresaSnapshot = await getDocs(qEmpresa);
-
-        if (empresaSnapshot.empty) {
-            console.error('No se encontró la empresa con el nombre:', nombreEmpresa);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se encontró la empresa seleccionada'
-            });
-            return;
-        }
-
-        // Obtener el ID de la empresa
-        const empresaId = empresaSnapshot.docs[0].id;
-        console.log("ID de empresa obtenida:", empresaId);
-
-        // Consultar todos los usuarios de la empresa
+        // Consultar todos los usuarios de la misma empresa
         const usuariosRef = collection(db, 'usuarios');
         const qUsuarios = query(usuariosRef, where('empresa', '==', empresaId));
         const usuariosSnapshot = await getDocs(qUsuarios);
 
         // Verificar si hay empleados
         if (usuariosSnapshot.empty) {
-            console.log("No hay empleados registrados en la empresa");
+            console.log("No hay empleados registrados en la empresa seleccionada");
             listaAsistencia.innerHTML = `
                 <tr>
                     <td colspan="4" class="text-center">No hay empleados registrados en la empresa</td>
@@ -2171,34 +2163,33 @@ async function cargarResumenAsistencia() {
             let totalHoras = 0;
             const diasTrabajados = new Set();
 
-            const registros = registrosSnapshot.docs.map(doc => doc.data());
-
-            registros.forEach(registroDoc => {
-                const fecha = registroDoc.fecha.toDate();
+            registrosSnapshot.docs.forEach(doc => {
+                const registro = doc.data();
+                const fecha = registro.fecha.toDate();
                 diasTrabajados.add(fecha.toLocaleDateString());
             });
 
-            totalHoras = calcularHorasTrabajadas(registros);
+            // Calcular horas trabajadas usando la función
+            totalHoras = calcularHorasTrabajadas(registrosSnapshot.docs.map(doc => doc.data()));
 
             return {
                 email: usuario.email,
                 diasTrabajados: diasTrabajados.size,
-                totalHoras: totalHoras
+                totalHoras: totalHoras.toFixed(2) + ' hrs'
             };
         });
 
         // Esperar a que se procesen todos los usuarios
         const resumen = await Promise.all(resumenPromises);
 
-        // Renderizar resumen
+        // Renderizar resumen en la tabla
         resumen.forEach(item => {
-            const horasFormateadas = typeof item.totalHoras === 'string' ? item.totalHoras : item.totalHoras.toFixed(2) + ' hrs';
             const fila = `
                 <tr>
                     <td>${new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' })}</td>
                     <td>${item.email}</td>
                     <td>${item.diasTrabajados}</td>
-                    <td>${horasFormateadas}</td>
+                    <td>${item.totalHoras}</td>
                 </tr>
             `;
             listaAsistencia.insertAdjacentHTML('beforeend', fila);
@@ -2214,9 +2205,11 @@ async function cargarResumenAsistencia() {
     }
 }
 
+
+
 // Evento para cargar el resumen cuando cambian el mes o la empresa
 document.getElementById('selectMestotal').addEventListener('change', cargarResumenAsistencia);
-document.getElementById('selectEmpresa').addEventListener('change', cargarResumenAsistencia);
+//document.getElementById('selectEmpresa').addEventListener('change', cargarResumenAsistencia);
 
 
 
