@@ -2093,45 +2093,131 @@ async function cargarEmpresasCombo() {
     }
 }
 
-// Función para cargar informes de la empresa seleccionada
-async function cargarInformeEmpresa() {
-    const selectEmpresa = document.getElementById('selectEmpresa');
+async function cargarResumenAsistencia() {
+    const mesSeleccionado = document.getElementById('selectMestotal').value;
+    const nombreEmpresa = document.getElementById('selectEmpresa').value; // Obtener nombre de empresa
+    const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
 
-    // Limpiar el select antes de actualizar (si aplica)
-    selectEmpresa.innerHTML = '<option value="">Seleccione una empresa</option>';
+    console.log("Mes seleccionado:", mesSeleccionado);
+    console.log("Empresa seleccionada:", nombreEmpresa);
 
-    const empresaId = selectEmpresa.value;
-
-    if (!empresaId) {
+    // Validar selección de mes
+    if (mesSeleccionado === "" || isNaN(mesSeleccionado) || mesSeleccionado < 0 || mesSeleccionado > 11) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona un mes',
+            text: 'Por favor, elige un mes para generar el resumen de asistencia',
+            confirmButtonText: 'Entendido'
+        });
         return;
     }
 
+    // Limpiar tabla
+    listaAsistencia.innerHTML = '';
+
     try {
-        const empresaRef = doc(db, 'empresas', empresaId);
-        const empresaSnap = await getDoc(empresaRef);
+        // Obtener ID de la empresa a partir del nombre
+        const empresasRef = collection(db, 'empresas');
+        const qEmpresa = query(empresasRef, where('nombre', '==', nombreEmpresa));
+        const empresaSnapshot = await getDocs(qEmpresa);
 
-        if (empresaSnap.exists()) {
-            const empresaData = empresaSnap.data();
-            console.log('Datos de la empresa:', empresaData);
-
-            // Aquí puedes actualizar otros elementos en la página con la información de la empresa
-            // document.getElementById('nombreEmpresa').textContent = empresaData.nombre;
-
-            // Cargar informes específicos de la empresa si aplica
-            // await cargarRegistrosEmpresa(empresaId);
-            // await cargarUsuariosEmpresa(empresaId);
+        if (empresaSnapshot.empty) {
+            console.error('No se encontró la empresa con el nombre:', nombreEmpresa);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se encontró la empresa seleccionada'
+            });
+            return;
         }
-    } catch (error) {
-        console.error('Error al cargar informe de empresa:', error);
 
+        // Obtener el ID de la empresa
+        const empresaId = empresaSnapshot.docs[0].id;
+        console.log("ID de empresa obtenida:", empresaId);
+
+        // Consultar todos los usuarios de la empresa
+        const usuariosRef = collection(db, 'usuarios');
+        const qUsuarios = query(usuariosRef, where('empresa', '==', empresaId));
+        const usuariosSnapshot = await getDocs(qUsuarios);
+
+        // Verificar si hay empleados
+        if (usuariosSnapshot.empty) {
+            console.log("No hay empleados registrados en la empresa");
+            listaAsistencia.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center">No hay empleados registrados en la empresa</td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Procesar cada usuario
+        const resumenPromises = usuariosSnapshot.docs.map(async (usuarioDoc) => {
+            const usuario = usuarioDoc.data();
+            const usuarioId = usuarioDoc.id;
+
+            // Consultar registros de este usuario
+            const registrosRef = collection(db, 'registros');
+            const qRegistros = query(
+                registrosRef,
+                where('userId', '==', usuarioId),
+                where('fecha', '>=', new Date(new Date().getFullYear(), mesSeleccionado, 1)),
+                where('fecha', '<=', new Date(new Date().getFullYear(), mesSeleccionado + 1, 0))
+            );
+
+            const registrosSnapshot = await getDocs(qRegistros);
+
+            // Calcular total de horas y días trabajados
+            let totalHoras = 0;
+            const diasTrabajados = new Set();
+
+            const registros = registrosSnapshot.docs.map(doc => doc.data());
+
+            registros.forEach(registroDoc => {
+                const fecha = registroDoc.fecha.toDate();
+                diasTrabajados.add(fecha.toLocaleDateString());
+            });
+
+            totalHoras = calcularHorasTrabajadas(registros);
+
+            return {
+                email: usuario.email,
+                diasTrabajados: diasTrabajados.size,
+                totalHoras: totalHoras
+            };
+        });
+
+        // Esperar a que se procesen todos los usuarios
+        const resumen = await Promise.all(resumenPromises);
+
+        // Renderizar resumen
+        resumen.forEach(item => {
+            const horasFormateadas = typeof item.totalHoras === 'string' ? item.totalHoras : item.totalHoras.toFixed(2) + ' hrs';
+            const fila = `
+                <tr>
+                    <td>${new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' })}</td>
+                    <td>${item.email}</td>
+                    <td>${item.diasTrabajados}</td>
+                    <td>${horasFormateadas}</td>
+                </tr>
+            `;
+            listaAsistencia.insertAdjacentHTML('beforeend', fila);
+        });
+
+    } catch (error) {
+        console.error('Error al generar resumen de asistencia:', error);
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudo cargar el informe de la empresa',
-            confirmButtonText: 'Entendido'
+            text: 'No se pudo generar el resumen de asistencia'
         });
     }
 }
+
+// Evento para cargar el resumen cuando cambian el mes o la empresa
+document.getElementById('selectMestotal').addEventListener('change', cargarResumenAsistencia);
+document.getElementById('selectEmpresa').addEventListener('change', cargarResumenAsistencia);
+
 
 
 // Cargar empresas cuando se carga la página

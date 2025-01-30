@@ -152,13 +152,13 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="selectEmpresa">Seleccionar Empresa:</label>
-                    <select id="selectEmpresa" class="form-control" onchange="cargarInformeEmpresa()">
+                    <select id="selectEmpresa" class="form-control">
                         <option value="">Seleccione un empresa</option>
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label for="selectMestotal">Seleccionar Mes:</label>
-                    <select id="selectMestotal" class="form-control" >
+                    <select id="selectMestotal" class="form-control" onchange="cargarResumenAsistencia()" >
                         <option value="">Seleccione un mes</option>
                         <option value="0">Enero</option>
                         <option value="1">Febrero</option>

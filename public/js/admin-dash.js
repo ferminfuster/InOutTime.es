@@ -3063,7 +3063,9 @@ async function obtenerEmpresaId() {
         return null;
     }
 }
-//Cargar resumen
+///////////////////////////////////////////
+// INFORMES - Cargan Resumen Asistencia //
+/////////////////////////////////////////
 async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
