@@ -111,27 +111,18 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const whatsappFloat = document.querySelector('.whatsapp-float');
-    
-    // Función para mostrar/ocultar el botón según el scroll
-    function toggleWhatsappButton() {
-        // Muestra el botón solo después de un cierto punto de scroll
-        if (window.scrollY > 200) {
-            whatsappFloat.style.display = 'block';
-        } else {
-            whatsappFloat.style.display = 'none';
-        }
-    }
 
-    // Añadir evento de scroll
-    window.addEventListener('scroll', toggleWhatsappButton);
+    // Asegúrate de que el botón sea visible al cargar la página
+    whatsappFloat.style.display = 'block'; // Asegúrate de que el botón esté visible
 
-    // Inicialmente oculto
-    whatsappFloat.style.display = 'none';
+    // Si deseas agregar alguna funcionalidad adicional, puedes hacerlo aquí
 });
 </script>
+
 
     <section class="features">
         <h2>¿Qué ofrecemos?</h2>
