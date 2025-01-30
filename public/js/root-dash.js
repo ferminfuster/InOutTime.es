@@ -2092,7 +2092,7 @@ async function cargarEmpresasCombo() {
         console.error("Error al cargar empresas en selectEmpresa: ", error);
     }
 }
-
+// Llamada para cargar información en INFORMES - Resumen asistencia
 async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const empresaId = document.getElementById('selectEmpresa').value; // Tomar empresa desde el select
