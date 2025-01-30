@@ -2202,13 +2202,31 @@ document.getElementById('selectEmpresa').addEventListener('change', cargarResume
 
 
 
-// Evento para cargar el resumen cuando cambian el mes o la empresa
-//document.getElementById('selectMestotal').addEventListener('change', cargarResumenAsistencia);
-//document.getElementById('selectEmpresa').addEventListener('change', cargarResumenAsistencia);
-
-
-
 // Cargar empresas cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
     cargarEmpresasCombo();
 });
+
+
+// Función para calcular horas trabajadas a partir de registros de un día
+function calcularHorasTrabajadas(registros) {
+    let horasTrabajadas = 0;
+    let horaEntrada = null;
+
+    // Ordenar registros por fecha ascendente
+    registros.sort((a, b) => a.fecha?.toDate() - b.fecha?.toDate());
+
+    registros.forEach((registro) => {
+        const fechaRegistro = registro.fecha?.toDate();
+
+        if (registro.accion_registro === 'entrada') {
+            horaEntrada = fechaRegistro;
+        } else if (registro.accion_registro === 'salida' && horaEntrada) {
+            const horaSalida = fechaRegistro;
+            horasTrabajadas += (horaSalida - horaEntrada) / (1000 * 60 * 60); // Diferencia en horas
+            horaEntrada = null; // Reiniciar para la siguiente entrada
+        }
+    });
+
+    return horasTrabajadas > 0 ? horasTrabajadas.toFixed(2) + ' hrs' : 'N/A';
+}
