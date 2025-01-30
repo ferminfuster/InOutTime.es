@@ -2095,29 +2095,18 @@ async function cargarEmpresasCombo() {
 // Llamada para cargar información en INFORMES - Resumen asistencia
 async function cargarResumenAsistencia() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
-    const empresaId = document.getElementById('selectEmpresa').value; // Tomar empresa desde el select
+    const empresaId = document.getElementById('selectEmpresa').value; // Ya es el ID de la empresa
     const listaAsistencia = document.getElementById('listaTodosAsistencia').getElementsByTagName('tbody')[0];
 
     console.log("Mes seleccionado:", mesSeleccionado);
-    console.log("Empresa seleccionada:", empresaId);
-
-    // Validar selección de empresa
-    if (!empresaId) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Selecciona una empresa',
-            text: 'Por favor, elige una empresa antes de generar el resumen de asistencia',
-            confirmButtonText: 'Entendido'
-        });
-        return;
-    }
+    console.log("ID de Empresa seleccionada:", empresaId);
 
     // Validar selección de mes
     if (mesSeleccionado === "" || isNaN(mesSeleccionado) || mesSeleccionado < 0 || mesSeleccionado > 11) {
         Swal.fire({
             icon: 'warning',
             title: 'Selecciona un mes',
-            text: 'Por favor, elige un mes válido para generar el resumen de asistencia',
+            text: 'Por favor, elige un mes para generar el resumen de asistencia',
             confirmButtonText: 'Entendido'
         });
         return;
@@ -2127,14 +2116,14 @@ async function cargarResumenAsistencia() {
     listaAsistencia.innerHTML = '';
 
     try {
-        // Consultar todos los usuarios de la misma empresa
+        // Consultar todos los usuarios de la empresa
         const usuariosRef = collection(db, 'usuarios');
         const qUsuarios = query(usuariosRef, where('empresa', '==', empresaId));
         const usuariosSnapshot = await getDocs(qUsuarios);
 
         // Verificar si hay empleados
         if (usuariosSnapshot.empty) {
-            console.log("No hay empleados registrados en la empresa seleccionada");
+            console.log("No hay empleados registrados en la empresa");
             listaAsistencia.innerHTML = `
                 <tr>
                     <td colspan="4" class="text-center">No hay empleados registrados en la empresa</td>
@@ -2163,33 +2152,34 @@ async function cargarResumenAsistencia() {
             let totalHoras = 0;
             const diasTrabajados = new Set();
 
-            registrosSnapshot.docs.forEach(doc => {
-                const registro = doc.data();
-                const fecha = registro.fecha.toDate();
+            const registros = registrosSnapshot.docs.map(doc => doc.data());
+
+            registros.forEach(registroDoc => {
+                const fecha = registroDoc.fecha.toDate();
                 diasTrabajados.add(fecha.toLocaleDateString());
             });
 
-            // Calcular horas trabajadas usando la función
-            totalHoras = calcularHorasTrabajadas(registrosSnapshot.docs.map(doc => doc.data()));
+            totalHoras = calcularHorasTrabajadas(registros);
 
             return {
                 email: usuario.email,
                 diasTrabajados: diasTrabajados.size,
-                totalHoras: totalHoras.toFixed(2) + ' hrs'
+                totalHoras: totalHoras
             };
         });
 
         // Esperar a que se procesen todos los usuarios
         const resumen = await Promise.all(resumenPromises);
 
-        // Renderizar resumen en la tabla
+        // Renderizar resumen
         resumen.forEach(item => {
+            const horasFormateadas = typeof item.totalHoras === 'string' ? item.totalHoras : item.totalHoras.toFixed(2) + ' hrs';
             const fila = `
                 <tr>
                     <td>${new Date(new Date().getFullYear(), mesSeleccionado).toLocaleString('default', { month: 'long' })}</td>
                     <td>${item.email}</td>
                     <td>${item.diasTrabajados}</td>
-                    <td>${item.totalHoras}</td>
+                    <td>${horasFormateadas}</td>
                 </tr>
             `;
             listaAsistencia.insertAdjacentHTML('beforeend', fila);
@@ -2205,10 +2195,15 @@ async function cargarResumenAsistencia() {
     }
 }
 
+// Evento para cargar el resumen cuando cambian el mes o la empresa
+document.getElementById('selectMestotal').addEventListener('change', cargarResumenAsistencia);
+document.getElementById('selectEmpresa').addEventListener('change', cargarResumenAsistencia);
+
+
 
 
 // Evento para cargar el resumen cuando cambian el mes o la empresa
-document.getElementById('selectMestotal').addEventListener('change', cargarResumenAsistencia);
+//document.getElementById('selectMestotal').addEventListener('change', cargarResumenAsistencia);
 //document.getElementById('selectEmpresa').addEventListener('change', cargarResumenAsistencia);
 
 
