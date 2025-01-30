@@ -105,6 +105,34 @@
         </div>
     </header>
 
+        <!-- Botón de WhatsApp Flotante -->
+<div class="whatsapp-float">
+    <a href="https://wa.me/+34661521311" target="_blank" class="whatsapp-button">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const whatsappFloat = document.querySelector('.whatsapp-float');
+    
+    // Función para mostrar/ocultar el botón según el scroll
+    function toggleWhatsappButton() {
+        // Muestra el botón solo después de un cierto punto de scroll
+        if (window.scrollY > 200) {
+            whatsappFloat.style.display = 'block';
+        } else {
+            whatsappFloat.style.display = 'none';
+        }
+    }
+
+    // Añadir evento de scroll
+    window.addEventListener('scroll', toggleWhatsappButton);
+
+    // Inicialmente oculto
+    whatsappFloat.style.display = 'none';
+});
+</script>
+
     <section class="features">
         <h2>¿Qué ofrecemos?</h2>
         <div class="feature-cards">
@@ -148,33 +176,7 @@
 
         </div>
     </section>
-    <!-- Botón de WhatsApp Flotante -->
-<div class="whatsapp-float">
-    <a href="https://wa.me/+34661521311" target="_blank" class="whatsapp-button">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const whatsappFloat = document.querySelector('.whatsapp-float');
-    
-    // Función para mostrar/ocultar el botón según el scroll
-    function toggleWhatsappButton() {
-        // Muestra el botón solo después de un cierto punto de scroll
-        if (window.scrollY > 200) {
-            whatsappFloat.style.display = 'block';
-        } else {
-            whatsappFloat.style.display = 'none';
-        }
-    }
 
-    // Añadir evento de scroll
-    window.addEventListener('scroll', toggleWhatsappButton);
-
-    // Inicialmente oculto
-    whatsappFloat.style.display = 'none';
-});
-</script>
     <section class="contact">
         <h2>Contáctanos</h2>
         <form id="contactForm">
