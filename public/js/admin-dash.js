@@ -2913,7 +2913,7 @@ window.cargarRegistrosTotales = cargarRegistrosTotales;
 async function cargarRegistrosTotales() {
     const mesSeleccionado = document.getElementById('selectMestotal').value;
     const listaRegistros = document.getElementById('listaTodosRegistros').getElementsByTagName('tbody')[0];
-    const totalRegistros = document.getElementById('totalRegistros');
+   // const totalRegistros = document.getElementById('totalRegistros');
 
         // Validar que se haya seleccionado un mes (no vacío y es un número entre 0 y 11)
         if (mesSeleccionado === "") {
