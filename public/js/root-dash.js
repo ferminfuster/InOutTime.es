@@ -2073,40 +2073,35 @@ async function descargarDivComoPDF(boton) {
 // Función para cargar empresas en el select
 async function cargarEmpresasCombo() {
     try {
-        // Referencia a la colección de empresas
+        console.log("Intentando cargar empresas...");
         const empresasRef = collection(db, 'empresas');
-        
-        // Query para obtener todas las empresas
-        const q = query(empresasRef, orderBy('nombre')); // Opcional: ordenar por nombre
-        
-        // Obtener snapshot
+        const q = query(empresasRef, orderBy('nombre'));
+
         const querySnapshot = await getDocs(q);
-        
-        // Obtener el elemento select
+        console.log("Empresas obtenidas:", querySnapshot.size);
+
         const selectEmpresa = document.getElementById('selectEmpresa');
-        
+
         // Limpiar opciones existentes (excepto la primera)
         while (selectEmpresa.options.length > 1) {
             selectEmpresa.remove(1);
         }
-        
-        // Iterar sobre las empresas y añadir al select
+
         querySnapshot.forEach((doc) => {
             const empresa = doc.data();
+            console.log("Agregando empresa:", empresa.nombre);
+
             const option = document.createElement('option');
-            option.value = doc.id; // Usar el ID del documento como valor
-            option.text = empresa.nombre; // Mostrar el nombre de la empresa
-            
-            // Puedes añadir más atributos si lo necesitas
+            option.value = doc.id;
+            option.text = empresa.nombre;
+
             option.setAttribute('data-codigo', empresa.codigo);
-            
             selectEmpresa.add(option);
         });
-        
-        console.log('Empresas cargadas exitosamente para el combo');
+
+        console.log('Empresas cargadas exitosamente');
     } catch (error) {
         console.error('Error al cargar empresas:', error);
-        
         Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -2118,40 +2113,35 @@ async function cargarEmpresasCombo() {
 
 // Función para cargar informes de la empresa seleccionada
 async function cargarInformeEmpresa() {
-    // Obtener el select de empresas
     const selectEmpresa = document.getElementById('selectEmpresa');
-    selectEmpresa.innerHTML = '<option value="">Seleccione un empresa</option>';
-    
-    // Obtener el ID de la empresa seleccionada
+
+    // Limpiar el select antes de actualizar (si aplica)
+    selectEmpresa.innerHTML = '<option value="">Seleccione una empresa</option>';
+
     const empresaId = selectEmpresa.value;
-    
+
     if (!empresaId) {
-        // Si no se ha seleccionado empresa, limpiar o resetear informes
         return;
     }
-    
+
     try {
-        // Aquí implementarías la lógica para cargar informes específicos de la empresa
-        // Por ejemplo, actualizar tablas, gráficos, etc.
-        
-        // Ejemplo de cómo podrías obtener datos de la empresa
         const empresaRef = doc(db, 'empresas', empresaId);
         const empresaSnap = await getDoc(empresaRef);
-        
+
         if (empresaSnap.exists()) {
             const empresaData = empresaSnap.data();
             console.log('Datos de la empresa:', empresaData);
-            
-            // Actualizar elementos con información de la empresa
+
+            // Aquí puedes actualizar otros elementos en la página con la información de la empresa
             // document.getElementById('nombreEmpresa').textContent = empresaData.nombre;
-            
-            // Cargar informes específicos de la empresa
+
+            // Cargar informes específicos de la empresa si aplica
             // await cargarRegistrosEmpresa(empresaId);
             // await cargarUsuariosEmpresa(empresaId);
         }
     } catch (error) {
         console.error('Error al cargar informe de empresa:', error);
-        
+
         Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -2160,6 +2150,7 @@ async function cargarInformeEmpresa() {
         });
     }
 }
+
 
 // Cargar empresas cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
