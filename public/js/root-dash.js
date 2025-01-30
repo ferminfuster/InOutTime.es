@@ -2120,6 +2120,7 @@ async function cargarEmpresasCombo() {
 async function cargarInformeEmpresa() {
     // Obtener el select de empresas
     const selectEmpresa = document.getElementById('selectEmpresa');
+    selectUsuarios.innerHTML = '<option value="">Seleccione un empresa</option>';
     
     // Obtener el ID de la empresa seleccionada
     const empresaId = selectEmpresa.value;
