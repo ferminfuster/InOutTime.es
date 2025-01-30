@@ -2071,7 +2071,7 @@ async function descargarDivComoPDF(boton) {
 //////////////////////
 
 // Función para cargar empresas en el select
-async function cargarEmpresas() {
+async function cargarEmpresasCombo() {
     try {
         // Referencia a la colección de empresas
         const empresasRef = collection(db, 'empresas');
@@ -2162,5 +2162,5 @@ async function cargarInformeEmpresa() {
 
 // Cargar empresas cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
-    cargarEmpresas();
+    cargarEmpresasCombo();
 });
