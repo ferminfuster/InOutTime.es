@@ -2230,3 +2230,137 @@ function calcularHorasTrabajadas(registros) {
 
     return horasTrabajadas > 0 ? horasTrabajadas.toFixed(2) + ' hrs' : 'N/A';
 }
+
+// Cargar Registros de todos los usuarios.
+async function cargarRegistrosTotales() {
+    const mesSeleccionado = document.getElementById('selectMestotal').value;
+    const listaRegistros = document.getElementById('listaTodosRegistros').getElementsByTagName('tbody')[0];
+    const totalRegistros = document.getElementById('totalRegistros');
+    const empresaId = document.getElementById('selectEmpresa').value; 
+
+        // Validar que se haya seleccionado un mes (no vacío y es un número entre 0 y 11)
+        if (mesSeleccionado === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Selecciona un mes',
+                text: 'Por favor, elige un mes para generar el resumen de asistencia',
+                confirmButtonText: 'Entendido'
+            });
+            return;
+        }
+
+    // Limpiar tabla
+    listaRegistros.innerHTML = '';
+    totalRegistros.textContent = '0';
+
+    try {
+        // Obtener el ID de la empresa del usuario actual
+        //const empresaId = await obtenerEmpresaId();
+        if (!empresaId) {
+            console.error('No se pudo obtener el ID de la empresa');
+            return;
+        }
+
+        // Consultar todos los usuarios de la misma empresa
+        const usuariosRef = collection(db, 'usuarios');
+        const qUsuarios = query(usuariosRef, where('empresa', '==', empresaId));
+        const usuariosSnapshot = await getDocs(qUsuarios);
+
+        // Verificar si hay empleados
+        if (usuariosSnapshot.empty) {
+            console.log("No hay empleados registrados en la empresa");
+            listaRegistros.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center">No hay empleados registrados en la empresa</td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Crear un array para almacenar los registros de todos los empleados
+        const todosLosRegistros = [];
+
+        // Cargar registros de cada empleado
+        for (const usuarioDoc of usuariosSnapshot.docs) {
+            const usuarioId = usuarioDoc.id;
+
+            // Consultar registros de este usuario
+            const registrosRef = collection(db, 'registros');
+            const qRegistros = query(
+                registrosRef,
+                where('userId', '==', usuarioId),
+                orderBy('fecha', 'desc') // Orden descendente por fecha
+            );
+
+            const registrosSnapshot = await getDocs(qRegistros);
+
+            // Filtrar registros por mes si se ha seleccionado un mes
+            let registrosFiltrados = registrosSnapshot.docs;
+            if (mesSeleccionado !== "") {
+                registrosFiltrados = registrosSnapshot.docs.filter(doc => {
+                    const fecha = doc.data().fecha?.toDate();
+                    return fecha && fecha.getMonth() == mesSeleccionado; // Filtrar por mes
+                });
+            }
+
+            // Agregar los registros filtrados al array
+            todosLosRegistros.push(...registrosFiltrados);
+        }
+
+        // Actualizar total de registros
+        totalRegistros.textContent = todosLosRegistros.length;
+
+        if (todosLosRegistros.length === 0) {
+            listaRegistros.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center">No hay registros para los empleados en este mes</td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Procesar registros y agrupar por días
+        const registrosPorDia = agruparRegistrosPorDia(todosLosRegistros);
+
+        // Renderizar tabla
+        Object.keys(registrosPorDia).forEach((dia) => {
+            const registros = registrosPorDia[dia];
+            const horasTrabajadas = calcularHorasTrabajadas(registros);
+
+            registros.forEach((registro, index) => {
+                const fecha = registro.fecha?.toDate();
+                const hora = fecha ? fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A'; // Formato de hora
+                const fila = `
+                    <tr data-id="${registro.id}">
+                        <td>${index === 0 ? dia : ''}</td>
+                        <td>${registro.email || 'N/A'}</td>
+                        <td>${hora}</td>
+                        <td>${registro.accion_registro || 'N/A'}</td>
+                        <td>${registro.comentario || 'Sin Comentarios'}</td>                   
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
+                                    <i class="fas fa-comment"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="editarRegistro('${registro.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('${registro.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                listaRegistros.insertAdjacentHTML('beforeend', fila);
+            });
+        });
+    } catch (error) {
+        console.error('Error al cargar registros:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los registros'
+        });
+    }
+}
