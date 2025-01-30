@@ -2073,41 +2073,23 @@ async function descargarDivComoPDF(boton) {
 // Función para cargar empresas en el select
 async function cargarEmpresasCombo() {
     try {
-        console.log("Intentando cargar empresas...");
+        const selectEmpresas = document.getElementById('selectEmpresa'); // Cambia el ID aquí
+        selectEmpresas.innerHTML = '<option value="">Seleccionar Empresa</option>';
+
         const empresasRef = collection(db, 'empresas');
-        const q = query(empresasRef, orderBy('nombre'));
-
-        const querySnapshot = await getDocs(q);
-        console.log("Empresas obtenidas:", querySnapshot.size);
-
-        const selectEmpresa = document.getElementById('selectEmpresa');
-
-        // Limpiar opciones existentes (excepto la primera)
-        while (selectEmpresa.options.length > 1) {
-            selectEmpresa.remove(1);
-        }
+        const querySnapshot = await getDocs(empresasRef);
 
         querySnapshot.forEach((doc) => {
             const empresa = doc.data();
-            console.log("Agregando empresa:", empresa.nombre);
-
             const option = document.createElement('option');
             option.value = doc.id;
-            option.text = empresa.nombre;
-
-            option.setAttribute('data-codigo', empresa.codigo);
-            selectEmpresa.add(option);
+            option.textContent = empresa.nombre_empresa; // Asegúrate de que el campo en Firestore se llama así
+            selectEmpresas.appendChild(option);
         });
 
-        console.log('Empresas cargadas exitosamente');
+        console.log('Empresas cargadas en selectEmpresa');
     } catch (error) {
-        console.error('Error al cargar empresas:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudieron cargar las empresas',
-            confirmButtonText: 'Entendido'
-        });
+        console.error("Error al cargar empresas en selectEmpresa: ", error);
     }
 }
 
