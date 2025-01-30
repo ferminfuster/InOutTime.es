@@ -563,44 +563,42 @@ async function contarUsuariosRevisar() {
             throw new Error("Empresa no definida");
         }
 
-        // Obtener la fecha de ayer al inicio y fin del día
-        const ayer = new Date();
-        ayer.setDate(ayer.getDate() - 1); // Restar un día
-        ayer.setHours(0, 0, 0, 0);
-
-        const finAyer = new Date(ayer);
-        finAyer.setHours(23, 59, 59, 999); // Fin del día anterior
-
         // Referencia a la colección de registros
         const registrosRef = collection(db, 'registros');
 
-        // Consulta para obtener todos los fichajes (entrada/salida) del día anterior
+        // Consulta para obtener todos los registros de la empresa
         const q = query(
             registrosRef,
             where('empresa', '==', window.empresaGlobal),
-            where('fecha', '>=', Timestamp.fromDate(ayer)),
-            where('fecha', '<=', Timestamp.fromDate(finAyer))
+            orderBy('fecha', 'desc') // Ordenar por fecha descendente para obtener el último registro
         );
 
         // Obtener snapshot
         const querySnapshot = await getDocs(q);
 
-        // Objeto para almacenar el último registro de cada usuario en el día anterior
-        const registrosPorUsuario = new Map();
+        // Objeto para almacenar el último registro de cada usuario
+        const ultimosRegistrosPorUsuario = new Map();
 
         querySnapshot.forEach((doc) => {
             const { email, accion_registro, fecha } = doc.data();
 
             // Guardar solo el registro más reciente del usuario
-            if (!registrosPorUsuario.has(email) || registrosPorUsuario.get(email).fecha.toMillis() < fecha.toMillis()) {
-                registrosPorUsuario.set(email, { accion_registro, fecha });
+            if (!ultimosRegistrosPorUsuario.has(email)) {
+                ultimosRegistrosPorUsuario.set(email, { 
+                    accion_registro, 
+                    fecha, 
+                    fechaFormateada: fecha.toDate().toLocaleString() 
+                });
             }
         });
 
-        // Filtrar usuarios cuyo último registro del día anterior fue "entrada"
-        const usuariosRevisar = Array.from(registrosPorUsuario.entries())
+        // Filtrar usuarios cuyo último registro fue "entrada"
+        const usuariosRevisar = Array.from(ultimosRegistrosPorUsuario.entries())
             .filter(([_, registro]) => registro.accion_registro === 'entrada')
-            .map(([email]) => email); // Obtener solo los emails
+            .map(([email, registro]) => ({
+                email,
+                ultimoRegistro: registro.fechaFormateada
+            }));
 
         // Actualizar el contador en el HTML
         const contadorElement = document.getElementById('usuariosRevisar');
@@ -609,18 +607,36 @@ async function contarUsuariosRevisar() {
         // Hacer la tarjeta clickeable solo si hay usuarios a revisar
         const cardElement = contadorElement.closest('.card');
         if (usuariosRevisar.length > 0) {
-            cardElement.style.cursor = 'pointer'; // Cambiar cursor
+            cardElement.style.cursor = 'pointer';
             cardElement.onclick = () => {
                 Swal.fire({
                     title: 'Usuarios a Revisar',
                     icon: 'warning',
-                    html: `<ul style="text-align:left">${usuariosRevisar.map(user => `<li>${user}</li>`).join('')}</ul>`,
-                    confirmButtonText: 'Entendido'
+                    html: `
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Último Registro</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${usuariosRevisar.map(user => `
+                                    <tr>
+                                        <td>${user.email}</td>
+                                        <td>${user.ultimoRegistro}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `,
+                    confirmButtonText: 'Entendido',
+                    width: '800px'
                 });
             };
         } else {
-            cardElement.style.cursor = 'default'; // Restaurar cursor
-            cardElement.onclick = null; // Eliminar evento de clic
+            cardElement.style.cursor = 'default';
+            cardElement.onclick = null;
         }
 
         console.log(`Usuarios a revisar en ${window.empresaGlobal}: ${usuariosRevisar.length}`);
@@ -629,7 +645,6 @@ async function contarUsuariosRevisar() {
     } catch (error) {
         console.error("Error al contar usuarios a revisar:", error);
         
-        // Mostrar 0 en caso de error
         document.getElementById('usuariosRevisar').textContent = '0';
 
         Swal.fire({
@@ -642,8 +657,6 @@ async function contarUsuariosRevisar() {
         return 0;
     }
 }
-
-
 
 // Función para obtener más detalles de los fichajes de hoy
 async function obtenerDetallesFichajesHoy() {
