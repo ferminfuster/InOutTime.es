@@ -1067,12 +1067,12 @@ document.getElementById('incidenciaForm').addEventListener('submit', async funct
           descripcion: descripcionIncidencia
       };
 
-      // Manejar archivo adjunto (si existe)
+      /* Manejar archivo adjunto (si existe)
       if (archivoIncidencia) {
           const storageRef = ref(storage, `incidencias/${user.uid}/${Date.now()}_${archivoIncidencia.name}`);
           const uploadResult = await uploadBytes(storageRef, archivoIncidencia);
           nuevoRegistro.archivoUrl = await getDownloadURL(uploadResult.ref);
-      }
+      }*/
 
       // Guardar el registro en Firestore
       const registrosRef = collection(db, "registros");
