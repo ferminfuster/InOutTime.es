@@ -86,6 +86,7 @@ async function obtenerUltimoRegistro(userId) {
 
 
 // Función para validar la acción de registro
+// Función para validar la acción de registro
 async function validarAccionRegistro(accion) {
   try {
     const user = auth.currentUser;
@@ -108,19 +109,21 @@ async function validarAccionRegistro(accion) {
     // Verificamos si el último registro es de un día anterior
     const esOtroDia = fechaUltimoRegistro.toDateString() !== fechaActual.toDateString();
 
-    // Notificar al usuario si tiene un día pendiente de cierre
+    // Si el usuario dejó un día pendiente de cierre, lo notificamos pero permitimos fichar entrada
     if (esOtroDia && ultimoRegistro.accion_registro === 'entrada') {
       notificarPendienteCierre(user);
+      return accion === 'entrada'; // Solo permite entrada en este caso
     }
 
-    // Lógica de validación basada en el último registro y la fecha
+    // Lógica de validación basada en el último registro y la fecha actual
     switch (accion) {
       case 'entrada':
+        // Solo permitir si el último registro es salida o incidencia y es del mismo día
         return ultimoRegistro.accion_registro === 'salida' || 
-               ultimoRegistro.accion_registro === 'incidencia' || 
-               esOtroDia;
+               ultimoRegistro.accion_registro === 'incidencia';
       case 'salida':
       case 'incidencia':
+        // Solo permitir si el último registro es entrada y es del mismo día
         return ultimoRegistro.accion_registro === 'entrada' && !esOtroDia;
       default:
         return false;
@@ -140,9 +143,10 @@ function notificarPendienteCierre(user) {
     toast: true,
     position: 'top-end',
     showConfirmButton: false,
-    timer: 4000 // Aumentamos el tiempo para que tenga más visibilidad
+    timer: 4000
   });
 }
+
 
 
   
