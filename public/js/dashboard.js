@@ -142,7 +142,7 @@ function notificarPendienteCierre(user) {
     text: `Tu último fichaje fue una "Entrada" de otro día. Contacta con el administrador.`,
     toast: true,
     position: 'top-end',
-    showConfirmButton: false,
+    showConfirmButton: "OK, Avisare al administrador",
     timer: 4000
   });
 }
