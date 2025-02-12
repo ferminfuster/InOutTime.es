@@ -84,8 +84,8 @@ async function obtenerUltimoRegistro(userId) {
     }
   }*/
 
+
 // Función para validar la acción de registro
-a// Función para validar la acción de registro
 async function validarAccionRegistro(accion) {
   try {
     const user = auth.currentUser;
