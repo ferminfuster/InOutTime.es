@@ -137,18 +137,6 @@ async function validarAccionRegistro(accion) {
   }
 }
 
-// Función para notificar con SweetAlert2 si hay un día pendiente de cierre
-function notificarPendienteCierre(user) {
-  Swal.fire({
-    icon: 'warning',
-    title: '¡Día pendiente de cierre!',
-    text: `Tu último fichaje fue una "Entrada" de otro día. Contacta con el administrador.`,
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 4000
-  });
-}
 
 // Función para notificar con SweetAlert2 si hay un día pendiente de cierre
 function notificarPendienteCierre(user) {
