@@ -189,6 +189,32 @@ function notificarPendienteCierre() {
     timer: 4000
   });
 }
+  // Función para registrar acción
+ // Función para mostrar notificación de éxito
+ function mostrarNotificacionExito(mensaje) {
+  Swal.fire({
+    icon: 'success',
+    title: '¡Registro Exitoso!',
+    text: mensaje,
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 2000
+  });
+}
+
+// Función para mostrar notificación de error
+function mostrarNotificacionError(mensaje) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: mensaje,
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000
+  });
+}
 
 // Verificar si el usuario está autenticado
 onAuthStateChanged(auth, async (user) => {
