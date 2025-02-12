@@ -86,12 +86,15 @@ async function obtenerUltimoRegistro(userId) {
 
 
 // Función para validar la acción de registro
+// Tiempo mínimo entre registros en milisegundos (Ejemplo: 30 segundos)
+const TIEMPO_MINIMO_ENTRE_REGISTROS = 30000; 
+
 // Función para validar la acción de registro
 async function validarAccionRegistro(accion) {
   try {
-    const user = auth.currentUser ;
+    const user = auth.currentUser;
     if (!user) {
-      mostrarError("Usuario no autenticado");
+      mostrarNotificacionError("Usuario no autenticado");
       return false;
     }
 
@@ -102,30 +105,32 @@ async function validarAccionRegistro(accion) {
       return accion === 'entrada';
     }
 
-    // Convertimos la fecha del último registro a un objeto Date
-    const fechaUltimoRegistro = new Date(ultimoRegistro.fecha_hora);
+    // Convertir la fecha del último registro a un objeto Date
+    const fechaUltimoRegistro = new Date(ultimoRegistro.fecha.seconds * 1000); // Firestore almacena timestamps con seconds y nanoseconds
     const fechaActual = new Date();
 
-    // Verificamos si el último registro es de un día anterior
+    // Verificar si el último registro fue hace menos del tiempo mínimo permitido
+    if (fechaActual - fechaUltimoRegistro < TIEMPO_MINIMO_ENTRE_REGISTROS) {
+      mostrarNotificacionError("Debes esperar unos segundos antes de fichar nuevamente.");
+      return false;
+    }
+
+    // Verificar si el último registro es de otro día
     const esOtroDia = fechaUltimoRegistro.toDateString() !== fechaActual.toDateString();
 
     // Lógica de validación basada en el último registro y la fecha actual
     switch (accion) {
       case 'entrada':
-        // Permitir entrada si el último registro es salida o incidencia del mismo día
-        if (ultimoRegistro.accion_registro === 'salida' || 
-            ultimoRegistro.accion_registro === 'incidencia') {
+        if (ultimoRegistro.accion_registro === 'salida' || ultimoRegistro.accion_registro === 'incidencia') {
           return true; // Permitir entrada
         } else if (esOtroDia && ultimoRegistro.accion_registro === 'entrada') {
-          // Si el último registro fue una entrada de otro día, mostrar advertencia
           notificarPendienteCierre(user);
-          return true; // Permitir entrada
+          return true; // Permitir entrada con advertencia
         }
         return false; // No permitir entrada en otros casos
 
       case 'salida':
       case 'incidencia':
-        // Solo permitir si el último registro es entrada y es del mismo día
         return ultimoRegistro.accion_registro === 'entrada' && !esOtroDia;
 
       default:
@@ -137,78 +142,19 @@ async function validarAccionRegistro(accion) {
   }
 }
 
-
-// Función para notificar con SweetAlert2 si hay un día pendiente de cierre
-function notificarPendienteCierre(user) {
-  Swal.fire({
-    icon: 'warning',
-    title: '¡Día pendiente de cierre!',
-    text: `Tu último fichaje fue una "Entrada" de otro día. Contacta con el administrador.`,
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 4000
-  });
-}
-
-
-  
-  // Función para registrar acción
- // Función para mostrar notificación de éxito
-function mostrarNotificacionExito(mensaje) {
-  Swal.fire({
-    icon: 'success',
-    title: '¡Registro Exitoso!',
-    text: mensaje,
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 2000
-  });
-}
-
-// Función para mostrar notificación de error
-function mostrarNotificacionError(mensaje) {
-  Swal.fire({
-    icon: 'error',
-    title: 'Error',
-    text: mensaje,
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 3000
-  });
-}
-
 // Función para registrar acción con notificaciones
 async function registrarAccion(accion) {
   try {
-    // Validar primero si se puede realizar la acción
     const puedeRegistrar = await validarAccionRegistro(accion);
 
     if (!puedeRegistrar) {
-      // Mensaje de error personalizado según la acción
-      switch (accion) {
-        case 'entrada':
-          mostrarNotificacionError("Solo puedes registrar entrada después de una salida");
-          break;
-        case 'salida':
-          mostrarNotificacionError("Solo puedes registrar salida después de una entrada");
-          break;
-        case 'incidencia':
-          mostrarNotificacionError("Solo puedes registrar incidencia después de una entrada");
-          break;
-      }
       return;
     }
 
     const user = auth.currentUser;
-
-    // Obtener datos del usuario
     const userDoc = await getDoc(doc(db, "usuarios", user.uid));
     const userData = userDoc.data();
 
-    // Crear nuevo registro
     const nuevoRegistro = {
       userId: user.uid,
       accion_registro: accion,
@@ -219,15 +165,11 @@ async function registrarAccion(accion) {
       nombre: userData.nombre
     };
 
-    // Guardar el registro en Firestore
     const registrosRef = collection(db, "registros");
-    const nuevoDocRef = doc(registrosRef);
-    await setDoc(nuevoDocRef, nuevoRegistro);
+    await setDoc(doc(registrosRef), nuevoRegistro);
 
-    // Notificación de éxito con mensaje personalizado
     mostrarNotificacionExito(`¡${accion.charAt(0).toUpperCase() + accion.slice(1)} registrada correctamente!`);
     await mostrarUltimoRegistro(user.uid);
- 
 
   } catch (error) {
     console.error(`Error al registrar ${accion}:`, error);
@@ -235,19 +177,6 @@ async function registrarAccion(accion) {
   }
 }
 
-  
-  // Funciones globales para registrar acciones
-  window.registrarEntrada = async function() {
-    await registrarAccion('entrada');
-  };
-  
-  window.registrarSalida = async function() {
-    await registrarAccion('salida');
-  };
-  
-  window.registrarIncidencia = async function() {
-    await registrarAccion('incidencia');
-  };
 
 // Verificar si el usuario está autenticado
 onAuthStateChanged(auth, async (user) => {
