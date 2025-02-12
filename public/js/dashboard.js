@@ -1048,7 +1048,7 @@ document.getElementById('incidenciaForm').addEventListener('submit', async funct
       const user = auth.currentUser;
       const tipoIncidencia = document.getElementById('tipoIncidencia').value;
       const descripcionIncidencia = document.getElementById('descripcionIncidencia').value;
-      const archivoIncidencia = document.getElementById('archivoIncidencia').files[0];
+      //const archivoIncidencia = document.getElementById('archivoIncidencia').files[0];
 
       // Obtener datos del usuario
       const userDoc = await getDoc(doc(db, "usuarios", user.uid));
