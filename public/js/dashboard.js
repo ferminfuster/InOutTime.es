@@ -109,23 +109,25 @@ async function validarAccionRegistro(accion) {
     // Verificamos si el último registro es de un día anterior
     const esOtroDia = fechaUltimoRegistro.toDateString() !== fechaActual.toDateString();
 
-    // Si el usuario dejó un día pendiente de cierre, lo notificamos pero permitimos fichar entrada
-    if (esOtroDia && ultimoRegistro.accion_registro === 'entrada') {
-      notificarPendienteCierre(user);
-      return accion === 'entrada'; // Solo permite entrada en este caso
-    }
-
     // Lógica de validación basada en el último registro y la fecha actual
     switch (accion) {
       case 'entrada':
-        // Permitir entrada si el último registro es salida, incidencia o entrada de otro día
-        return ultimoRegistro.accion_registro === 'salida' || 
-               ultimoRegistro.accion_registro === 'incidencia' || 
-               (esOtroDia && ultimoRegistro.accion_registro === 'entrada');
+        // Permitir entrada si el último registro es salida o incidencia del mismo día
+        if (ultimoRegistro.accion_registro === 'salida' || 
+            ultimoRegistro.accion_registro === 'incidencia') {
+          return true; // Permitir entrada
+        } else if (esOtroDia && ultimoRegistro.accion_registro === 'entrada') {
+          // Si el último registro fue una entrada de otro día, mostrar advertencia
+          notificarPendienteCierre(user);
+          return true; // Permitir entrada
+        }
+        return false; // No permitir entrada en otros casos
+
       case 'salida':
       case 'incidencia':
         // Solo permitir si el último registro es entrada y es del mismo día
         return ultimoRegistro.accion_registro === 'entrada' && !esOtroDia;
+
       default:
         return false;
     }
@@ -133,6 +135,19 @@ async function validarAccionRegistro(accion) {
     console.error("Error al validar acción:", error);
     return false;
   }
+}
+
+// Función para notificar con SweetAlert2 si hay un día pendiente de cierre
+function notificarPendienteCierre(user) {
+  Swal.fire({
+    icon: 'warning',
+    title: '¡Día pendiente de cierre!',
+    text: `Tu último fichaje fue una "Entrada" de otro día. Contacta con el administrador.`,
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 4000
+  });
 }
 
 // Función para notificar con SweetAlert2 si hay un día pendiente de cierre
