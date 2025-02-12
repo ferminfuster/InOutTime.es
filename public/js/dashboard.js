@@ -89,7 +89,7 @@ async function obtenerUltimoRegistro(userId) {
 // Función para validar la acción de registro
 async function validarAccionRegistro(accion) {
   try {
-    const user = auth.currentUser;
+    const user = auth.currentUser ;
     if (!user) {
       mostrarError("Usuario no autenticado");
       return false;
@@ -118,9 +118,10 @@ async function validarAccionRegistro(accion) {
     // Lógica de validación basada en el último registro y la fecha actual
     switch (accion) {
       case 'entrada':
-        // Solo permitir si el último registro es salida o incidencia y es del mismo día
+        // Permitir entrada si el último registro es salida, incidencia o entrada de otro día
         return ultimoRegistro.accion_registro === 'salida' || 
-               ultimoRegistro.accion_registro === 'incidencia';
+               ultimoRegistro.accion_registro === 'incidencia' || 
+               (esOtroDia && ultimoRegistro.accion_registro === 'entrada');
       case 'salida':
       case 'incidencia':
         // Solo permitir si el último registro es entrada y es del mismo día
@@ -142,11 +143,10 @@ function notificarPendienteCierre(user) {
     text: `Tu último fichaje fue una "Entrada" de otro día. Contacta con el administrador.`,
     toast: true,
     position: 'top-end',
-    showConfirmButton: "OK, Avisare al administrador",
+    showConfirmButton: false,
     timer: 4000
   });
 }
-
 
 
   
