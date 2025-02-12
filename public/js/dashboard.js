@@ -85,6 +85,7 @@ async function obtenerUltimoRegistro(userId) {
   }*/
 
 // Función para validar la acción de registro
+a// Función para validar la acción de registro
 async function validarAccionRegistro(accion) {
   try {
     const user = auth.currentUser;
@@ -100,17 +101,27 @@ async function validarAccionRegistro(accion) {
       return accion === 'entrada';
     }
 
-    // Lógica de validación basada en el último registro
+    // Convertimos la fecha del último registro a un objeto Date
+    const fechaUltimoRegistro = new Date(ultimoRegistro.fecha_hora);
+    const fechaActual = new Date();
+
+    // Verificamos si el último registro es de un día anterior
+    const esOtroDia = fechaUltimoRegistro.toDateString() !== fechaActual.toDateString();
+
+    // Notificar al usuario si tiene un día pendiente de cierre
+    if (esOtroDia && ultimoRegistro.accion_registro === 'entrada') {
+      notificarPendienteCierre(user);
+    }
+
+    // Lógica de validación basada en el último registro y la fecha
     switch (accion) {
       case 'entrada':
-        // Permitir entrada si el último registro es salida o incidencia
-        return ultimoRegistro.accion_registro === 'salida' || ultimoRegistro.accion_registro === 'incidencia';
+        return ultimoRegistro.accion_registro === 'salida' || 
+               ultimoRegistro.accion_registro === 'incidencia' || 
+               esOtroDia;
       case 'salida':
-        // Permitir salida solo si el último registro es entrada
-        return ultimoRegistro.accion_registro === 'entrada';
       case 'incidencia':
-        // Permitir incidencia solo si el último registro es entrada
-        return ultimoRegistro.accion_registro === 'entrada';
+        return ultimoRegistro.accion_registro === 'entrada' && !esOtroDia;
       default:
         return false;
     }
@@ -119,6 +130,20 @@ async function validarAccionRegistro(accion) {
     return false;
   }
 }
+
+// Función para notificar con SweetAlert2 si hay un día pendiente de cierre
+function notificarPendienteCierre(user) {
+  Swal.fire({
+    icon: 'warning',
+    title: '¡Día pendiente de cierre!',
+    text: `Tu último fichaje fue una "Entrada" de otro día. Contacta con el administrador.`,
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 4000 // Aumentamos el tiempo para que tenga más visibilidad
+  });
+}
+
 
   
   // Función para registrar acción
@@ -1113,21 +1138,3 @@ window.addEventListener('click', function(event) {
 /////////////////////////////////////
 // POP informando que ayer no ficho //
 //////////////////////////////////////
-/*
-async function verificarSalidaAnterior() {
-  try {
-      const response = await fetch('/api/ultimo-fichaje'); // Ajusta la API según tu backend
-      const data = await response.json();
-
-      if (data && data.accion === "Entrada" && !data.salidaConfirmada) {
-          Swal.fire({
-              title: "Fichaje Incompleto",
-              text: "Ayer no registraste una salida. Informa a tu administrador por favor",
-              icon: "warning",
-              confirmButtonText: "OK"
-          });
-      }
-  } catch (error) {
-      console.error("Error verificando fichaje anterior:", error);
-  }
-}*/
