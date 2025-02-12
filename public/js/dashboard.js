@@ -177,6 +177,18 @@ async function registrarAccion(accion) {
   }
 }
 
+// Función para notificar día pendiente de cierre
+function notificarPendienteCierre() {
+  Swal.fire({
+    icon: 'warning',
+    title: '¡Día pendiente de cierre!',
+    text: `Tu último fichaje fue una "Entrada" de otro día. Contacta con el administrador.`,
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 4000
+  });
+}
 
 // Verificar si el usuario está autenticado
 onAuthStateChanged(auth, async (user) => {
