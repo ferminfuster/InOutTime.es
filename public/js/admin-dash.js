@@ -2653,7 +2653,7 @@ async function editarRegistro(registroId) {
         };
 
         // 📌 Guardar cambios en log_modificaciones_registros
-        await addDoc(collection(db, 'modificaciones_registros'), cambios);
+        await addDoc(collection(db, 'log_modificaciones_registros'), cambios);
 
         // 📌 Actualizar el registro en la colección original
         await updateDoc(registroRef, cambios.datos_nuevos);
