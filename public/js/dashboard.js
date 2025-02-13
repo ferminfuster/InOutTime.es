@@ -1112,8 +1112,8 @@ window.addEventListener('click', function(event) {
 /////////////////////////
 let logoutTimer;
 let warningTimer;
-const tiempoInactividad = 15000; // 15 segundos
-const tiempoAdvertencia = 10000; // 10 segundos (5 segundos antes del logout)
+const tiempoInactividad = 20000; // 15 segundos
+const tiempoAdvertencia = 15000; // 10 segundos (5 segundos antes del logout)
 
 // Función para cerrar sesión
 async function cerrarSesion() {
@@ -1139,7 +1139,7 @@ function mostrarAdvertenciaCierre() {
     title: "Inactividad detectada",
     text: "Tu sesión se cerrará en 5 segundos si no interactúas.",
     toast: true,
-    position: "top-end",
+    //position: "top-end",
     showConfirmButton: false,
     timer: 5000
   });
