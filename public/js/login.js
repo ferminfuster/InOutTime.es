@@ -131,10 +131,16 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
           });
         };
 
-        // Redirigir según el rol
+        // Determinar la URL de redirección
+        let dashboardUrl = "dashboard.html"; // URL por defecto
+
+        if (userData.empresa === "Milala.es") {
+          dashboardUrl = "dashboard-milala.html";
+        }
+
         switch (userData.rol) {
           case "user":
-            notificarYRedirigir(`Bienvenido, usuario ${userData.nombre}`, "dashboard.html");
+            notificarYRedirigir(`Bienvenido, usuario ${userData.nombre}`, dashboardUrl);
             break;
           case "admin":
             notificarYRedirigir(`Bienvenido, administrador ${userData.nombre}`, "admin-dash.html");
