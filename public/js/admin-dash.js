@@ -2577,95 +2577,99 @@ async function editarRegistro(registroId) {
         return;
     }
 
-    const registroRef = doc(db, 'registros', registroId);
-    const registroSnapshot = await getDoc(registroRef);
+    try {
+        // 📌 Obtener el registro antes de modificarlo
+        const registroRef = doc(db, 'registros', registroId);
+        const registroSnapshot = await getDoc(registroRef);
 
-    if (!registroSnapshot.exists()) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'El registro no existe.',
-        });
-        return;
-    }
-
-    const registroData = registroSnapshot.data();
-
-    const { value: formValues } = await Swal.fire({
-        title: 'Editar Registro',
-        html: `
-            <div class="form-group">
-                <label for="editarAccion">Acción:</label>
-                <select id="editarAccion" class="swal2-input form-control">
-                    <option value="entrada" ${registroData.accion_registro === 'entrada' ? 'selected' : ''}>Entrada</option>
-                    <option value="salida" ${registroData.accion_registro === 'salida' ? 'selected' : ''}>Salida</option>
-                    <option value="incidencia" ${registroData.accion_registro === 'incidencia' ? 'selected' : ''}>Incidencia</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="editarFecha">Fecha y Hora:</label>
-                <input type="datetime-local" id="editarFecha" class="swal2-input form-control" value="${registroData.fecha.toDate().toISOString().slice(0, 16)}" required>
-            </div>
-            <div class="form-group">
-                <label for="editarComentarios">Comentarios:</label>
-                <input type="text" id="editarComentarios" class="swal2-input form-control" placeholder="Opcional" value="${registroData.comentario || ''}">
-            </div>
-        `,
-        focusConfirm: false,
-        showCancelButton: true,
-        confirmButtonText: 'Guardar Cambios',
-        cancelButtonText: 'Cancelar',
-        preConfirm: () => {
-            const accion = document.getElementById('editarAccion').value;
-            const fecha = document.getElementById('editarFecha').value;
-            const comentarios = document.getElementById('editarComentarios').value;
-
-            if (!accion || !fecha) {
-                Swal.showValidationMessage('Por favor, completa todos los campos obligatorios.');
-                return;
-            }
-
-            return { accion, fecha, comentarios };
-        },
-    });
-
-    if (formValues) {
-        try {
-            const cambios = {
-                accion_anterior: registroData.accion_registro,
-                accion_nueva: formValues.accion,
-                fecha_anterior: registroData.fecha,
-                fecha_nueva: Timestamp.fromDate(new Date(formValues.fecha)),
-                comentario_anterior: registroData.comentario || '',
-                comentario_nuevo: formValues.comentarios || '',
-                usuarioModifico: usuarioActual.email,
-                fechaModificacion: serverTimestamp(),
-            };
-
-            // Guardar en la colección de modificaciones_registros
-            await addDoc(collection(db, 'log_modificaciones_registros'), {
-                registroId,
-                ...cambios,
+        if (!registroSnapshot.exists()) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El registro no existe.',
             });
+            return;
+        }
 
-            // Actualizar el registro original en la colección registros
-            await updateDoc(registroRef, {
+        const registroData = registroSnapshot.data();
+
+        // 📌 Solicitar nuevos valores con SweetAlert
+        const { value: formValues } = await Swal.fire({
+            title: 'Editar Registro',
+            html: `
+                <div class="form-group">
+                    <label for="editarAccion">Acción:</label>
+                    <select id="editarAccion" class="swal2-input form-control">
+                        <option value="entrada" ${registroData.accion_registro === 'entrada' ? 'selected' : ''}>Entrada</option>
+                        <option value="salida" ${registroData.accion_registro === 'salida' ? 'selected' : ''}>Salida</option>
+                        <option value="incidencia" ${registroData.accion_registro === 'incidencia' ? 'selected' : ''}>Incidencia</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editarFecha">Fecha y Hora:</label>
+                    <input type="datetime-local" id="editarFecha" class="swal2-input form-control" value="${registroData.fecha.toDate().toISOString().slice(0, 16)}" required>
+                </div>
+                <div class="form-group">
+                    <label for="editarComentarios">Comentarios:</label>
+                    <input type="text" id="editarComentarios" class="swal2-input form-control" placeholder="Opcional" value="${registroData.comentario || ''}">
+                </div>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Guardar Cambios',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const accion = document.getElementById('editarAccion').value;
+                const fecha = document.getElementById('editarFecha').value;
+                const comentarios = document.getElementById('editarComentarios').value;
+
+                if (!accion || !fecha) {
+                    Swal.showValidationMessage('Por favor, completa todos los campos obligatorios.');
+                    return;
+                }
+
+                return { accion, fecha, comentarios };
+            },
+        });
+
+        if (!formValues) return;
+
+        // 📌 Construir datos del cambio
+        const cambios = {
+            registroId: registroId,
+            accion_realizada: "modificado",
+            usuario_modificador: usuarioActual.email,
+            fecha_modificacion: serverTimestamp(),
+            datos_anteriores: {
+                accion_registro: registroData.accion_registro,
+                fecha: registroData.fecha,
+                comentario: registroData.comentario || '',
+            },
+            datos_nuevos: {
                 accion_registro: formValues.accion,
                 fecha: Timestamp.fromDate(new Date(formValues.fecha)),
                 comentario: formValues.comentarios || '',
-                comentario_fecha: serverTimestamp(),
-            });
+            }
+        };
 
-            Swal.fire('Registro actualizado', '', 'success');
+        // 📌 Guardar cambios en log_modificaciones_registros
+        await addDoc(collection(db, 'modificaciones_registros'), cambios);
 
-            // Recargar los registros
-            await cargarRegistrosPorUsuario();
-        } catch (error) {
-            console.error('Error al actualizar el registro:', error);
-            Swal.fire('Error', 'No se pudo actualizar el registro. Intenta nuevamente.', 'error');
-        }
+        // 📌 Actualizar el registro en la colección original
+        await updateDoc(registroRef, cambios.datos_nuevos);
+
+        // 📌 Mostrar mensaje de éxito
+        Swal.fire('Registro actualizado', '', 'success');
+
+        // 📌 Recargar los registros
+        await cargarRegistrosPorUsuario();
+
+    } catch (error) {
+        console.error('Error al actualizar el registro:', error);
+        Swal.fire('Error', 'No se pudo actualizar el registro. Intenta nuevamente.', 'error');
     }
 }
+
 //////////////////////////
 ///// Eliminar registro //
 /////////////////////////
