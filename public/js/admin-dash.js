@@ -2641,7 +2641,7 @@ async function editarRegistro(registroId) {
             };
 
             // Guardar en la colección de modificaciones_registros
-            await addDoc(collection(db, 'modificaciones_registros'), {
+            await addDoc(collection(db, 'log_modificaciones_registros'), {
                 registroId,
                 ...cambios,
             });
