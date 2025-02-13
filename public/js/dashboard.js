@@ -1110,27 +1110,51 @@ window.addEventListener('click', function(event) {
   }
 });
 /////////////////////////
-////////////////////////
-
 let logoutTimer;
+let warningTimer;
+const tiempoInactividad = 15000; // 15 segundos
+const tiempoAdvertencia = 10000; // 10 segundos (5 segundos antes del logout)
 
 // Función para cerrar sesión
 async function cerrarSesion() {
   try {
     await auth.signOut();
-    mostrarNotificacionError("Sesión cerrada por inactividad.");
-    window.location.href = "/"; // Redirige a la página de inicio de sesión
+    Swal.fire({
+      icon: "error",
+      title: "Sesión cerrada",
+      text: "Tu sesión se cerró por inactividad.",
+      confirmButtonText: "OK"
+    }).then(() => {
+      window.location.href = "/"; // Redirige a la página de login
+    });
   } catch (error) {
     console.error("Error al cerrar sesión:", error);
   }
 }
 
-// Función para reiniciar el temporizador de cierre de sesión
+// Función para mostrar advertencia antes del logout
+function mostrarAdvertenciaCierre() {
+  Swal.fire({
+    icon: "warning",
+    title: "Inactividad detectada",
+    text: "Tu sesión se cerrará en 5 segundos si no interactúas.",
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 5000
+  });
+}
+
+// Función para reiniciar el temporizador de inactividad
 function reiniciarTemporizador() {
-  if (logoutTimer) {
-    clearTimeout(logoutTimer);
-  }
-  logoutTimer = setTimeout(cerrarSesion, 15000); // 15 segundos
+  if (logoutTimer) clearTimeout(logoutTimer);
+  if (warningTimer) clearTimeout(warningTimer);
+
+  // Configurar advertencia antes del logout
+  warningTimer = setTimeout(mostrarAdvertenciaCierre, tiempoAdvertencia);
+
+  // Configurar cierre de sesión tras inactividad
+  logoutTimer = setTimeout(cerrarSesion, tiempoInactividad);
 }
 
 // Eventos que reinician el temporizador (movimiento del mouse, teclas, clics)
