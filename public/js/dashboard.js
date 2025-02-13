@@ -334,28 +334,10 @@ function mostrarError(mensaje) {
 }
 
 // Función para obtener lugar actual
-async function obtenerIP() {
-  try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip; // Devuelve la dirección IP
-  } catch (error) {
-      console.error('Error al obtener la IP:', error);
-      return null; // Devuelve null en caso de error
-  }
+function obtenerLugarActual() {
+    // Puedes implementar geolocalización o usar un valor predeterminado
+    return 'Oficina Principal';
 }
-
-async function obtenerLugarActual() {
-  const ip = await obtenerIP();
-  if (ip) {
-      // Aquí puedes registrar la IP junto con el lugar actual
-      console.log('IP del usuario:', ip);
-      return `Oficina Principal (IP: ${ip})`;
-  } else {
-      return 'Oficina Principal'; // Valor predeterminado si no se puede obtener la IP
-  }
-}
-
 
 // Definir funciones globales para registrar acciones
 window.registrarEntrada = function() {
