@@ -2914,7 +2914,7 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
             userId: userDoc.id,
             accion_registro: accion,
             fecha: Timestamp.fromDate(new Date(fecha)),
-            lugar: 'Oficina Principal',
+            lugar: 'Fichaje realizado por el Administrador',
             email: userData.email,
             empresa: userData.empresa,
             nombre: userData.nombre,
