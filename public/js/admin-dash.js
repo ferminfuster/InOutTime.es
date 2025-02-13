@@ -2456,7 +2456,7 @@ async function cargarRegistrosPorUsuario() {
                         <td>${registro.email || 'N/A'}</td>
                         <td>${hora}</td>
                         <td>${registro.accion_registro || 'N/A'}</td>
-                        <td>${registro.comentario || 'Sin Comentarios'}</td>
+                        <td>${registro.comentario || ''}</td>
                         <td>${index === 0 ? horasTrabajadas : ''}</td>
                         <td>
                             <div class="btn-group">
@@ -2535,6 +2535,18 @@ window.cargarRegistrosPorUsuario = cargarRegistrosPorUsuario;
 // Agregar comentario a un registro //
 //////////////////////////////////////
 async function agregarComentario(registroId) {
+    const auth = getAuth();
+    const usuarioActual = auth.currentUser;
+
+    if (!usuarioActual) {
+        Swal.fire({
+            icon: 'error',
+            title: 'No autorizado',
+            text: 'Debes estar logueado para agregar un comentario.',
+        });
+        return;
+    }
+
     const { value: comentario } = await Swal.fire({
         title: 'Añadir Comentario',
         input: 'textarea',
@@ -2544,20 +2556,55 @@ async function agregarComentario(registroId) {
 
     if (comentario) {
         try {
-            await updateDoc(doc(db, 'registros', registroId), {
+            const registroRef = doc(db, 'registros', registroId);
+            const registroSnapshot = await getDoc(registroRef);
+
+            if (!registroSnapshot.exists()) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'El registro no existe.',
+                });
+                return;
+            }
+
+            const registroData = registroSnapshot.data();
+
+            // 📌 Guardar el comentario en la colección 'registros'
+            await updateDoc(registroRef, {
                 comentario,
                 comentario_fecha: serverTimestamp()
             });
+
+            // 📌 Registrar la acción en la colección 'modificaciones_registros'
+            const cambios = {
+                registroId,
+                accion_realizada: "comentario añadido",
+                usuario_modificador: usuarioActual.email,
+                fecha_modificacion: serverTimestamp(),
+                datos_anteriores: {
+                    comentario: registroData.comentario || ''
+                },
+                datos_nuevos: {
+                    comentario: comentario
+                }
+            };
+
+            // 📌 Agregar a log de modificaciones
+            await addDoc(collection(db, 'modificaciones_registros'), cambios);
+
             // Mostrar notificación
             Swal.fire('Comentario añadido', '', 'success');
-            
-            // Cargar de nuevo la pagina de registro
-            cargarRegistrosPorUsuario();
+
+            // Recargar los registros
+            await cargarRegistrosPorUsuario();
         } catch (error) {
+            console.error('Error al agregar comentario:', error);
             Swal.fire('Error', 'No se pudo añadir el comentario', 'error');
         }
     }
 }
+
 
 window.agregarComentario = agregarComentario;
 window.editarRegistro = editarRegistro;
@@ -3149,7 +3196,7 @@ async function cargarRegistrosTotales() {
                         <td>${registro.email || 'N/A'}</td>
                         <td>${hora}</td>
                         <td>${registro.accion_registro || 'N/A'}</td>
-                        <td>${registro.comentario || 'Sin Comentarios'}</td>                   
+                        <td>${registro.comentario || ''}</td>                   
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-info" onclick="agregarComentario('${registro.id}')">
