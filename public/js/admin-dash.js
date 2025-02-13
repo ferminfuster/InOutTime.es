@@ -2563,7 +2563,18 @@ window.agregarComentario = agregarComentario;
 window.editarRegistro = editarRegistro;
 // Editar registro
 async function editarRegistro(registroId) {
-    // Obtener el registro actual de Firestore
+    const auth = getAuth();
+    const usuarioActual = auth.currentUser;
+
+    if (!usuarioActual) {
+        Swal.fire({
+            icon: 'error',
+            title: 'No autorizado',
+            text: 'Debes estar logueado para editar un registro.',
+        });
+        return;
+    }
+
     const registroRef = doc(db, 'registros', registroId);
     const registroSnapshot = await getDoc(registroRef);
 
@@ -2578,7 +2589,6 @@ async function editarRegistro(registroId) {
 
     const registroData = registroSnapshot.data();
 
-    // Mostrar el formulario de edición
     const { value: formValues } = await Swal.fire({
         title: 'Editar Registro',
         html: `
@@ -2618,106 +2628,43 @@ async function editarRegistro(registroId) {
     });
 
     if (formValues) {
-        // Actualizar el registro en Firestore
         try {
+            const cambios = {
+                accion_anterior: registroData.accion_registro,
+                accion_nueva: formValues.accion,
+                fecha_anterior: registroData.fecha,
+                fecha_nueva: Timestamp.fromDate(new Date(formValues.fecha)),
+                comentario_anterior: registroData.comentario || '',
+                comentario_nuevo: formValues.comentarios || '',
+                usuarioModifico: usuarioActual.email,
+                fechaModificacion: serverTimestamp(),
+            };
+
+            // Guardar en la colección de modificaciones_registros
+            await addDoc(collection(db, 'modificaciones_registros'), {
+                registroId,
+                ...cambios,
+            });
+
+            // Actualizar el registro original en la colección registros
             await updateDoc(registroRef, {
                 accion_registro: formValues.accion,
-                fecha: Timestamp.fromDate(new Date(formValues.fecha)), // Convertir la fecha a Timestamp
-                comentario: formValues.comentarios || '', // Incluir comentarios si se pasan
-                comentario_fecha: serverTimestamp() // Actualizar la fecha del comentario
+                fecha: Timestamp.fromDate(new Date(formValues.fecha)),
+                comentario: formValues.comentarios || '',
+                comentario_fecha: serverTimestamp(),
             });
 
             Swal.fire('Registro actualizado', '', 'success');
 
-            // Actualizar la tabla después de editar
-            await cargarRegistrosPorUsuario(); // Llama a la función para recargar los registros
+            // Recargar los registros
+            await cargarRegistrosPorUsuario();
         } catch (error) {
             console.error('Error al actualizar el registro:', error);
             Swal.fire('Error', 'No se pudo actualizar el registro. Intenta nuevamente.', 'error');
         }
     }
 }
-// Eliminar registro
-async function eliminarRegistro(registroId) {
-    const result = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: "No podrás revertir esta acción",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonText: 'Cancelar',
-        confirmButtonText: 'Sí, eliminar'
-    });
 
-    if (result.isConfirmed) {
-        try {
-            // Eliminar el registro de Firestore
-            await deleteDoc(doc(db, 'registros', registroId));
-            
-            // Mostrar notificación de éxito
-            Swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success');
-            
-            // Recargar los registros después de la eliminación
-            cargarRegistrosPorUsuario();
-        } catch (error) {
-            console.error('Error al eliminar registro:', error);
-            Swal.fire('Error', 'No se pudo eliminar el registro', 'error');
-        }
-    }
-}
-
-window.eliminarRegistro = eliminarRegistro;
-// Función para abrir el modal de registro manual
-async function abrirModalRegistroManual() {
-    try {
-        const { value: formValues } = await Swal.fire({
-            title: 'Registro Manual',
-            html: `
-                <div class="swal-form">
-                    <label>Seleccionar Usuario:</label>
-                    <select id="swal-usuario" class="swal2-select" required>
-                        <option value="">Seleccione un usuario</option>
-                        <!-- Se llenará dinámicamente -->
-                    </select>
-                    <label>Tipo de Registro:</label>
-                    <select id="swal-tipo-registro" class="swal2-select" required>
-                        <option value="">Seleccionar tipo</option>
-                        <option value="entrada">Entrada</option>
-                        <option value="salida">Salida</option>
-                        <option value="incidencia">Incidencia</option>
-                    </select>
-                    <label>Fecha y Hora:</label>
-                    <input type="datetime-local" id="swal-fecha-registro" class="swal2-input" required>
-                    <label>Justificación:</label>
-                    <textarea id="swal-justificacion" class="swal2-input" placeholder="Introduce una justificación" rows="3" required></textarea>
-                </div>
-            `,
-            focusConfirm: false,
-            preConfirm: () => {
-                return {
-                    usuario: document.getElementById('swal-usuario').value,
-                    tipoRegistro: document.getElementById('swal-tipo-registro').value,
-                    fechaRegistro: document.getElementById('swal-fecha-registro').value,
-                    justificacion: document.getElementById('swal-justificacion').value
-                };
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Guardar Registro',
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (formValues) {
-            await guardarRegistroManual(formValues);
-        }
-    } catch (error) {
-        console.error('Error en registro manual:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message
-        });
-    }
-}
 
 // Función para guardar el registro manual
 async function guardarRegistroManual(datos) {
@@ -2914,11 +2861,11 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
             userId: userDoc.id,
             accion_registro: accion,
             fecha: Timestamp.fromDate(new Date(fecha)),
-            lugar: 'Fichaje realizado por el Administrador',
+            lugar: 'Administración',
             email: userData.email,
             empresa: userData.empresa,
             nombre: userData.nombre,
-            comentarios: comentarios || '',
+            comentarios: comentarios || 'Fichaje realizado de forma manual',
             modificadoPor: adminEmail,  // Usuario logueado que hizo la modificación
             fechaModificacion: Timestamp.now(),
            // ipModificacion: userIp,  // IP del usuario que modifica
