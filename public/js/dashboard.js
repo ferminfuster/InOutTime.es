@@ -1109,6 +1109,34 @@ window.addEventListener('click', function(event) {
       cerrarModalIncidencia();
   }
 });
-/////////////////////////////////////
-// POP informando que ayer no ficho //
-//////////////////////////////////////
+/////////////////////////
+////////////////////////
+
+let logoutTimer;
+
+// Función para cerrar sesión
+async function cerrarSesion() {
+  try {
+    await auth.signOut();
+    mostrarNotificacionError("Sesión cerrada por inactividad.");
+    window.location.href = "/"; // Redirige a la página de inicio de sesión
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+  }
+}
+
+// Función para reiniciar el temporizador de cierre de sesión
+function reiniciarTemporizador() {
+  if (logoutTimer) {
+    clearTimeout(logoutTimer);
+  }
+  logoutTimer = setTimeout(cerrarSesion, 15000); // 15 segundos
+}
+
+// Eventos que reinician el temporizador (movimiento del mouse, teclas, clics)
+document.addEventListener("mousemove", reiniciarTemporizador);
+document.addEventListener("keydown", reiniciarTemporizador);
+document.addEventListener("click", reiniciarTemporizador);
+
+// Iniciar el temporizador al cargar la página
+reiniciarTemporizador();
