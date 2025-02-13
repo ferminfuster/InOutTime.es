@@ -1166,7 +1166,7 @@ window.desactivarUsuario = async function(email) {
         const usuarioData = usuarioDoc.data();
 
         // Registrar usuario eliminado en otra colección
-        await addDoc(collection(db, 'usuarios_eliminados'), {
+        await addDoc(collection(db, 'log_usuarios_eliminados'), {
             email: usuarioData.email,
             nombre: usuarioData.nombre,
             apellidos: usuarioData.apellidos || '',
@@ -1485,7 +1485,7 @@ window.mostrarUsuariosEliminados = async function() {
 
         // Obtener usuarios eliminados (últimos 50)
         const usuariosEliminadosQuery = query(
-            collection(db, 'usuarios_eliminados'),
+            collection(db, 'log_usuarios_eliminados'),
             orderBy('fechaEliminacion', 'desc'),
             limit(50)
         );
