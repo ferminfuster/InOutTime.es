@@ -2561,7 +2561,9 @@ async function agregarComentario(registroId) {
 
 window.agregarComentario = agregarComentario;
 window.editarRegistro = editarRegistro;
-// Editar registro
+//////////////////////
+// Editar registro ///
+//////////////////////
 async function editarRegistro(registroId) {
     const auth = getAuth();
     const usuarioActual = auth.currentUser;
@@ -2664,8 +2666,89 @@ async function editarRegistro(registroId) {
         }
     }
 }
+//////////////////////////
+///// Eliminar registro //
+/////////////////////////
+async function eliminarRegistro(registroId) {
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esta acción",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, eliminar'
+    });
 
+    if (result.isConfirmed) {
+        try {
+            // Eliminar el registro de Firestore
+            await deleteDoc(doc(db, 'registros', registroId));
+            
+            // Mostrar notificación de éxito
+            Swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success');
+            
+            // Recargar los registros después de la eliminación
+            cargarRegistrosPorUsuario();
+        } catch (error) {
+            console.error('Error al eliminar registro:', error);
+            Swal.fire('Error', 'No se pudo eliminar el registro', 'error');
+        }
+    }
+}
 
+window.eliminarRegistro = eliminarRegistro;
+// Función para abrir el modal de registro manual
+async function abrirModalRegistroManual() {
+    try {
+        const { value: formValues } = await Swal.fire({
+            title: 'Registro Manual',
+            html: `
+                <div class="swal-form">
+                    <label>Seleccionar Usuario:</label>
+                    <select id="swal-usuario" class="swal2-select" required>
+                        <option value="">Seleccione un usuario</option>
+                        <!-- Se llenará dinámicamente -->
+                    </select>
+                    <label>Tipo de Registro:</label>
+                    <select id="swal-tipo-registro" class="swal2-select" required>
+                        <option value="">Seleccionar tipo</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="salida">Salida</option>
+                        <option value="incidencia">Incidencia</option>
+                    </select>
+                    <label>Fecha y Hora:</label>
+                    <input type="datetime-local" id="swal-fecha-registro" class="swal2-input" required>
+                    <label>Justificación:</label>
+                    <textarea id="swal-justificacion" class="swal2-input" placeholder="Introduce una justificación" rows="3" required></textarea>
+                </div>
+            `,
+            focusConfirm: false,
+            preConfirm: () => {
+                return {
+                    usuario: document.getElementById('swal-usuario').value,
+                    tipoRegistro: document.getElementById('swal-tipo-registro').value,
+                    fechaRegistro: document.getElementById('swal-fecha-registro').value,
+                    justificacion: document.getElementById('swal-justificacion').value
+                };
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Guardar Registro',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (formValues) {
+            await guardarRegistroManual(formValues);
+        }
+    } catch (error) {
+        console.error('Error en registro manual:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message
+        });
+    }
+}
 // Función para guardar el registro manual
 async function guardarRegistroManual(datos) {
     try {
