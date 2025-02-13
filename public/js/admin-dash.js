@@ -1426,7 +1426,7 @@ window.modificarUsuario = async function(email) {
             console.log("Usuario actualizado correctamente");
 
             // Log de modificación
-            await addDoc(collection(db, 'logs_modificaciones'), {
+            await addDoc(collection(db, 'log_modificaciones_usuarios'), {
                 usuarioModificado: email,
                 modificadoPor: {
                     uid: userActual.uid,
