@@ -2640,6 +2640,9 @@ async function editarRegistro(registroId) {
 
         const registroData = registroSnapshot.data();
 
+        // 📌 Ajustar la fecha y hora a la zona horaria local
+        const fechaLocal = new Date(registroData.fecha.toDate().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+
         // 📌 Solicitar nuevos valores con SweetAlert
         const { value: formValues } = await Swal.fire({
             title: 'Editar Registro',
@@ -2654,7 +2657,7 @@ async function editarRegistro(registroId) {
                 </div>
                 <div class="form-group">
                     <label for="editarFecha">Fecha y Hora:</label>
-                    <input type="datetime-local" id="editarFecha" class="swal2-input form-control" value="${registroData.fecha.toDate().toISOString().slice(0, 16)}" required>
+                    <input type="datetime-local" id="editarFecha" class="swal2-input form-control" value="${fechaLocal}" required>
                 </div>
                 <div class="form-group">
                     <label for="editarComentarios">Comentarios:</label>
