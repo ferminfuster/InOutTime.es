@@ -2784,101 +2784,6 @@ async function eliminarRegistro(registroId) {
 
 
 window.eliminarRegistro = eliminarRegistro;
-// Funcion para abrir el modal de registro manual
-async function abrirModalRegistroManual() {
-    // Crear el modal dinámicamente
-    const modalHtml = `
-        <div class="modal fade" id="registroManualModal" tabindex="-1" aria-labelledby="registroManualModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="registroManualModalLabel">Registro Manual</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="registroManualForm">
-                            <div class="form-group">
-                                <label for="usuario">Seleccionar Usuario:</label>
-                                <select id="usuario" class="form-control" required>
-                                    <option value="">Seleccione un usuario</option>
-                                    <!-- Se llenará dinámicamente -->
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="tipoRegistro">Tipo de Registro:</label>
-                                <select id="tipoRegistro" class="form-control" required>
-                                    <option value="">Seleccionar tipo</option>
-                                    <option value="entrada">Entrada</option>
-                                    <option value="salida">Salida</option>
-                                    <option value="incidencia">Incidencia</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="fechaRegistro">Fecha y Hora:</label>
-                                <input type="datetime-local" id="fechaRegistro" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="justificacion">Justificación:</label>
-                                <textarea id="justificacion" class="form-control" placeholder="Introduce una justificación" rows="3" required></textarea>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" id="guardarRegistroBtn">Guardar Registro</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Insertar el modal en el body
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-    // Mostrar el modal
-    $('#registroManualModal').modal('show');
-
-    // Manejar el botón de guardar
-    document.getElementById('guardarRegistroBtn').onclick = async function() {
-        const usuario = document.getElementById('usuario').value;
-        const tipoRegistro = document.getElementById('tipoRegistro').value;
-        const fechaRegistro = document.getElementById('fechaRegistro').value;
-        const justificacion = document.getElementById('justificacion').value;
-
-        if (!usuario || !tipoRegistro || !fechaRegistro || !justificacion) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Por favor, completa todos los campos obligatorios.'
-            });
-            return;
-        }
-
-        const formValues = { usuario, tipoRegistro, fechaRegistro, justificacion };
-
-        try {
-            await guardarRegistroManual(formValues);
-            $('#registroManualModal').modal('hide');
-            Swal.fire('Registro guardado', '', 'success');
-        } catch (error) {
-            console.error('Error en registro manual:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.message
-            });
-        }
-    };
-
-    // Eliminar el modal del DOM después de cerrarlo
-    $('#registroManualModal').on('hidden.bs.modal', function () {
-        document.getElementById('registroManualModal').remove();
-    });
-}
-// Fin //
-/*
 // Función para abrir el modal de registro manual
 async function abrirModalRegistroManual() {
     try {
@@ -2930,7 +2835,7 @@ async function abrirModalRegistroManual() {
         });
     }
 }
-*/
+
 // Función para guardar el registro manual
 async function guardarRegistroManual(datos) {
     try {
