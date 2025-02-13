@@ -2811,6 +2811,7 @@ async function mostrarFormularioRegistroManual() {
 }
 
 // Función para agregar registro manual
+/*
 async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
     try {
         // Obtener referencia a la colección de usuarios
@@ -2863,6 +2864,75 @@ async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios 
         if (totalRegistros) {
             totalRegistros.textContent = parseInt(totalRegistros.textContent) + 1;
         }
+
+    } catch (error) {
+        console.error('Error al agregar registro:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo agregar el registro. Intenta nuevamente.',
+        });
+    }
+}*/
+async function agregarRegistroManual(usuarioEmail, { accion, fecha, comentarios }) {
+    try {
+        const auth = getAuth();
+        const usuarioActual = auth.currentUser;
+
+        if (!usuarioActual) {
+            Swal.fire({
+                icon: 'error',
+                title: 'No autorizado',
+                text: 'Debes estar logueado para realizar esta acción.',
+            });
+            return;
+        }
+
+        const adminEmail = usuarioActual.email; // Usuario logueado que realiza la acción
+        const usuariosRef = collection(db, "usuarios");
+        const q = query(usuariosRef, where("email", "==", usuarioEmail));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Usuario no encontrado',
+                text: 'No se pudo encontrar el usuario con el email proporcionado.',
+            });
+            return;
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
+
+        //Obtener IP del usuario que realiza la acción
+        //const ipResponse = await fetch('https://api64.ipify.org?format=json');
+        //const ipData = await ipResponse.json();
+        //const userIp = ipData.ip;
+
+        const nuevoRegistro = {
+            userId: userDoc.id,
+            accion_registro: accion,
+            fecha: Timestamp.fromDate(new Date(fecha)),
+            lugar: 'Oficina Principal',
+            email: userData.email,
+            empresa: userData.empresa,
+            nombre: userData.nombre,
+            comentarios: comentarios || '',
+            modificadoPor: adminEmail,  // Usuario logueado que hizo la modificación
+            fechaModificacion: Timestamp.now(),
+           // ipModificacion: userIp,  // IP del usuario que modifica
+        };
+
+        const docRef = await addDoc(collection(db, 'registros'), nuevoRegistro);
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro agregado',
+            text: 'El registro se agregó correctamente.',
+        });
+
+        cargarRegistrosPorUsuario();
 
     } catch (error) {
         console.error('Error al agregar registro:', error);
