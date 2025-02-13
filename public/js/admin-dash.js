@@ -2844,7 +2844,7 @@ async function abrirModalRegistroManual() {
     document.getElementById('guardarRegistroBtn').onclick = async function() {
         const usuario = document.getElementById('usuario').value;
         const tipoRegistro = document.getElementById('tipoRegistro').value;
-        = document.getElementById('fechaRegistro').value;
+        const fechaRegistro = document.getElementById('fechaRegistro').value;
         const justificacion = document.getElementById('justificacion').value;
 
         if (!usuario || !tipoRegistro || !fechaRegistro || !justificacion) {
