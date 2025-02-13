@@ -2682,20 +2682,52 @@ async function eliminarRegistro(registroId) {
 
     if (result.isConfirmed) {
         try {
+            const auth = getAuth();
+            const usuario = auth.currentUser;
+
+            if (!usuario) {
+                Swal.fire('Error', 'No se pudo identificar al usuario. Inicia sesión nuevamente.', 'error');
+                return;
+            }
+
+            // Obtener el registro antes de eliminarlo
+            const registroRef = doc(db, 'registros', registroId);
+            const registroSnapshot = await getDoc(registroRef);
+
+            if (!registroSnapshot.exists()) {
+                Swal.fire('Error', 'El registro no existe.', 'error');
+                return;
+            }
+
+            const registroData = registroSnapshot.data();
+
+            // Guardar información de la eliminación en modificaciones_registros
+            const eliminacionData = {
+                registroId: registroId,
+                accion_realizada: "eliminado",
+                fecha_modificacion: serverTimestamp(),
+                usuario_modificador: usuario.email,
+                detalles_anteriores: registroData,  // Guarda el estado antes de ser eliminado
+            };
+
+            await addDoc(collection(db, 'log_modificaciones_registros'), eliminacionData);
+
             // Eliminar el registro de Firestore
-            await deleteDoc(doc(db, 'registros', registroId));
-            
+            await deleteDoc(registroRef);
+
             // Mostrar notificación de éxito
             Swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success');
-            
+
             // Recargar los registros después de la eliminación
             cargarRegistrosPorUsuario();
+
         } catch (error) {
             console.error('Error al eliminar registro:', error);
             Swal.fire('Error', 'No se pudo eliminar el registro', 'error');
         }
     }
 }
+
 
 window.eliminarRegistro = eliminarRegistro;
 // Función para abrir el modal de registro manual
