@@ -5,87 +5,589 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmàcia Salut</title>
     <link rel="stylesheet" href="style.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
     <header>
         <h1>Farmàcia Salut</h1>
         <nav>
             <ul>
-                <li><a href="#about">Inici</a></li>
-                <li><a href="#services">Serveis</a></li>
-                <li><a href="#testimonials">Testimonis</a></li>
-                <li><a href="#location">Ubicació</a></li>
-                <li><a href="#contact">Contacte</a></li>
+                <li><a href="#qui-som">Qui som</a></li>
+                <li><a href="#missio-valors">Missió i Valors</a></li>
+				<li><a href="#medicaments">Medicaments</a></li>
+                <li><a href="#on-som">On som</a></li>
+                <li><a href="#contacte">Contacte</a></li>               
             </ul>
         </nav>
     </header>
+    
     <main>
-        <section id="about">
-            <h2>Benvinguts a Farmàcia Salut</h2>
-            <p>Som una farmàcia de confiança a Castellar del Vallès, dedicada a cuidar la teva salut i benestar. Amb anys d'experiència, la nostra propietària, Iasmina Andrada, i el seu equip estan aquí per oferir-te el millor servei i assessorament farmacèutic. Farmàcia Salut és el fruit de l'esforç i la dedicació de Iasmina Andrada, una professional amb vocació farmacèutica el camí de la qual va començar fa més de 30 anys a Romania. Des de petita, la seva curiositat per la medicina i el benestar de les persones la va portar a formar-se en el sector farmacèutic. L'any 2007, la Iasmina va emigrar a Espanya, on va trobar una nova oportunitat per desenvolupar la seva passió i ajudar la comunitat amb el seu coneixement i experiència. Després d'anys de treball en diverses farmàcies, va decidir emprendre el seu propi projecte, oferint un espai on la salut i la proximitat amb els clients fossin la prioritat. Avui, Farmàcia Salut s'ha convertit en un referent a Castellar del Vallès, destacant per la seva atenció personalitzada, productes de qualitat i un equip compromès amb el benestar dels seus clients.</p>
+        <section id="qui-som">
+            <h2><i class="fas fa-info-circle"></i> Qui som </h2>
+            <p>Som una farmàcia de confiança a Castellar del Vallès, dedicada a cuidar de la teva salut i benestar. Amb anys d'experiència, la nostra propietària, Iasmina Andrada, i el seu equip estan aquí per oferir-te el millor servei i assessorament farmacèutic.</p>
         </section>
-        
-		<section id="services">
-			<h2>Els Nostres Serveis</h2>
-			<div class="service-container">
-				<div class="service-card">
-					<i class="fas fa-pills service-icon"></i>
-					<h3>Dispensació de medicaments</h3>
-					<p>Proporcionem medicaments amb recepta i de venda lliure amb assessorament personalitzat.</p>
-				</div>
-				<div class="service-card">
-					<i class="fas fa-comments service-icon"></i>
-					<h3>Assessorament farmacèutic</h3>
-					<p>El nostre equip està disponible per respondre les teves preguntes sobre medicaments i salut.</p>
-				</div>
-				<div class="service-card">
-					<i class="fas fa-heartbeat service-icon"></i>
-					<h3>Control de salut</h3>
-					<p>Oferim serveis de control de pressió arterial i glucosa.</p>
-				</div>
-				<div class="service-card">
-					<i class="fas fa-home service-icon"></i>
-					<h3>Atenció a domicili</h3>
-					<p>Brindem atenció a clients amb mobilitat reduïda.</p>
-				</div>
-			</div>
-		</section>
-        
-		<section id="testimonials">
-			<h2>Testimonis</h2>
-			<div class="testimonial-container">
-				<div class="testimonial-card">
-					<blockquote>
-						<p>"Atenció excel·lent i productes de qualitat. Molt recomanada!"</p>
-						<cite>- Maria López</cite>
-					</blockquote>
-				</div>
-				<div class="testimonial-card">
-					<blockquote>
-						<p>"Sempre trobo el que necessito i el personal és molt amable."</p>
-						<cite>- Joan Pérez</cite>
-					</blockquote>
-				</div>
-				<div class="testimonial-card">
-					<blockquote>
-						<p>"Un lloc de confiança on sempre em sento ben atès."</p>
-						<cite>- Anna Garcia</cite>
-					</blockquote>
-				</div>
-			</div>
-		</section>
-        
-        <section id="location">
-            <h2>On Som?</h2>
+
+        <section id="missio-valors">
+            <h2><i class="fas fa-balance-scale"></i> Missió i Valors </h2>
+            <p>La nostra missió és proporcionar atenció farmacèutica de qualitat, promovent la salut i el benestar de la comunitat. Ens caracteritzem per la proximitat, la confiança i l'excel·lència en el servei.</p>
+        </section>
+
+
+		<section id="medicaments">
+            <h2><i class="fas fa-medkit"></i> Medicaments Publicitaris </h2>
+            <div>
+                <button class="tab-button active" onclick="openTab(event, 'acidesa')">Acidesa</button>
+                <button class="tab-button" onclick="openTab(event, 'dolor')">Dolor</button>
+                <button class="tab-button" onclick="openTab(event, 'aftes')">Aftes</button>
+                <button class="tab-button" onclick="openTab(event, 'refredat')">Refredat</button>
+                <button class="tab-button" onclick="openTab(event, 'tos')">Tos</button>
+                <button class="tab-button" onclick="openTab(event, 'restreñiment')">Restreñiment</button>
+                <button class="tab-button" onclick="openTab(event, 'varius')">Varius</button>
+                <button class="tab-button" onclick="openTab(event, 'hemorroides')">Hemorroides</button>
+                <button class="tab-button" onclick="openTab(event, 'vomits')">Vòmits</button>
+                <button class="tab-button" onclick="openTab(event, 'diarrea')">Diarrea</button>
+            </div>
+
+            <div id="acidesa" class="tab-content active">
+                <h3>Acidesa</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 1 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234567</td>
+                            <td>Composició: X, Format: 20 comprimits</td>
+                            <td>Per alleujar la sensació d'acidesa</td>
+                            <td>Prendre després dels àpats</td>
+                            <td>1-2 comprimits al dia</td>
+                            <td>Màxim 14 dies</td>
+                            <td>5,00 €</td>
+                            <td>No recomanat per a menors de 12 anys</td>
+                            <td>Disponible</td>
+                            <td>Evitar menjars molt grassos i picants</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 2 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234568</td>
+                            <td>Composició: Y, Format: 30 comprimits</td>
+                            <td>Per alleujar la sensació d'acidesa</td>
+                            <td>Prendre després dels àpats</td>
+                            <td>1 comprimit al dia</td>
+                            <td>Màxim 14 dies</td>
+                            <td>6,00 €</td>
+                            <td>No recomanat per a menors de 12 anys</td>
+                            <td>Disponible</td>
+                            <td>Evitar menjars molt grassos i picants</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="dolor" class="tab-content">
+                <h3>Dolor</h3>
+				                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 3 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234569</td>
+                            <td>Composició: Z, Format: 20 comprimits</td>
+                            <td>Per alleujar el dolor lleu a moderat</td>
+                            <td>Prendre amb un got d'aigua</td>
+                            <td>1-2 comprimits cada 6 hores</td>
+                            <td>Màxim 3 dies</td>
+                            <td>4,50 €</td>
+                            <td>No recomanat per a persones amb problemes hepàtics</td>
+                            <td>Disponible</td>
+                            <td>Aplicar calor local per alleujar el dolor</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 4 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234570</td>
+                            <td>Composició: A, Format: 10 comprimits</td>
+                            <td>Per alleujar el dolor muscular</td>
+                            <td>Prendre amb menjar</td>
+                            <td>1 comprimit cada 8 hores</td>
+                            <td>Màxim 5 dies</td>
+                            <td>5,50 €</td>
+                            <td>No recomanat per a persones amb al·lèrgies a l'ibuprofèn</td>
+                            <td>Disponible</td>
+                            <td>Realitzar estiraments suaus</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="aftes" class="tab-content">
+                <h3>Aftes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 5 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234571</td>
+                            <td>Composició: B, Format: Gel oral</td>
+                            <td>Per alleujar el dolor d'aftes</td>
+                            <td>Aplicar directament sobre l'afta</td>
+                            <td>3-4 vegades al dia</td>
+                            <td>Fins a la curació</td>
+                            <td>7,00 €</td>
+                            <td>No recomanat per a menors de 6 anys</td>
+                            <td>Disponible</td>
+                            <td>Evitar aliments àcids</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 6 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234572</td>
+                            <td>Composició: C, Format: 15 ml</td>
+                            <td>Per alleujar el dolor d'aftes</td>
+                            <td>Raspallar suaument la zona afectada</td>
+                            <td>2-3 vegades al dia</td>
+                            <td>Fins a la curació</td>
+                            <td>8,00 €</td>
+                            <td>No recomanat per a persones amb al·lèrgies a la seva composició</td>
+                            <td>Disponible</td>
+                            <td>Mantenir una bona higiene bucal</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="refredat" class="tab-content">
+                <h3>Refredat</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 7 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234573</td>
+                            <td>Composició: D, Format: 20 comprimits</td>
+                            <td>Per alleujar els símptomes del refredat</td>
+                            <td>Prendre amb un got d'aigua</td>
+                            <td>1 comprimit cada 8 hores</td>
+                            <td>Màxim 5 dies</td>
+                            <td>6,50 €</td>
+                            <td>No recomanat per a persones amb hipertensió</td>
+                            <td>Disponible</td>
+                            <td>Beure molta aigua i descansar</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 8 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234574</td>
+                            <td>Composició: E, Format: 10 sobres</td>
+                            <td>Per alleujar la congestió nasal</td>
+                            <td>Dissoldre en aigua calenta</td>
+                            <td>1 sobre cada 6 hores</td>
+                            <td>Màxim 3 dies</td>
+                            <td>5,00 €</td>
+                            <td>No recomanat per a menors de 12 anys</td>
+                            <td>Disponible</td>
+                            <td>Utilitzar humidificadors d'aire</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="tos" class="tab-content">
+                <h3>Tos</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 9 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234575</td>
+                            <td>Composició: F, Format: 100 ml</td>
+                            <td>Per alleujar la tos seca</td>
+                            <td>Prendre amb una cullera dosificadora</td>
+                            <td>10 ml cada 6 hores</td>
+                                                        <td>Màxim 7 dies</td>
+                            <td>7,50 €</td>
+                            <td>No recomanat per a persones amb asma</td>
+                            <td>Disponible</td>
+                            <td>Beure infusions calentes</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 10 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234576</td>
+                            <td>Composició: G, Format: 200 ml</td>
+                            <td>Per alleujar la tos productiva</td>
+                            <td>Prendre amb un got d'aigua</td>
+                            <td>15 ml cada 8 hores</td>
+                            <td>Màxim 7 dies</td>
+                            <td>8,00 €</td>
+                            <td>No recomanat per a persones amb al·lèrgies a la seva composició</td>
+                            <td>Disponible</td>
+                            <td>Mantenir-se hidratat i evitar l'exposició al fred</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="restreñiment" class="tab-content">
+                <h3>Restreñiment</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 11 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234577</td>
+                            <td>Composició: H, Format: 30 comprimits</td>
+                            <td>Per alleujar el restreñiment ocasional</td>
+                            <td>Prendre amb un got d'aigua</td>
+                            <td>1 comprimit al dia</td>
+                            <td>Màxim 7 dies</td>
+                            <td>5,00 €</td>
+                            <td>No recomanat per a persones amb obstrucció intestinal</td>
+                            <td>Disponible</td>
+                            <td>Aumentar la ingesta de fibra i líquids</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 12 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234578</td>
+                            <td>Composició: I, Format: 20 sobres</td>
+                            <td>Per alleujar el restreñiment</td>
+                            <td>Dissoldre en aigua</td>
+                            <td>1 sobre al dia</td>
+                            <td>Màxim 7 dies</td>
+                            <td>6,00 €</td>
+                            <td>No recomanat per a persones amb malalties intestinals</td>
+                            <td>Disponible</td>
+                            <td>Fer exercici regularment</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="varius" class="tab-content">
+                <h3>Varius</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 13 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234579</td>
+                            <td>Composició: J, Format: 50 ml</td>
+                            <td>Per alleujar els símptomes de varius</td>
+                            <td>Aplicar sobre la zona afectada</td>
+                            <td>2-3 vegades al dia</td>
+                            <td>Fins a la millora</td>
+                            <td>9,00 €</td>
+                            <td>No recomanat per a persones amb al·lèrgies a la seva composició</td>
+                            <td>Disponible</td>
+                            <td>Elevar les cames quan es descansa</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 14 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234580</td>
+                            <td>Composició: K, Format: 30 comprimits</td>
+                            <td>Per millorar la circulació</td>
+                            <td>Prendre amb un got d'aigua</td>
+                            <td>1 comprimit al dia</td>
+                            <td>Màxim 14 dies</td>
+                            <td>7,50 €</td>
+                            <td>No recomanat per a persones amb problemes cardíacs</td>
+                            <td>Disponible</td>
+                            <td>Evitar estar de peu durant llargs períodes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="hemorroides" class="tab-content">
+                <h3>Hemorroides</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 15 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234581</td>
+                            <td>Composició: L, Format: 30 supositoris</td>
+                            <td>Per alleujar els símptomes d'hemorroides</td>
+                            <td>Introduir un supositori al dia</td>
+                            <td>1 supositori al dia</td>
+                            <td>Màxim 7 dies</td>
+                            <td>8,50 €</td>
+                            <td>No recomanat per a persones amb al·lèrgies a la seva composició</td>
+                            <td>Disponible</td>
+                            <td>Mantenir una dieta rica en fibra</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 16 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234582</td>
+                            <td>Composició: M, Format: 50 ml</td>
+                            <td>Per alleujar el dolor i la inflamació</td>
+                            <td>Aplicar sobre la zona afectada</td>
+                            <td>2-3 vegades al dia</td>
+                            <td>Fins a la millora</td>
+                            <td>9,50 €</td>
+                            <td>No recomanat per a persones amb al·lèrgies a la seva composició</td>
+                            <td>Disponible</td>
+                            <td>                            <td>Evitar estar assegut durant llargs períodes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="vomits" class="tab-content">
+                <h3>Vòmits</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 17 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234583</td>
+                            <td>Composició: N, Format: 20 comprimits</td>
+                            <td>Per alleujar els vòmits i les nàusees</td>
+                            <td>Prendre amb un got d'aigua</td>
+                            <td>1 comprimit cada 6 hores</td>
+                            <td>Màxim 3 dies</td>
+                            <td>6,00 €</td>
+                            <td>No recomanat per a persones amb problemes hepàtics</td>
+                            <td>Disponible</td>
+                            <td>Beure líquids clars i evitar aliments greixosos</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 18 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234584</td>
+                            <td>Composició: O, Format: 10 sobres</td>
+                            <td>Per alleujar les nàusees</td>
+                            <td>Dissoldre en aigua</td>
+                            <td>1 sobre cada 8 hores</td>
+                            <td>Màxim 3 dies</td>
+                            <td>5,50 €</td>
+                            <td>No recomanat per a menors de 12 anys</td>
+                            <td>Disponible</td>
+                            <td>Evitar olors fortes i menjar en petites quantitats</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="diarrea" class="tab-content">
+                <h3>Diarrea</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producte</th>
+                            <th>CN</th>
+                            <th>Descripció</th>
+                            <th>Indicacions</th>
+                            <th>Mode d'ús</th>
+                            <th>Posologia</th>
+                            <th>Durada del tractament</th>
+                            <th>Preu</th>
+                            <th>Contraindicacions</th>
+                            <th>Estoc</th>
+                            <th>Consell no farmacològic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>Producte 19 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234585</td>
+                            <td>Composició: P, Format: 20 comprimits</td>
+                            <td>Per alleujar la diarrea</td>
+                            <td>Prendre amb un got d'aigua</td>
+                            <td>1-2 comprimits després de cada evacuació</td>
+                            <td>Màxim 2 dies</td>
+                            <td>4,00 €</td>
+                            <td>No recomanat per a persones amb infeccions intestinals</td>
+                            <td>Disponible</td>
+                            <td>Beure líquids per evitar la deshidratació</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>Producte 20 <i class="fas fa-medkit"></i></h4>
+                            </td>
+                            <td>1234586</td>
+                            <td>Composició: Q, Format: 10 sobres</td>
+                            <td>Per alleujar la diarrea</td>
+                            <td>Dissoldre en aigua</td>
+                            <td>1 sobre cada 6 hores</td>
+                            <td>Màxim 2 dies</td>
+                            <td>5,50 €</td>
+                            <td>No recomanat per a menors de 12 anys</td>
+                            <td>Disponible</td>
+                            <td>Evitar aliments grassos i picants</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section id="on-som">
+            <h2><i class="fas fa-map"></i> On som </h2>
             <p>Ens trobem a Castellar del Vallès, al carrer Suïssa 20.</p>
             <p><strong>Telèfon:</strong> 612 123 123</p>
             <img src="images/mapa.png" alt="Ubicació de la farmàcia">
         </section>
-        
-        <section id="contact">
-            <h2>Contacte</h2>
+
+        <section id="contacte">
+            <h2><i class="fas fa-phone-alt"></i> Contacte</h2>
             <form id="contactForm">
                 <label for="name">Nom:</label>
                 <input type="text" id="name" name="name" required>
@@ -99,15 +601,9 @@
                 <button type="submit">Enviar</button>
             </form>
         </section>
-		<div id="popup" class="popup">
-			<div class="popup-content">
-				<span class="close" id="closePopup">&times;</span>
-				<h2>Hola!</h2>
-				<p>Aquesta pàgina és propietat de Iasmina Andrada.</p>
-				<p>Estudiant de GM de Farmàcia a IES Castellarnau</p>
-			</div>
-		</div>
-    </main>
+
+	</main>
+
     <footer>
         <p>&copy; 2025 Farmàcia Salut - Tots els drets reservats - Creat per Iasmina Andrada Dalipi.</p>
     </footer>
