@@ -391,7 +391,7 @@ window.cargarGruposEnModal = async function() {
         querySnapshot.forEach((documento) => {
             const grupo = documento.data();
             const option = document.createElement('option');
-            option.value = documento.nombre; // ID del grupo
+            option.value = grupo.nombre; // ID del grupo
             option.textContent = grupo.nombre; // Nombre del grupo
             grupoSelect.appendChild(option);
         });
