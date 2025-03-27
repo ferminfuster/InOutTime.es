@@ -170,7 +170,7 @@ window.crearNuevoGrupo = async function(event) {
         event.target.reset();
 
         // Recargar lista de grupos (si tienes una función para ello)
-        //window.cargarGrupos(); // Asegúrate de implementar esta función
+        window.cargarGrupos(); // Asegúrate de implementar esta función
 
         // Notificación de éxito
         Swal.fire({
