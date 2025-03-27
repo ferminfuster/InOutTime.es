@@ -719,7 +719,7 @@ window.eliminarEmpresa = async function(empresaId) {
     }
 }
 
-indow.eliminarGrupo = async function(grupoId) {
+window.eliminarGrupo = async function(grupoId) {
     const result = await Swal.fire({
         title: '¿Estás seguro?',
         text: "No podrás revertir esta acción",
