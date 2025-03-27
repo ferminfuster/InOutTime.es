@@ -342,8 +342,8 @@ function obtenerLugarActual() {
 // Definir funciones globales para registrar acciones
 window.registrarEntrada = function() {
     registrarAccion('entrada');
-    const cameraInput = document.getElementById('cameraInput');
-    cameraInput.click(); // Simula un clic en el input de la cámara
+  //  const cameraInput = document.getElementById('cameraInput');
+  //  cameraInput.click(); // Simula un clic en el input de la cámara
 };
 
 window.registrarSalida = function() {
