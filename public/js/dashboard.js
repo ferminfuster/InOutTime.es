@@ -342,7 +342,8 @@ function obtenerLugarActual() {
 // Definir funciones globales para registrar acciones
 window.registrarEntrada = function() {
     registrarAccion('entrada');
-    document.getElementById('cameraInput').click();
+    const cameraInput = document.getElementById('cameraInput');
+    cameraInput.click(); // Simula un clic en el input de la cámara
 };
 
 window.registrarSalida = function() {
@@ -355,20 +356,24 @@ window.registrarIncidencia = function() {
 
 //PRUEBAS CAMARA DE FOTOS//
 // Función para registrar entrada y tomar foto
+window.registrarEntrada = function() {
+  const cameraInput = document.getElementById('cameraInput');
+  cameraInput.click(); // Simula un clic en el input de la cámara
+};
 
-  // Manejar el evento de cambio del input de la cámara
-  document.getElementById('cameraInput').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.getElementById('capturedImage');
-            img.src = e.target.result;
-            img.style.display = 'block'; // Muestra la imagen capturada
-        };
-        reader.readAsDataURL(file);
-    }
-  });
+// Manejar el evento de cambio del input de la cámara
+document.getElementById('cameraInput').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+          const img = document.getElementById('capturedImage');
+          img.src = e.target.result;
+          img.style.display = 'block'; // Muestra la imagen capturada
+      };
+      reader.readAsDataURL(file);
+  }
+});
 // CAMARA DE FOTOS //
 
 //// Mostrar Información del último registro
