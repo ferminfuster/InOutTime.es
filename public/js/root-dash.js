@@ -50,6 +50,14 @@ window.abrirModalNuevaEmpresa = function() {
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
 }
+
+window.abrirModalNuevoGrupo = function() {
+    console.log("Abriendo modal nuevo grupo");
+    const modalElement = document.getElementById('modalNuevoGrupo');
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+}
+
 ////////////////////////
 // CREAR NUEVA EMPRESA//
 ////////////////////////
