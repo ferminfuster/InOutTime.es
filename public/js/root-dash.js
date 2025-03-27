@@ -201,6 +201,7 @@ window.cargarEmpresas = async function() {
             const fila = `
                 <tr data-id="${documento.id}">
                     <td>${empresa.nombre_empresa || 'Sin nombre'}</td>
+                    <td>${empresa.grupo_empresa || 'Sin grupo'}</td>
                     <td>${empresa.CIF || 'Sin CIF'}</td>
                     <td>${empresa.email_empresa || 'No especificada'}</td>
                     <td>${empresa.responsable_empresa || 'No especificada'}</td>
