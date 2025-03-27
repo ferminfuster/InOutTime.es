@@ -49,6 +49,9 @@ window.abrirModalNuevaEmpresa = function() {
     const modalElement = document.getElementById('modalNuevaEmpresa');
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
+        
+    // Cargar grupos en el select
+        cargarGruposEnModal();
 }
 
 window.abrirModalNuevoGrupo = function() {
