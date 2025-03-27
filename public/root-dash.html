@@ -90,6 +90,9 @@
     <button class="btn btn-primary mb-3" onclick="abrirModalNuevaEmpresa()">
         Nueva Empresa
     </button>
+    <button class="btn btn-primary mb-3" onclick="abrirModalNuevoGrupo()">
+        Nuevo Grupo de Empresas
+    </button>
     <div class="table-responsive">
         <table id="empresasTable" class="table table-striped">
             <thead>
@@ -114,6 +117,23 @@
             <button class="btn btn-primary mb-3" onclick="imprimirDivGenerico(this)">Imprimir</button>
         </div>
         <div id="mobileEmpresasList" class="mobile-empresas-list"></div>
+    </div>
+
+    <!-- Tabla de Grupos de Empresas -->
+    <h3>Grupos de Empresas</h3>
+    <div class="table-responsive">
+        <table id="gruposTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre del Grupo</th>
+                    <th>Empresas Asociadas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="listaGrupos">
+                <!-- Datos de grupos se cargarán dinámicamente -->
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -268,6 +288,28 @@
                     </select>
                     
                     <button type="submit" class="btn btn-primary">Crear Empresa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nuevo Grupo de Empresas -->
+<div class="modal fade" id="modalNuevoGrupo">
+    <div class="modal-dialog modal-custom">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Grupo de Empresas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNuevoGrupo">
+                    <input type="text" class="form-control mb-2" id="nombreGrupo" placeholder="Nombre del Grupo" required>
+                    <label class="text-white">Seleccionar Empresas</label>
+                    <select multiple class="form-control mb-2" id="empresasSeleccionadas">
+                        <!-- Opciones de empresas se cargarán dinámicamente -->
+                    </select>
+                    <button type="submit" class="btn btn-primary">Crear Grupo</button>
                 </form>
             </div>
         </div>
