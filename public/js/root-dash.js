@@ -717,6 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('empresas-section')) {
         console.log("Sección de empresas encontrada, cargando empresas");
         window.cargarEmpresas();
+        window.cargarGrupos();
     }
 });
 
