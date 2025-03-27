@@ -103,7 +103,7 @@ window.crearNuevaEmpresa = async function(event) {
             tipo_contrato: periodicidad,
             fecha_expiracion: fechaExpiracion,
             tipo_licencia: tipoLicencia, // Añadido tipo de licencia
-            grupo: grupoSeleccionado // Añadir grupo seleccionado
+            grupo_empresa: grupoSeleccionado // Añadir grupo seleccionado
         });
 
         console.log("Empresa creada con ID: ", docRef.id);
