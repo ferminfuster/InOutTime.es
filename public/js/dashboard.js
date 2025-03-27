@@ -357,8 +357,8 @@ window.registrarIncidencia = function() {
 //PRUEBAS CAMARA DE FOTOS//
 // Función para registrar entrada y tomar foto
 window.registrarEntrada = function() {
-  const cameraInput = document.getElementById('cameraInput');
-  cameraInput.click(); // Simula un clic en el input de la cámara
+  //const cameraInput = document.getElementById('cameraInput');
+  //cameraInput.click(); // Simula un clic en el input de la cámara
 };
 
 // Manejar el evento de cambio del input de la cámara
