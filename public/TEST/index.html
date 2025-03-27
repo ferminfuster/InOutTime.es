@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="InOutTime: Optimiza la gestión de tu equipo con un control sencillo de entradas, salidas e incidencias.">
+    <meta name="keywords" content="control horario, gestión de personal, fichaje online, informes de trabajo">
+    <meta name="author" content="InOutTime">
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-DDB4BPZ5Z6"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+    
+          gtag('config', 'G-DDB4BPZ5Z6');
+        </script>
+        <!-- En el <head> de tu index.html -->
+    <link rel="canonical" href="https://www.inouttime.es">
+        <!-- Agregamos el favicon -->
+    <link rel="icon" href="/images/logo.ico" type="image/x-icon">
+
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:title" content="InOutTime - Control de Presencia">
+    <meta property="og:description" content="Gestiona los fichajes de tu empresa de forma sencilla">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.inouttime.es">
+    <meta property="og:image" content="https://www.inouttime.es/images/logo.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="InOutTime">
+    <meta name="twitter:description" content="Solución de control horario para empresas">
+    <title>InOutTime | Control de Horarios y Gestión de Personal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #334155;
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        header .logo img {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin: 10px 0;
+        }
+        header p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .cta-button {
+            background-color: #ff9800;
+            color: #fff;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .cta-button:hover {
+            background-color: #e68900;
+        }
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+        }
+        #cookie-banner button {
+            background-color: #ff9800;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="images/logo.png" alt="InOutTime Logo">
+        </div>
+        <div class="header-content">
+            <h1>Simplicidad que impulsa tu negocio</h1>
+            <p>Controla entradas, salidas e incidencias de manera rápida y sencilla.</p>
+            <button class="cta-button" onclick="window.location.href='login.html'">Accede al portal</button>
+        </div>
+    </header>
+
+        <!-- Botón de WhatsApp Flotante -->
+<div class="whatsapp-float">
+    <a href="https://wa.me/+34661521311" target="_blank" class="whatsapp-button">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const whatsappFloat = document.querySelector('.whatsapp-float');
+
+    // Asegúrate de que el botón sea visible al cargar la página
+    whatsappFloat.style.display = 'block'; // Asegúrate de que el botón esté visible
+
+    // Si deseas agregar alguna funcionalidad adicional, puedes hacerlo aquí
+});
+</script>
+
+
+    <section class="features">
+        <h2>¿Qué ofrecemos?</h2>
+        <div class="feature-cards">
+            <div class="card">
+                <h3>Fichajes Simplificados</h3>
+                <p>Registra entradas y salidas al instante con solo un clic.</p>
+            </div>
+            <div class="card">
+                <h3>Gestión de Incidencias</h3>
+                <p>Mantén el control de incidencias y eventos importantes.</p>
+            </div>
+            <div class="card">
+                <h3>Informes Detallados</h3>
+                <p>Accede a informes claros sobre las horas trabajadas.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <h2>Planes Flexibles</h2>
+        <div class="pricing-cards">
+            <div class="pricing-card">
+                <h3>Plan Básico</h3>
+                <p>Alta del administrador y toda la funcionalidad básica.</p>
+                <div class="price">€8.95/mes</div>
+                <div class="annual-price">€79.99/año <span class="discount">(25% ahorro)</span></div>
+            </div>
+            <div class="pricing-card">
+                <h3>Plan Estándar</h3>
+                <p>Incluye soporte por email y alta de usuarios.</p>
+                <div class="price">€13.95/mes</div>
+                <div class="annual-price">€125.99/año <span class="discount">(25% ahorro)</span></div>
+            </div>
+            <div class="pricing-card">
+                <h3>Plan Prime</h3>
+                <p>Informes personalizados y soporte telefónico.</p>
+                <div class="price">€15.95/mes</div>
+                <div class="annual-price">€139.99/año <span class="discount">(27% ahorro)</span></div>
+            </div>
+
+
+        </div>
+    </section>
+
+    <section class="contact">
+        <h2>Contáctanos</h2>
+        <form id="contactForm">
+            <input type="text" name="nombre" placeholder="Tu nombre" required>
+            <input type="email" name="email" placeholder="Tu email" required>
+            <input type="tel" name="telefono" placeholder="Tu telefono" required>
+            <textarea name="mensaje" placeholder="Tu mensaje" rows="4" required></textarea>
+            <button type="submit" class="cta-button">Enviar mensaje</button>
+        </form>
+        <p id="responseMessage" style="display:none; margin-top:10px;"></p>
+    </section>
+    
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Evita la redirección estándar del formulario
+    
+            const form = event.target;
+            const formData = new FormData(form);
+    
+            try {
+                const response = await fetch('https://formspree.io/f/xgvvggkn', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                });
+    
+                const responseMessage = document.getElementById('responseMessage');
+                if (response.ok) {
+                    responseMessage.textContent = '¡Gracias! Tu mensaje ha sido enviado con éxito.';
+                    responseMessage.style.color = 'green';
+                    form.reset(); // Limpia el formulario después de enviarlo
+                } else {
+                    responseMessage.textContent = 'Hubo un error al enviar tu mensaje. Por favor, inténtalo de nuevo.';
+                    responseMessage.style.color = 'red';
+                }
+                responseMessage.style.display = 'block';
+            } catch (error) {
+                const responseMessage = document.getElementById('responseMessage');
+                responseMessage.textContent = 'Hubo un error al enviar tu mensaje. Por favor, inténtalo más tarde.';
+                responseMessage.style.color = 'red';
+                responseMessage.style.display = 'block';
+            }
+        });
+    </script>
+
+<footer>
+    <p>&copy; <span id="currentYear"></span> InOutTime. Todos los derechos reservados. | 
+    <a href="politica_cookies.html">Política de Cookies</a></p>
+</footer>
+
+<script>
+    // Establecer el año actual
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>
+    <div id="cookie-banner">
+        <p>Este sitio web utiliza cookies para mejorar la experiencia del usuario. <a href="politica_cookies.html" style="color: #ff9800;">Leer más</a></p>
+        <button onclick="aceptarCookies()">Aceptar</button>
+    </div>
+
+    <script>
+        function aceptarCookies() {
+            document.getElementById('cookie-banner').style.display = 'none';
+            localStorage.setItem('cookiesAceptadas', 'true');
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('cookiesAceptadas') === 'true') {
+                document.getElementById('cookie-banner').style.display = 'none';
+            }
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

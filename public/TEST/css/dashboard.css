@@ -1,0 +1,423 @@
+:root {
+    --primary-color: #0ea5e9;
+    --secondary-color: #14b8a6;
+    --background-color: #1e293b;
+    --text-color: #f1f5f9;
+    --card-background: #334155;
+    --error-color: #ef4444;
+    --success-color: #22c55e;
+    --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+}
+
+.user-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    margin-right: 20px;
+}
+
+.user-info h2 {
+    margin-bottom: 5px;
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+
+.user-info p {
+    color: #94a3b8;
+}
+
+.panel-title h3 {
+    font-size: 1.8em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.fichaje-buttons button {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.secondary-actions button {
+    margin-bottom: 15px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.button i {
+    margin-right: 10px;
+}
+
+.entry-button {
+    background-color: #c8e6c9;
+    color: #1B5E20;
+    border: 1px solid #4CAF50;
+}
+
+.entry-button:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.entry-button:active {
+    background-color: #2E7D32;
+}
+
+.exit-button {
+    background-color: #ffcdd2;
+    color: #b71c1c;
+    border: 1px solid #ef5350;
+}
+
+.exit-button:hover {
+    background-color: #ef5350;
+    color: white;
+}
+
+.exit-button:active {
+    background-color: #d32f2f;
+}
+
+.incidence-button {
+    background-color: #fff3e0;
+    color: #ff8f00;
+    border: 1px solid #ffb300;
+}
+
+.incidence-button:hover {
+    background-color: #ffb300;
+    color: white;
+}
+
+.incidence-button:active {
+    background-color: #e65100;
+}
+
+.main-button {
+    background-color: #334155;
+    color: white;
+    border: 1px solid #475569;
+}
+
+.main-button:hover {
+    background-color: #475569;
+}
+
+.main-button:active {
+    background-color: #2c3e50;
+}
+.logo img {
+    width: 80px;
+    margin-bottom: 20px;
+}
+/* Modal básico */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Fijado al fondo */
+    z-index: 1; /* Asegurarse de que el modal se muestre encima de otros contenidos */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ocupa toda la pantalla */
+    height: 100%; /* Ocupa toda la pantalla */
+    overflow: auto; /* Permite desplazarse si el contenido es muy grande */
+    background-color: rgb(0, 0, 0); /* Fondo negro con opacidad */
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo con opacidad */
+}
+
+/* Estilo del contenido del modal */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Centrado vertical y horizontal */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ancho del 80% de la pantalla */
+}
+
+/* Estilo del botón de cerrar */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+/* Estilos para el formulario */
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+/* CSS Adicional */
+.user-status-container {
+    --user-status-title-color: #ffffff;
+    --user-status-entrada-bg: #c8e6c9; /* Fondo de entrada */
+    --user-status-entrada-color: #1B5E20; /* Texto de entrada */
+    --user-status-salida-bg: #ffcdd2; /* Fondo de salida */
+    --user-status-salida-color: #b71c1c; /* Texto de salida */
+    --user-status-incidencia-bg: #fff3e0; /* Fondo de incidencia */
+    --user-status-incidencia-color: #ff8f00; /* Texto de incidencia */
+
+    /* Quitamos el fondo gris */
+    background-color: transparent; 
+    border: none; /* Eliminamos bordes, si es necesario */
+    
+    box-shadow: none; /* Quitamos posibles sombras */
+}
+
+.user-status-element {
+    padding: 10px;
+    
+    font-size: 1em;
+    text-align: center;
+    border-radius: 8px;
+    display: block;
+    width: 100%; /* Se asegura que el ancho sea correcto */
+    font-weight: bold;
+
+}
+
+.user-status-element span {
+    display: block;
+}
+
+.status-entrada {
+    background-color: var(--user-status-entrada-bg);
+    color: var(--user-status-entrada-color);
+    border: 1px solid #4CAF50;
+}
+
+.status-salida {
+    background-color: var(--user-status-salida-bg);
+    color: var(--user-status-salida-color);
+    border: 1px solid #ef5350;
+}
+
+.status-incidencia {
+    background-color: var(--user-status-incidencia-bg);
+    color: var(--user-status-incidencia-color);
+    border: 1px solid #ffb300;
+}
+
+/* Estilos para el div que actuará como botón */
+#horasTrabajadasHoy {
+    display: block; /* Asegura que se comporte como un bloque en línea */
+    padding: 12px; /* Espaciado interno del "botón" */
+    color: white; /* Color del texto */
+    text-align: center; /* Centra el texto */
+    font-size: 1.2em; /* Tamaño del texto */
+    border: none; /* Eliminar bordes por defecto */
+    border-radius: 5px; /* Bordes redondeados */
+    background-color: transparent; 
+    border: none; /* Eliminamos bordes, si es necesario */
+    box-shadow: none; /* Quitamos posibles sombras */
+  }
+
+  /* Estilo adicional para el texto dentro */
+  #horasHoy {
+    font-weight: bold; /* Resaltar el texto de las horas trabajadas */
+  }
+  
+  /* Incidencia modal*/
+  .incidenciamodal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.incidenciamodal .modal-content {
+    background-color: var(--card-background);
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.incidenciamodal .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: var(--text-color);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.incidenciamodal .close:hover {
+    color: var(--primary-color);
+}
+
+.incidenciamodal h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.incidenciamodal .input-group {
+    margin-bottom: 15px;
+}
+
+.incidenciamodal .input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.incidenciamodal .input-group input,
+.incidenciamodal .input-group select,
+.incidenciamodal .input-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+.incidenciamodal .input-group input:focus,
+.incidenciamodal .input-group select:focus,
+.incidenciamodal .input-group textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.incidenciamodal .input-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.incidenciamodal .button {
+    width: 100%;
+    padding: 12px;
+    background: var(--gradient-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.incidenciamodal .button:hover {
+    transform: translateY(-3px);
+    opacity: 0.9;
+}
+
+.incidenciamodal .input-group[type="file"] {
+    position: relative;
+    overflow: hidden;
+}
+
+.incidenciamodal .input-group[type="file"] input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.incidenciamodal .input-group[type="file"]::before {
+    content: 'Seleccionar archivo';
+    display: inline-block;
+    background: var(--card-background);
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 10px;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+}
+
+.incidenciamodal .input-group[type="file"]:hover::before {
+    background-color: var(--background-color);
+}

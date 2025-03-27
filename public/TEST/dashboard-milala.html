@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InOutTime - Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="js/dashboard.js"></script>
+        <!-- Agregamos el favicon -->
+    <link rel="icon" href="/images/logo.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <!-- Cabecera de usuario -->
+        <div class="user-header">
+            <div class="logo">
+                <img src="images/logo.png" alt="InOutTime Logo">
+            </div>
+            <div class="user-info">
+                <h2 id="nombreUser">Cargando...</h2>
+                <p id="emailUser">Cargando...</p>
+                <p id="empresaUser">Cargando...</p>
+            </div>
+
+        </div>
+
+        <!-- Panel de Usuario -->
+        <div class="panel-title">
+            <h2>==  Milala.es == </h2>             
+        </div>
+        <div class="panel-title">
+            <h3>Último Registro </h3>             
+        </div>
+        <div id="statusUser" class="user-status-container">
+            <!-- Aquí se mostrará la información de estado -->        
+        </div>
+        
+            <!-- Este div se actualizará con las horas trabajadas hoy -->
+        <div id="horasTrabajadasHoy" class="horas-trabajadas-container">
+              <h4>Horas trabajadas hoy: <span id="horasHoy">Calculando...</span></h4>
+            </div>
+        <div class="panel-title">
+            <h3>Panel de Usuario </h3>             
+        </div>
+        <div class="fichaje-buttons">
+            <button id="btnEntrada" class="button entry-button" onclick="registrarEntrada()">
+                <i class="fas fa-sign-in-alt"></i> Registrar Entrada
+            </button>
+            <button id="btnIncidencia" class="button incidence-button" onclick="registrarIncidenciaEntrada()">
+                <i class="fas fa-exclamation-triangle"></i> Incidencia de Entrada
+            </button>
+            <button id="btnSalida" class="button exit-button" onclick="registrarSalida()">
+                <i class="fas fa-sign-out-alt"></i> Registrar Salida
+            </button>
+            <button id="btnIncidencia" class="button incidence-button" onclick="registrarIncidenciaSalida()">
+                <i class="fas fa-exclamation-triangle"></i> Incidencia de Salida
+            </button>
+        </div>
+
+<!-- Input para capturar la foto -->
+<input type="file" accept="image/*" capture="environment" id="cameraInput" style="display: none;">
+<img id="capturedImage" src="" alt="Imagen Capturada" style="display: none; max-width: 100%; height: auto;">
+
+        <!-- Opciones Administrativas (solo visible para administradores) -->
+        <div id="admin-buttons" class="secondary-actions" style="display: none;">
+            <div class="panel-title">
+                <h3>Panel de administrador</h3>
+            </div>
+            <button class="button main-button" onclick="window.location.href='admin-dash.html'">
+                <i class="fas fa-user-plus"></i> Panel de administrador
+            </button>
+        </div>
+
+        
+                <!-- Modal de Mis Registros -->
+            <div id="modalMisRegistros" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" onclick="cerrarModalRegistros()">&times;</span>
+                    <h2>Mis Registros</h2>
+                    <div class="filtros-registros">
+                        <input type="date" id="fechaDesde" class="input-fecha">
+                        <input type="date" id="fechaHasta" class="input-fecha">
+                        <button onclick="cargarRegistros()" class="button main-button">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        <button onclick="exportarPDF()" class="button main-button">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
+                    </div>
+                    <div class="tabla-registros">
+                        <table id="tablaRegistros">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Acción</th>
+                                    <th>Lugar</th>
+                                    <th>Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registrosBody">
+                                <!-- Aquí se cargarán los registros -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal en Registrar Incidencia -->
+<div id="incidenciaModal" class="incidenciamodal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModalIncidencia()">&times;</span>
+      <h2>Registrar Incidencia</h2>
+      <form id="incidenciaForm">
+        <div class="input-group">
+          <label for="tipoIncidencia">Tipo de Incidencia</label>
+          <select id="tipoIncidencia" required>
+            <option value="">Seleccionar tipo</option>
+            <option value="tecnica">Incidencia Técnica</option>
+            <option value="administrativa">Incidencia Administrativa</option>
+            <option value="salud">Incidencia de Salud</option>
+            <option value="otra">Otra</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="descripcionIncidencia">Descripción detallada</label>
+          <textarea 
+            id="descripcionIncidencia" 
+            rows="4" 
+            placeholder="Describe tu incidencia en detalle..."
+            required
+          ></textarea>
+        </div>
+               <button type="submit" class="button main-button">Enviar Incidencia</button>
+      </form>
+    </div>
+  </div>
+
+    </div>
+    <footer>
+        <p>&copy; <span id="currentYear"></span> InOutTime. Todos los derechos reservados. | 
+        <a href="politica_cookies.html">Política de Cookies</a></p>
+    </footer>
+    
+    <script>
+        // Establecer el año actual
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

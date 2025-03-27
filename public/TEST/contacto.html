@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contacta con InOutTime para soporte y consultas">
+    <meta name="keywords" content="contacto, soporte, InOutTime, atención al cliente">
+    <meta name="author" content="InOutTime">
+    <link rel="canonical" href="https://www.inouttime.es/contacto">
+    <link rel="icon" href="/images/logo.ico" type="image/x-icon">
+
+            <!-- Google tag (gtag.js) -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-DDB4BPZ5Z6"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+        
+              gtag('config', 'G-DDB4BPZ5Z6');
+            </script>
+
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:title" content="Contacto - InOutTime">
+    <meta property="og:description" content="Ponte en contacto con el equipo de InOutTime">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.inouttime.es/contacto">
+    <meta property="og:image" content="https://www.inouttime.es/images/logo.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contacto - InOutTime">
+    <meta name="twitter:description" content="Contacta con nuestro equipo de soporte">
+    
+    <title>InOutTime | Contacto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #334155;
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        header .logo img {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin: 10px 0;
+        }
+        header p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .contact-info {
+            background-color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .contact-details {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .contact-details div {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">
+            <img src="images/logo.png" alt="InOutTime Logo">
+        </a>
+        <div class="header-content">
+            <h1>Optimiza la gestión de tu equipo</h1>
+            <p>Controla entradas, salidas e incidencias de manera rápida y sencilla.</p>
+        </div>
+    </header>
+
+    <section class="features">
+        <h2>Contáctanos</h2>
+        <div class="feature-cards">
+            <div class="card">
+                <h3>Email</h3>
+                <p>info@inouttime.es</p>
+            </div>
+            <div class="card">
+                <h3>Teléfono</h3>
+                <p>661521311</p>
+            </div>
+            <div class="card">
+                <h3>Web</h3>
+                <p>www.inouttime.es</p>
+            </div>
+        </div>
+    </section>
+
+        <section class="contact">
+            <h2>Envíanos un Mensaje</h2>
+            <form id="contactForm">
+                <input type="text" name="nombre" placeholder="Tu nombre" required>
+                <input type="email" name="email" placeholder="Tu email" required>
+                <input type="tel" name="telefono" placeholder="Tu telefono" required>
+                <textarea name="mensaje" placeholder="Tu mensaje" rows="4" required></textarea>
+                <button type="submit" class="cta-button">Enviar mensaje</button>
+            </form>
+            <p id="responseMessage" style="display:none; margin-top:10px;"></p>
+        </section>
+    </section>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Evita la redirección estándar del formulario
+    
+            const form = event.target;
+            const formData = new FormData(form);
+    
+            try {
+                const response = await fetch('https://formspree.io/f/xgvvggkn', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                });
+    
+                const responseMessage = document.getElementById('responseMessage');
+                if (response.ok) {
+                    responseMessage.textContent = '¡Gracias! Tu mensaje ha sido enviado con éxito.';
+                    responseMessage.style.color = 'green';
+                    form.reset(); // Limpia el formulario después de enviarlo
+                } else {
+                    responseMessage.textContent = 'Hubo un error al enviar tu mensaje. Por favor, inténtalo de nuevo.';
+                    responseMessage.style.color = 'red';
+                }
+                responseMessage.style.display = 'block';
+            } catch (error) {
+                const responseMessage = document.getElementById('responseMessage');
+                responseMessage.textContent = 'Hubo un error al enviar tu mensaje. Por favor, inténtalo más tarde.';
+                responseMessage.style.color = 'red';
+                responseMessage.style.display = 'block';
+            }
+        });
+    </script>
+
+    <footer>
+        <p>&copy; 2025 InOutTime. Todos los derechos reservados. | 
+        <a href="politica_cookies.html">Política de Cookies</a></p>
+    </footer>
+
+    <div id="cookie-banner">
+        <p>Este sitio web utiliza cookies para mejorar la experiencia del usuario. <a href="politica_cookies.html" style="color: #ff9800;">Leer más</a></p>
+        <button onclick="aceptarCookies()">Aceptar</button>
+    </div>
+
+    <script>
+        function aceptarCookies() {
+            document.getElementById('cookie-banner').style.display = 'none';
+            localStorage.setItem('cookiesAceptadas', 'true');
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('cookiesAceptadas') === 'true') {
+                document.getElementById('cookie-banner').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
