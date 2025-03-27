@@ -138,6 +138,67 @@ window.crearNuevaEmpresa = async function(event) {
     }
 }
 
+// Función para crear un nuevo grupo de empresas
+window.crearNuevoGrupo = async function(event) {
+    event.preventDefault();
+    
+    // Obtener valores del formulario
+    const nombreGrupo = document.getElementById('nombreGrupo').value;
+    const descripcionGrupo = document.getElementById('descripcionGrupo').value;
+    const gestorGrupo = document.getElementById('GestorGrupo').value;
+
+    // Array para almacenar los IDs de las empresas asociadas
+    const empresasAsociadas = []; // Aquí puedes agregar lógica para seleccionar empresas
+
+    try {
+        // Añadir documento a Firestore
+        const docRef = await addDoc(collection(db, 'grupos'), {
+            nombre: nombreGrupo,
+            descripcion: descripcionGrupo,
+            gestor: gestorGrupo,
+            empresas_asociadas: empresasAsociadas // Inicialmente vacío, puedes llenarlo después
+        });
+
+        console.log("Grupo creado con ID: ", docRef.id);
+
+        // Cerrar modal
+        const modalElement = document.getElementById('modalNuevoGrupo');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
+
+        // Limpiar formulario
+        event.target.reset();
+
+        // Recargar lista de grupos (si tienes una función para ello)
+        window.cargarGrupos(); // Asegúrate de implementar esta función
+
+        // Notificación de éxito
+        Swal.fire({
+            icon: 'success',
+            title: 'Grupo Creado',
+            text: 'El grupo se ha registrado correctamente',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+    } catch (error) {
+        console.error("Error al crear grupo: ", error);
+        
+        // Notificación de error
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo crear el grupo',
+            confirmButtonText: 'Entendido'
+        });
+    }
+}
+
+// Añadir el event listener al formulario
+document.getElementById('formNuevoGrupo').addEventListener('submit', crearNuevoGrupo);
+
 // Función para calcular la fecha de expiración
 function calcularFechaExpiracion(periodicidad) {
     const fechaActual = new Date();
