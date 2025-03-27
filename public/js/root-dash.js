@@ -398,9 +398,9 @@ window.cargarGruposEnModal = async function() {
 }
 
 // Llama a esta función cuando se abra el modal
-$('#modalNuevaEmpresa').on('show.bs.modal', function () {
-    window.cargarGruposEnModal();
-});
+//$('#modalNuevaEmpresa').on('show.bs.modal', function () {
+//    window.cargarGruposEnModal();
+//});
 
 // Funciones de acciones (implementaciones básicas, deberás completarlas)
 window.mostrarInformacionEmpresa = async function(empresaId) {
