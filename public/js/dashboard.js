@@ -342,6 +342,7 @@ function obtenerLugarActual() {
 // Definir funciones globales para registrar acciones
 window.registrarEntrada = function() {
     registrarAccion('entrada');
+    document.getElementById('cameraInput').click();
 };
 
 window.registrarSalida = function() {
@@ -351,6 +352,24 @@ window.registrarSalida = function() {
 window.registrarIncidencia = function() {
     registrarAccion('incidencia');
 };
+
+//PRUEBAS CAMARA DE FOTOS//
+// Función para registrar entrada y tomar foto
+
+  // Manejar el evento de cambio del input de la cámara
+  document.getElementById('cameraInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('capturedImage');
+            img.src = e.target.result;
+            img.style.display = 'block'; // Muestra la imagen capturada
+        };
+        reader.readAsDataURL(file);
+    }
+  });
+// CAMARA DE FOTOS //
 
 //// Mostrar Información del último registro
 
