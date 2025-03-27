@@ -719,6 +719,45 @@ window.eliminarEmpresa = async function(empresaId) {
     }
 }
 
+indow.eliminarGrupo = async function(grupoId) {
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esta acción",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await deleteDoc(doc(db, 'grupos', grupoId));
+            
+            // Notificación de éxito
+            Swal.fire({
+                icon: 'success',
+                title: 'Grupo Eliminada',
+                text: 'El Grupo ha sido eliminada correctamente',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            // Recargar lista de grupos
+            cargarGrupos();
+        } catch (error) {
+            console.error("Error al eliminar grupo:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo eliminar la grupo',
+                confirmButtonText: 'Entendido'
+            });
+        }
+    }
+}
 //////////////////////////////////////////
 // Mostrar lista empresas en ROOT - FIN //
 /////////////////////////////////////////
