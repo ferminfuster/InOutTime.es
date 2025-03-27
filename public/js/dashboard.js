@@ -355,8 +355,9 @@ window.registrarIncidencia = function() {
 };
 
 //PRUEBAS CAMARA DE FOTOS//
+/*
 // Función para registrar entrada y tomar foto
-window.registrarEntrada = function() {
+//window.registrarEntrada = function() {
   //const cameraInput = document.getElementById('cameraInput');
   //cameraInput.click(); // Simula un clic en el input de la cámara
 };
@@ -375,6 +376,7 @@ document.getElementById('cameraInput').addEventListener('change', function(event
   }
 });
 // CAMARA DE FOTOS //
+*/
 
 //// Mostrar Información del último registro
 
