@@ -75,6 +75,7 @@ window.crearNuevaEmpresa = async function(event) {
     const statusInput = document.getElementById('statusEmpresa').value;
     const periodicidad = document.getElementById('periodicidadContrato').value;
     const tipoLicencia = document.getElementById('tipoLicencia').value;
+    const grupoSeleccionado = document.getElementById('grupoEmpresa').value; // Obtener grupo seleccionado
 
     // Convertir status a booleano
     const status = statusInput.toUpperCase() === 'ACTIVA' ? true : false;
@@ -98,7 +99,8 @@ window.crearNuevaEmpresa = async function(event) {
             fecha_alta: fechaAlta,
             tipo_contrato: periodicidad,
             fecha_expiracion: fechaExpiracion,
-            tipo_licencia: tipoLicencia // Añadido tipo de licencia
+            tipo_licencia: tipoLicencia, // Añadido tipo de licencia
+            grupo: grupoSeleccionado // Añadir grupo seleccionado
         });
 
         console.log("Empresa creada con ID: ", docRef.id);
@@ -369,6 +371,36 @@ window.cargarGrupos = async function() {
         `;
     }
 }
+//Cargar grupos en modal
+window.cargarGruposEnModal = async function() {
+    try {
+        const gruposRef = collection(db, 'grupos');
+        const querySnapshot = await getDocs(gruposRef);
+        
+        const grupoSelect = document.getElementById('grupoEmpresa');
+        grupoSelect.innerHTML = '<option value="">Seleccionar Grupo (opcional)</option>'; // Limpiar y agregar opción por defecto
+
+        if (querySnapshot.empty) {
+            console.log("No hay grupos en la base de datos");
+            return;
+        }
+
+        querySnapshot.forEach((documento) => {
+            const grupo = documento.data();
+            const option = document.createElement('option');
+            option.value = documento.id; // ID del grupo
+            option.textContent = grupo.nombre; // Nombre del grupo
+            grupoSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error al cargar grupos: ", error);
+    }
+}
+
+// Llama a esta función cuando se abra el modal
+$('#modalNuevaEmpresa').on('show.bs.modal', function () {
+    window.cargarGruposEnModal();
+});
 
 // Funciones de acciones (implementaciones básicas, deberás completarlas)
 window.mostrarInformacionEmpresa = async function(empresaId) {
