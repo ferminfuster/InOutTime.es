@@ -306,6 +306,69 @@ window.cargarEmpresas = async function() {
         `;
     }
 }
+//Cargar lista de grupos
+window.cargarGrupos = async function() {
+    try {
+        console.log("Iniciando carga de grupos");
+
+        const gruposRef = collection(db, 'grupos');
+        const querySnapshot = await getDocs(gruposRef);
+        
+        console.log(`Número de grupos encontrados: ${querySnapshot.size}`);
+
+        const listaGrupos = document.getElementById('listaGrupos');
+        listaGrupos.innerHTML = ''; // Limpiar lista actual
+
+        if (querySnapshot.empty) {
+            console.log("No hay grupos en la base de datos");
+            listaGrupos.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center">No hay grupos registrados</td>
+                </tr>
+            `;
+            return;
+        }
+
+        querySnapshot.forEach((documento) => {
+            const grupo = documento.data();
+            console.log("Grupo encontrado:", grupo);
+
+            const fila = `
+                <tr data-id="${documento.id}">
+                    <td>${grupo.nombre || 'Sin nombre'}</td>
+                    <td>${grupo.descripcion || 'No especificada'}</td>
+                    <td>${grupo.gestor || 'No especificado'}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-info btn-sm" 
+                                    onclick="modificarGrupo('${documento.id}')"
+                                    title="Editar Grupo">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" 
+                                    onclick="eliminarGrupo('${documento.id}')"
+                                    title="Eliminar Grupo">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            listaGrupos.insertAdjacentHTML('beforeend', fila);
+        });
+    } catch (error) {
+        console.error("Error detallado al cargar grupos: ", error);
+        
+        const listaGrupos = document.getElementById('listaGrupos');
+        listaGrupos.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center text-danger">
+                    Error al cargar grupos: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
 
 // Funciones de acciones (implementaciones básicas, deberás completarlas)
 window.mostrarInformacionEmpresa = async function(empresaId) {
